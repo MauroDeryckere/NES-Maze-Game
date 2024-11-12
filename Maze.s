@@ -34,7 +34,7 @@ INES_SRAM = 0                                                       ; 1 = batter
 .segment "TILES"
 .incbin "Tiles.chr"
 
-;.segment "VECTORS"
+.segment "VECTORS"
 ;.word nmi
 ;.word reset
 ;.word irq
