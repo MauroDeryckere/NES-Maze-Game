@@ -9,6 +9,10 @@ PPU_VRAM_ADDRESS2 = $2006
 PPU_VRAM_IO = $2007
 SPRITE_DMA = $4014
 
+; Joystick/Controller values
+JOYPAD1 = $4016
+JOYPAD2 = $4017
+
 ; Gamepad bit values
 PAD_A = $01
 PAD_B = $02
@@ -52,7 +56,63 @@ gamepad:		.res 1 ; stores the current gamepad values
 .segment "OAM"
 oam: .res 256	; sprite OAM data
 
+.segment "BSS"
+palette: .res 32 ; current palette buffer
 
+.segment "CODE"
+.proc reset
+    sei
+    lda #0
+    sta PPU_CONTROL
+    sta PPU_MASK
+    ;sta APU_DM_CONTROL
+    lda #40
+    sta JOYPAD2
+
+    cld
+    ldx #$FF
+    txs
+
+    bit PPU_STATUS
+wait_vblank:
+    bit PPU_STATUS
+    bpl wait_vblank
+
+    lda #0
+    ldx #0
+
+clear_ram:
+    sta $0000, x
+    sta $0100, x
+    sta $0200, x
+    sta $0300, x
+    sta $0400, x
+    sta $0500, x
+    sta $0600, x
+    sta $0700, x
+    inx
+    bne clear_ram
+
+    lda #255
+    ldx #0
+
+clear_oam:
+    sta oam, x
+    inx
+    inx
+    inx
+    inx
+    bne clear_oam
+
+wait_vblank2:
+    bit PPU_STATUS
+    bpl wait_vblank2
+
+    lda #%10001000
+    sta PPU_CONTROL
+
+    jmp main
+.endproc
 
 .segment "CODE"
 .proc clear_nametable
@@ -80,6 +140,23 @@ oam: .res 256	; sprite OAM data
         bne loop
     rts
 .endproc
+
+.segment "CODE"
+.proc main
+    ldx #0
+palette_loop:
+    lda default_palette, x
+    sta palette, x
+    inx
+    cpx #32
+    bcc palette_loop
+
+    jsr clear_nametable
+    
+    ;jsr ppu_update
+.endproc
+
+
 
 ;*****************************************************************
 ; Our default palette table 16 entries for tiles and 16 entries for sprites
