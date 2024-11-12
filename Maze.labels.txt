@@ -1,0 +1,8 @@
+al 008025 .default_palette
+al 00801E .loop
+al 008013 .columnloop
+al 008011 .rowloop
+al 008000 .clear_nametable
+al 000200 .oam
+al 000001 .gamepad
+al 000000 .nmi_ready

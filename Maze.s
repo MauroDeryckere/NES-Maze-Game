@@ -34,10 +34,10 @@ INES_SRAM = 0                                                       ; 1 = batter
 .segment "TILES"
 .incbin "Tiles.chr"
 
-.segment "VECTORS"
-.word nmi
-.word reset
-.word irq
+;.segment "VECTORS"
+;.word nmi
+;.word reset
+;.word irq
 
 .segment "ZEROPAGE"
 
@@ -51,3 +51,47 @@ gamepad:		.res 1 ; stores the current gamepad values
 
 .segment "OAM"
 oam: .res 256	; sprite OAM data
+
+
+
+.segment "CODE"
+.proc clear_nametable
+    lda PPU_STATUS 
+    lda #$20
+    sta PPU_VRAM_ADDRESS2
+    lda #$00
+    sta PPU_VRAM_ADDRESS2
+
+    lda #0
+    ldy #30
+    rowloop:
+        ldx #32
+        columnloop:
+            sta PPU_VRAM_IO
+            dex
+            bne columnloop
+        dey
+        bne rowloop
+
+    ldx #64
+    loop:
+        sta PPU_VRAM_IO
+        dex
+        bne loop
+    rts
+.endproc
+
+;*****************************************************************
+; Our default palette table 16 entries for tiles and 16 entries for sprites
+;*****************************************************************
+
+.segment "RODATA"
+default_palette:
+.byte $0F,$15,$26,$37 ; bg0 purple/pink
+.byte $0F,$09,$19,$29 ; bg1 green
+.byte $0F,$01,$11,$21 ; bg2 blue
+.byte $0F,$00,$10,$30 ; bg3 greyscale
+.byte $0F,$18,$28,$38 ; sp0 yellow
+.byte $0F,$14,$24,$34 ; sp1 purple
+.byte $0F,$1B,$2B,$3B ; sp2 teal
+.byte $0F,$12,$22,$32 ; sp3 marine
