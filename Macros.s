@@ -18,3 +18,13 @@
     sta PPU_VRAM_ADDRESS2
     sta PPU_VRAM_ADDRESS2
 .endmacro
+
+.macro set_Carry_to_highest_bit_A
+    cmp #%10000000
+    bmi :+
+    sec
+    jmp :++
+    :
+    clc
+    :
+.endmacro

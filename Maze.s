@@ -6,15 +6,17 @@
 ; 6502 Zero Page Memory (256 bytes)
 ;*****************************************************************
 
-nmi_ready:		.res 1 ; set to 1 to push a PPU frame update, 
-					   ;        2 to turn rendering off next NMI
-gamepad:		.res 1 ; stores the current gamepad values
+nmi_ready:		    .res 1 ; set to 1 to push a PPU frame update, 
+					       ;        2 to turn rendering off next NMI
+gamepad:		    .res 1 ; stores the current gamepad values
 
-paddr:          .res 2 ; 16-bit address pointer
+paddr:              .res 2 ; 16-bit address pointer
 
-ppu_ctl0:		.res 1 ; PPU Control Register 2 Value
+ppu_ctl0:		    .res 1 ; PPU Control Register 2 Value
 
-ppu_ctl1:		.res 1 ; PPU Control Register 2 Value
+ppu_ctl1:		    .res 1 ; PPU Control Register 2 Value
+
+byte_loop_couter:   .res 1 ; counter for the bits in map transfer
 
 .segment "OAM"
 oam: .res 256	; sprite OAM data
@@ -193,32 +195,55 @@ irq:
 	rti
 .endproc
 
+
+.segment "CODE"
+.proc display_map
+    vram_set_address (NAME_TABLE_0_ADDRESS) 
+    assign_16i paddr, map_layout    ;load map into ppu
+
+    ldy #0
+loop:
+	lda (paddr),y   ;get byte to load
+    tax
+    lda #8
+    sta byte_loop_couter
+
+    byteloop:
+    txa             ;copy x into a
+    set_Carry_to_highest_bit_A  ;rol sets bit 0 to the value of the carry flag, so we make sure the carry flag is set to the value of bit 7 to rotate correctly
+    rol             ;rotate to get the correct bit on pos 0
+    tax             ;copy current rotation back to x
+    and #%00000001  ;and with 1, to check if tile is filled
+	sta PPU_VRAM_IO ;write to ppu
+
+    dec byte_loop_couter    ;decrease counter
+    lda byte_loop_couter    ;get value into A
+    cmp #0                  ;check if 0
+    bne byteloop            ;repeat byteloop if not done with byte yet
+
+    iny
+	cpy #4
+	bne loop
+    rts
+.endproc
+
 .segment "CODE"
 .proc main
     ldx #0
 palette_loop:
-    lda default_palette, x
+    lda default_palette, x  ;load palettes
     sta palette, x
     inx
     cpx #32
     bcc palette_loop
 
     jsr ppu_off
-
     jsr clear_nametable
     
-    vram_set_address (NAME_TABLE_0_ADDRESS)
-    assign_16i paddr, welcome_txt
-    ldy #0
-loop:
-	lda (paddr),y
-	sta PPU_VRAM_IO
-	iny
-	cpy #32
-	bne loop
+    jsr display_map
 
     jsr ppu_update
-    rts
+    ;rts ;dit crasht de cpu, daarom comment ik het
 .endproc
 
 ;*****************************************************************
@@ -237,8 +262,9 @@ default_palette:
 .byte $0F,$12,$22,$32 ; sp3 marine
 
 
-welcome_txt:
-.byte 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
+map_layout:
+;.byte 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
+.byte %10101010, %10101010, %10101010, %10101010
 
 
 
