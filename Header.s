@@ -58,6 +58,7 @@ ATTRIBUTE_TABLE_0_ADDRESS	= $23C0
 NAME_TABLE_1_ADDRESS		= $2400
 ATTRIBUTE_TABLE_1_ADDRESS	= $27C0
 
+<<<<<<< HEAD
 ;MAP BUFFER DEFINES
 MAP_BUFFER_SIZE = 120
 MAP_BUFFER_ADDRESS = $00
@@ -65,6 +66,8 @@ MAP_COLUMNS = 32 ;32 bits
 MAP_ROWS = 30 
 
 
+=======
+>>>>>>> 21b5241 (Made map display on button press)
 .segment "HEADER"
 INES_MAPPER = 0                                                     ; 0 = NROM
 INES_MIRROR = 0                                                     ; 0 = horizontal mirror/1 = vertical
@@ -102,6 +105,10 @@ paddr:              .res 2 ; 16-bit address pointer
 byte_loop_couter:   .res 1 ; counter for the bits in map transfer
 
 should_show_map:    .res 1 ; temp var for testing 
+
+ppu_ctl0:		    .res 1 ; PPU Control Register 2 Value
+
+ppu_ctl1:		    .res 1 ; PPU Control Register 2 Value
 
 a_pressed_last_frame: .res 1
 
