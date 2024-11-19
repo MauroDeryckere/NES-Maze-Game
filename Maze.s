@@ -1,29 +1,4 @@
 .include "Header.s"
-
-.segment "ZEROPAGE"
-;*****************************************************************
-; 6502 Zero Page Memory (256 bytes)
-;*****************************************************************
-map_buffer:         .res 120 ; reserve memory for the map (stored as 30x32 tiles) 1 bit per tile so 960 tiles
-
-nmi_ready:		    .res 1 ; set to 1 to push a PPU frame update, 
-					       ;        2 to turn rendering off next NMI
-gamepad:		    .res 1 ; stores the current gamepad values
-
-paddr:              .res 2 ; 16-bit address pointer
-
-ppu_ctl0:		    .res 1 ; PPU Control Register 2 Value
-
-ppu_ctl1:		    .res 1 ; PPU Control Register 2 Value
-
-byte_loop_couter:   .res 1 ; counter for the bits in map transfer
-
-.segment "OAM"
-oam: .res 256	; sprite OAM data
-
-.segment "BSS"
-palette: .res 32 ; current palette buffer
-
 .include "Macros.s"
 
 .segment "CODE"
@@ -160,6 +135,8 @@ irq:
 
     bit PPU_STATUS
 	; transfer sprite OAM data using DMA
+	ldx #0
+	stx PPU_SPRRAM_ADDRESS
 	lda #>oam
 	sta SPRITE_DMA
 
@@ -185,6 +162,7 @@ irq:
 	; flag PPU update complete
 	ldx #0
 	stx nmi_ready
+ppu_update_end:
 
 	; restore registers and return
 	pla
@@ -195,6 +173,54 @@ irq:
 	rti
 .endproc
 
+.segment "CODE"
+.proc gamepad_poll
+	; strobe the gamepad to latch current button state
+	lda #1
+	sta JOYPAD1
+	lda #0
+	sta JOYPAD1
+	; read 8 bytes from the interface at $4016
+	ldx #8
+loop:
+    pha
+    lda JOYPAD1
+    ; combine low two bits and store in carry bit
+	and #%00000011
+	cmp #%00000001
+	pla
+	; rotate carry into gamepad variable
+	ror
+	dex
+	bne loop
+	sta gamepad
+	rts
+.endproc
+
+.segment "CODE"
+.proc handle_input
+    jsr gamepad_poll
+    lda gamepad
+    and #PAD_L
+    beq A_NOT_PRESSED
+        lda a_pressed_last_frame
+        cmp #01
+        beq set_a
+
+        lda #$01
+        sta should_show_map
+
+        set_a:
+        lda #$01
+        sta a_pressed_last_frame
+        jmp end_input_handle
+    A_NOT_PRESSED:
+    lda #$00
+    sta a_pressed_last_frame
+    end_input_handle:
+
+    rts
+.endproc
 
 .segment "CODE"
 .proc display_map
@@ -204,15 +230,15 @@ irq:
     vram_set_address (NAME_TABLE_0_ADDRESS) 
     assign_16i paddr, MAP_BUFFER_ADDRESS    ;load map into ppu
 
-    ldy #0
+    ldy #0          ;reset value of y
 loop:
 	lda (paddr),y   ;get byte to load
     tax
-    lda #8
+    lda #8          ;8 bits in a byte
     sta byte_loop_couter
 
     byteloop:
-    txa             ;copy x into a
+    txa             ;copy x into a to preform actions on a copy
     set_Carry_to_highest_bit_A  ;rol sets bit 0 to the value of the carry flag, so we make sure the carry flag is set to the value of bit 7 to rotate correctly
     rol             ;rotate to get the correct bit on pos 0
     tax             ;copy current rotation back to x
@@ -315,7 +341,6 @@ default_palette:
 .byte $0F,$12,$22,$32 ; sp3 marine
 
 map_layout:
-;.byte 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
 .byte %10101010, %10101010, %10101010, %10101010
 .byte %01010101, %01010101, %01010101, %01010101
 .byte %10101010, %10101010, %10101010, %10101010
