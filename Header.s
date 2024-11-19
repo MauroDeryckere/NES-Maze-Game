@@ -78,3 +78,29 @@ INES_SRAM = 0                                                       ; 1 = batter
 .word nmi
 .word reset
 .word irq
+
+.segment "ZEROPAGE"
+
+;*****************************************************************
+; 6502 Zero Page Memory (256 bytes)
+;*****************************************************************
+
+maze_buffer:        .res 120
+
+nmi_ready:		    .res 1 ; set to 1 to push a PPU frame update, 
+					       ;        2 to turn rendering off next NMI
+gamepad:		    .res 1 ; stores the current gamepad values
+
+paddr:              .res 2 ; 16-bit address pointer
+
+byte_loop_couter:   .res 1 ; counter for the bits in map transfer
+
+should_show_map:    .res 1 ; temp var for testing 
+
+a_pressed_last_frame: .res 1
+
+.segment "OAM"
+oam: .res 256	; sprite OAM data
+
+.segment "BSS"
+palette: .res 32 ; current palette buffer
