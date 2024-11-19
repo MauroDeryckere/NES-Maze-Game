@@ -5,6 +5,7 @@
 ;*****************************************************************
 ; 6502 Zero Page Memory (256 bytes)
 ;*****************************************************************
+map_buffer:         .res 120 ; reserve memory for the map (stored as 30x32 tiles) 1 bit per tile so 960 tiles
 
 nmi_ready:		    .res 1 ; set to 1 to push a PPU frame update, 
 					       ;        2 to turn rendering off next NMI
