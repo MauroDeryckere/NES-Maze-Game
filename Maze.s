@@ -14,7 +14,7 @@
 .segment "CODE"
 ; ppu_update: waits until next NMI, turns rendering on (if not already), uploads OAM, palette, and nametable update to PPU
 .proc ppu_update
-lda ppu_ctl0
+    lda ppu_ctl0
 	ora #VBLANK_NMI
 	sta ppu_ctl0
 	sta PPU_CONTROL
@@ -27,7 +27,7 @@ lda ppu_ctl0
 
 ; ppu_off: waits until next NMI, turns rendering off (now safe to write PPU directly via PPU_VRAM_IO)
 .proc ppu_off
-jsr wait_frame
+    jsr wait_frame
 	lda ppu_ctl0
 	and #%01111111
 	sta ppu_ctl0
@@ -53,7 +53,6 @@ jsr wait_frame
     ldx #$FF
     txs
 
-    bit PPU_STATUS
 wait_vblank:
     bit PPU_STATUS
     bpl wait_vblank
@@ -142,7 +141,13 @@ irq:
 	sta SPRITE_DMA
 
 	; transfer current palette to PPU
-	vram_set_address $3F00
+	lda #%10001000 ; set horizontal nametable increment
+	sta PPU_CONTROL 
+	lda PPU_STATUS
+	lda #$3F ; set PPU address to $3F00
+	sta PPU_VRAM_ADDRESS2
+	stx PPU_VRAM_ADDRESS2
+	ldx #0 ; transfer the 32 bytes to VRAM
 	ldx #0 ; transfer the 32 bytes to VRAM
 @loop:
 	lda palette, x
@@ -163,7 +168,6 @@ irq:
 	; flag PPU update complete
 	ldx #0
 	stx nmi_ready
-ppu_update_end:
 
 	; restore registers and return
 	pla
@@ -202,29 +206,37 @@ loop:
 .proc handle_input
     jsr gamepad_poll
     lda gamepad
-    and #PAD_L
+    and #PAD_A
     beq A_NOT_PRESSED
+        ;code for button press here  
         lda a_pressed_last_frame
-        cmp #01
-        beq set_a
+        bne A_NOT_PRESSED           ;check for pressed this frame
+        lda should_show_map
+        bne A_NOT_PRESSED           ;check if map is already visible
 
-        lda #$01
-        sta should_show_map
+        lda #1
+        sta should_show_map         ;set map visible
 
-        set_a:
-        lda #$01
+        jsr display_map             ;copy map to ppu
+
+        lda #1
         sta a_pressed_last_frame
-        jmp end_input_handle
+        jmp :+
     A_NOT_PRESSED:
-    lda #$00
-    sta a_pressed_last_frame
-    end_input_handle:
+        ;code for other buttons etc here
+        lda #0
+        sta a_pressed_last_frame
+    :
 
     rts
 .endproc
 
 .segment "CODE"
 .proc display_map
+    jsr ppu_off
+    jsr clear_nametable
+
+
     vram_set_address (NAME_TABLE_0_ADDRESS) 
     assign_16i paddr, map_layout    ;load map into ppu
 
@@ -250,6 +262,9 @@ loop:
     iny
 	cpy #120                ;the screen is 120 bytes in total, so check if 120 bytes have been displayed to know if we're done
 	bne loop
+
+    jsr ppu_update
+
     rts
 .endproc
 
@@ -265,11 +280,11 @@ palette_loop:
 
     jsr ppu_off
     jsr clear_nametable
-    
-    jsr display_map
-
     jsr ppu_update
-    ;rts ;dit crasht de cpu, daarom comment ik het
+mainloop:
+    jsr handle_input
+
+    jmp mainloop
 .endproc
 
 ;*****************************************************************
