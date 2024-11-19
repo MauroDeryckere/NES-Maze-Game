@@ -1,7 +1,6 @@
 .include "Header.s"
 
 .segment "ZEROPAGE"
-
 ;*****************************************************************
 ; 6502 Zero Page Memory (256 bytes)
 ;*****************************************************************
@@ -199,8 +198,11 @@ irq:
 
 .segment "CODE"
 .proc display_map
+
+    JSR run_prims_maze
+
     vram_set_address (NAME_TABLE_0_ADDRESS) 
-    assign_16i paddr, map_layout    ;load map into ppu
+    assign_16i paddr, MAP_BUFFER_ADDRESS    ;load map into ppu
 
     ldy #0
 loop:
@@ -222,7 +224,7 @@ loop:
     bne byteloop            ;repeat byteloop if not done with byte yet
 
     iny
-	cpy #120                ;the screen is 120 bytes in total, so check if 120 bytes have been displayed to know if we're done
+	cpy #MAP_BUFFER_SIZE              ;the screen is 120 bytes in total, so check if 120 bytes have been displayed to know if we're done
 	bne loop
     rts
 .endproc
@@ -246,6 +248,30 @@ palette_loop:
     ;rts ;dit crasht de cpu, daarom comment ik het
 .endproc
 
+
+;*****************************************************************
+; The main algorithm loop
+;*****************************************************************
+.segment "CODE"
+.proc run_prims_maze
+    ;choose random cell and mark as passage - for now just cell 0 marked as 1
+    LDA #%10000000
+    STA MAP_BUFFER_ADDRESS
+    rts
+.endproc
+
+
+;*****************************************************************
+; Accessing the map buffer
+;*****************************************************************
+.segment "CODE"
+.proc access_map_buffer
+    ;check bounds
+    ;not in bounds -> show somehow / return
+    ;convert bit to byte && correct bit in byte
+    ;load the value at bitIdx
+.endproc
+
 ;*****************************************************************
 ; Our default palette table 16 entries for tiles and 16 entries for sprites
 ;*****************************************************************
@@ -260,7 +286,6 @@ default_palette:
 .byte $0F,$14,$24,$34 ; sp1 purple
 .byte $0F,$1B,$2B,$3B ; sp2 teal
 .byte $0F,$12,$22,$32 ; sp3 marine
-
 
 map_layout:
 ;.byte 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0
