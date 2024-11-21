@@ -1,7 +1,9 @@
 .include "Header.s"
-
 .include "Macros.s"
 
+;*****************************************************************
+; Utility functions
+;*****************************************************************
 .segment "CODE"
 .proc wait_frame
 	inc nmi_ready
@@ -11,7 +13,6 @@
 	rts
 .endproc
 
-.segment "CODE"
 ; ppu_update: waits until next NMI, turns rendering on (if not already), uploads OAM, palette, and nametable update to PPU
 .proc ppu_update
     lda ppu_ctl0
@@ -119,12 +120,15 @@ wait_vblank2:
         bne loop
     rts
 .endproc
+;*****************************************************************
 
+;*****************************************************************
+; Interupts
+;*****************************************************************
 .segment "CODE"
 irq:
 	rti
 
-.segment "CODE"
 .proc nmi
     ;save registers
     pha
@@ -177,7 +181,34 @@ irq:
 	pla
 	rti
 .endproc
+;*****************************************************************
 
+;*****************************************************************
+; Main Gameloop
+;*****************************************************************
+.segment "CODE"
+.proc main
+    ldx #0
+palette_loop:
+    lda default_palette, x  ;load palettes
+    sta palette, x
+    inx
+    cpx #32
+    bcc palette_loop
+
+    jsr ppu_off
+    jsr clear_nametable
+    jsr ppu_update
+mainloop:
+    jsr start
+
+    jmp mainloop
+.endproc
+;*****************************************************************
+
+;*****************************************************************
+; Input
+;*****************************************************************
 .segment "CODE"
 .proc gamepad_poll
 	; strobe the gamepad to latch current button state
@@ -201,9 +232,12 @@ loop:
 	sta gamepad
 	rts
 .endproc
+;*****************************************************************
 
-.segment "CODE"
-.proc handle_input
+;*****************************************************************
+; Start
+;*****************************************************************
+.proc start
     jsr gamepad_poll
     lda gamepad
     and #PAD_A
@@ -230,15 +264,20 @@ loop:
 
     rts
 .endproc
+;*****************************************************************
 
+;*****************************************************************
+; Graohics
+;*****************************************************************
 .segment "CODE"
 .proc display_map
     jsr ppu_off
     jsr clear_nametable
 
+    JSR run_prims_maze ;temporarily do this here every frame - this is just for resting and will be moved later.
 
     vram_set_address (NAME_TABLE_0_ADDRESS) 
-    assign_16i paddr, map_layout    ;load map into ppu
+    assign_16i paddr, MAP_BUFFER_ADDRESS    ;load map into ppu
 
     ldy #0          ;reset value of y
 loop:
@@ -260,77 +299,63 @@ loop:
     bne byteloop            ;repeat byteloop if not done with byte yet
 
     iny
-	cpy #120                ;the screen is 120 bytes in total, so check if 120 bytes have been displayed to know if we're done
-	bne loop
+        cpy #MAP_BUFFER_SIZE              ;the screen is 120 bytes in total, so check if 120 bytes have been displayed to know if we're done
+        bne loop
 
     jsr ppu_update
 
     rts
 .endproc
+;*****************************************************************
 
+;*****************************************************************
+; Simple Random number generation
+;*****************************************************************
 .segment "CODE"
-.proc main
-    ldx #0
-palette_loop:
-    lda default_palette, x  ;load palettes
-    sta palette, x
-    inx
-    cpx #32
-    bcc palette_loop
+.proc random_number_generator
+RNG:
+    LDA RandomSeed  ; Load the current seed
+    ASL             ; Shift left
+    BCC NoXor       ; Branch if no carry
+    EOR #$B4        ; XOR with a feedback value (tweak as needed)
 
-    jsr ppu_off
-    jsr clear_nametable
-    jsr ppu_update
-mainloop:
-    jsr handle_input
+NoXor:
+    STA RandomSeed  ; Store the new seed
+    RTS             ; Return
 
-    jmp mainloop
+RandomSeed:
+    .byte $99     ; Initial seed value (can be anything)
+
 .endproc
-
-;*****************************************************************
-; Our default palette table 16 entries for tiles and 16 entries for sprites
 ;*****************************************************************
 
-.segment "RODATA"
-default_palette:
-.byte $0F,$15,$26,$37 ; bg0 purple/pink
-.byte $0F,$09,$19,$29 ; bg1 green
-.byte $0F,$01,$11,$21 ; bg2 blue
-.byte $0F,$00,$10,$30 ; bg3 greyscale
-.byte $0F,$18,$28,$38 ; sp0 yellow
-.byte $0F,$14,$24,$34 ; sp1 purple
-.byte $0F,$1B,$2B,$3B ; sp2 teal
-.byte $0F,$12,$22,$32 ; sp3 marine
+;*****************************************************************
+; Map buffer functions
+;*****************************************************************
+.segment "CODE"
+.proc access_map_buffer
+    ;check bounds
+    ;not in bounds -> show somehow / return
+    ;convert bit to byte && correct bit in byte
+    ;load the value at bitIdx
+.endproc
+;*****************************************************************
 
+;*****************************************************************
+; The main algorithm loop (prims)
+;*****************************************************************
+.segment "CODE"
+.proc run_prims_maze
+    ;choose random cell and mark as passage - for now just cell 0 marked as 1
+    ;LDA #%10000000
+    JSR random_number_generator
+    STA MAP_BUFFER_ADDRESS
 
-map_layout:
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
-.byte %10101010, %10101010, %10101010, %10101010
-.byte %01010101, %01010101, %01010101, %01010101
+    JSR random_number_generator
+    STA MAP_BUFFER_ADDRESS + 1
+
+    JSR random_number_generator
+    STA MAP_BUFFER_ADDRESS + 1
+    rts
+.endproc
+;*****************************************************************
