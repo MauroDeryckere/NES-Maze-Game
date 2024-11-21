@@ -287,7 +287,6 @@ mainloop:
     jmp mainloop
 .endproc
 
-
 ;*****************************************************************
 ; Simple Random number generation
 ;*****************************************************************
@@ -304,7 +303,7 @@ NoXor:
     RTS             ; Return
 
 RandomSeed:
-    .byte $77     ; Initial seed value (can be anything)
+    .byte $99     ; Initial seed value (can be anything)
 
 .endproc
 
@@ -325,58 +324,6 @@ RandomSeed:
     STA MAP_BUFFER_ADDRESS + 1
     rts
 .endproc
-
-
-;*****************************************************************
-; Accessing the map buffer
-;*****************************************************************
-.segment "CODE"
-.proc access_map_buffer
-    ;check bounds
-    ;not in bounds -> show somehow / return
-    ;convert bit to byte && correct bit in byte
-    ;load the value at bitIdx
-.endproc
-
-
-;*****************************************************************
-; Simple Random number generation
-;*****************************************************************
-.segment "CODE"
-.proc random_number_generator
-RNG:
-    LDA RandomSeed  ; Load the current seed
-    ASL             ; Shift left
-    BCC NoXor       ; Branch if no carry
-    EOR #$B4        ; XOR with a feedback value (tweak as needed)
-
-NoXor:
-    STA RandomSeed  ; Store the new seed
-    RTS             ; Return
-
-RandomSeed:
-    .byte $77     ; Initial seed value (can be anything)
-
-.endproc
-
-;*****************************************************************
-; The main algorithm loop
-;*****************************************************************
-.segment "CODE"
-.proc run_prims_maze
-    ;choose random cell and mark as passage - for now just cell 0 marked as 1
-    ;LDA #%10000000
-    JSR random_number_generator
-    STA MAP_BUFFER_ADDRESS
-
-    JSR random_number_generator
-    STA MAP_BUFFER_ADDRESS + 1
-
-    JSR random_number_generator
-    STA MAP_BUFFER_ADDRESS + 1
-    rts
-.endproc
-
 
 ;*****************************************************************
 ; Accessing the map buffer
