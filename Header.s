@@ -1,4 +1,7 @@
-; Define PPU Registers
+;*****************************************************************
+; Defines
+;*****************************************************************
+; PPU Registers
 PPU_CONTROL = $2000 ; PPU Control Register 1 (Write)
 PPU_MASK = $2001 ; PPU Control Register 2 (Write)
 PPU_STATUS = $2002; PPU Status Register (Read)
@@ -9,7 +12,7 @@ PPU_VRAM_ADDRESS2 = $2006 ; PPU VRAM Address Register 2 (Write)
 PPU_VRAM_IO = $2007 ; VRAM I/O Register (Read/Write)
 SPRITE_DMA = $4014 ; Sprite DMA Register
 
-; Define PPU control register masks
+; PPU control register masks
 NT_2000 = $00 ; nametable location
 NT_2400 = $01
 NT_2800 = $02
@@ -34,7 +37,7 @@ OBJ_OFF = $00 ; turn objects off
 OBJ_CLIP = $10 ; clip objects
 OBJ_ON = $14 ; turn objects on
 
-; Define APU Registers
+; APU Registers
 APU_DM_CONTROL = $4010 ; APU Delta Modulation Control Register (Write)
 APU_CLOCK = $4015 ; APU Sound/Vertical Clock Signal Register (Read/Write)
 
@@ -58,11 +61,12 @@ ATTRIBUTE_TABLE_0_ADDRESS	= $23C0
 NAME_TABLE_1_ADDRESS		= $2400
 ATTRIBUTE_TABLE_1_ADDRESS	= $27C0
 
-; MAP BUFFER DEFINES
+; MAP BUFFER
 MAP_BUFFER_SIZE = 120
 MAP_BUFFER_ADDRESS = $00
 MAP_COLUMNS = 32 ;32 bits
 MAP_ROWS = 30 
+;*****************************************************************
 
 .segment "HEADER"
 INES_MAPPER = 0                                                     ; 0 = NROM
@@ -84,12 +88,10 @@ INES_SRAM = 0                                                       ; 1 = batter
 .word reset
 .word irq
 
-.segment "ZEROPAGE"
-
 ;*****************************************************************
 ; 6502 Zero Page Memory (256 bytes)
 ;*****************************************************************
-
+.segment "ZEROPAGE"
 maze_buffer:        .res 120
 
 nmi_ready:		    .res 1 ; set to 1 to push a PPU frame update, 
@@ -107,9 +109,25 @@ ppu_ctl0:		    .res 1 ; PPU Control Register 2 Value
 ppu_ctl1:		    .res 1 ; PPU Control Register 2 Value
 
 a_pressed_last_frame: .res 1
+;*****************************************************************
 
 .segment "OAM"
 oam: .res 256	; sprite OAM data
 
 .segment "BSS"
 palette: .res 32 ; current palette buffer
+
+;*****************************************************************
+; Our default palette table 16 entries for tiles and 16 entries for sprites
+;*****************************************************************
+.segment "RODATA"
+default_palette:
+.byte $0F,$15,$26,$37 ; bg0 purple/pink
+.byte $0F,$09,$19,$29 ; bg1 green
+.byte $0F,$01,$11,$21 ; bg2 blue
+.byte $0F,$00,$10,$30 ; bg3 greyscale
+.byte $0F,$18,$28,$38 ; sp0 yellow
+.byte $0F,$14,$24,$34 ; sp1 purple
+.byte $0F,$1B,$2B,$3B ; sp2 teal
+.byte $0F,$12,$22,$32 ; sp3 marine
+;*****************************************************************
