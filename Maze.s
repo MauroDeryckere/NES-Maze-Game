@@ -230,7 +230,7 @@ loop:
 	DEX
 	BNE loop
 	STA gamepad
-	RTA
+	RTS
 .endproc
 ;*****************************************************************
 
@@ -267,7 +267,7 @@ loop:
 ;*****************************************************************
 
 ;*****************************************************************
-; Graohics
+; Graphics
 ;*****************************************************************
 .segment "CODE"
 .proc display_map
@@ -296,7 +296,7 @@ loop:
 
     DEC byte_loop_couter    ;decrease counter
     LDA byte_loop_couter    ;get value into A
-    DNE byteloop            ;repeat byteloop if not done with byte yet
+    BNE byteloop            ;repeat byteloop if not done with byte yet
 
     INY
         CPY #MAP_BUFFER_SIZE              ;the screen is 120 bytes in total, so check if 120 bytes have been displayed to know if we're done
