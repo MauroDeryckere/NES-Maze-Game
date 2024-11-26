@@ -28,7 +28,6 @@
     clc
     :
 .endmacro
-
 ;page 0 - 3
 .macro remove_from_Frontier page, offset
 
@@ -36,10 +35,27 @@ LDA page
 CMP #0
 BNE :+
 
+; Calculate the address of the last item in the list
+LDA frontier_listQ1_size
+
+TAX
+DEX
+TXA
+
+ASL
+
+CLC 
+ADC #<FRONTIER_LISTQ1       ; Add the low byte of FRONTIER_LIST_ADDRESS.
+STA tempPadrToLast             ; Store the low byte of the calculated address.
+
+LDA #>FRONTIER_LISTQ1      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+ADC #$00              ; Add carry if crossing a page boundary.
+STA tempPadrToLast+1  
+
+; Calculate the address to be removed
 LDA offset
 ASL
 
-; Calculate the address
 CLC 
 ADC #<FRONTIER_LISTQ1       ; Add the low byte of FRONTIER_LIST_ADDRESS.
 STA paddr             ; Store the low byte of the calculated address.
@@ -48,15 +64,25 @@ LDA #>FRONTIER_LISTQ1      ; Load the high byte of FRONTIER_LIST_ADDRESS.
 ADC #$00              ; Add carry if crossing a page boundary.
 STA paddr+1  
 
-;temporarily just clear what is on this location
+;write the last values to the location to be removed
+LDY #0
+LDA (tempPadrToLast),Y
+STA (paddr),Y 
+
+LDY #$1
+LDA (tempPadrToLast),Y
+STA (paddr),Y
+
+;clear the last values
 LDA #0
 LDY #0
-STA (paddr),Y 
+STA (tempPadrToLast),Y 
 
 LDA #0
 LDY #$1
-STA (paddr),Y
+STA (tempPadrToLast),Y
 
+DEC frontier_listQ1_size
 
 JMP :+
 

@@ -254,14 +254,16 @@ palette_loop:
     add_to_Frontier #$0, #$0
     
     ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
+    add_to_Frontier #$11, #$11
+    add_to_Frontier #$22, #$22
+    add_to_Frontier #$33, #$33
+    add_to_Frontier #$44, #$44
+    add_to_Frontier #$55, #$55
+    add_to_Frontier #$66, #$66
+    add_to_Frontier #$77, #$77
+    add_to_Frontier #$88, #$88
+
+    add_to_Frontier #$99, #$99
 
     remove_from_Frontier #0, #2
 

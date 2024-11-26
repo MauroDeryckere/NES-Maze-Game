@@ -124,6 +124,8 @@ frontier_listQ2_size:	.res 1
 frontier_listQ3_size:	.res 1
 frontier_listQ4_size:	.res 1
 
+tempPadrToLast: 		.res 2 ;last item in address for a given quarter, used for the remove from list macro
+
 ;*****************************************************************
 
 .segment "OAM"
