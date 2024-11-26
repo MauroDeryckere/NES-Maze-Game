@@ -246,6 +246,7 @@ palette_loop:
     JSR clear_nametable
     JSR ppu_update
 
+    ;set an initial randomseed value
     LDA #$42
     STA RandomSeed
     
@@ -261,7 +262,7 @@ palette_loop:
     ;add_to_Frontier #$39, #$05
     ;add_to_Frontier #$18, #$47
     ;add_to_Frontier #$57, #$38
-    
+
     RTS
 .endproc
 
