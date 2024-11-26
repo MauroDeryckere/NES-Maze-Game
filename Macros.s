@@ -29,6 +29,41 @@
     :
 .endmacro
 
+;page 0 - 3
+.macro remove_from_Frontier page, offset
+
+LDA page
+CMP #0
+BNE :+
+
+LDA offset
+ASL
+
+; Calculate the address
+CLC 
+ADC #<FRONTIER_LISTQ1       ; Add the low byte of FRONTIER_LIST_ADDRESS.
+STA paddr             ; Store the low byte of the calculated address.
+
+LDA #>FRONTIER_LISTQ1      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+ADC #$00              ; Add carry if crossing a page boundary.
+STA paddr+1  
+
+;temporarily just clear what is on this location
+LDA #0
+LDY #0
+STA (paddr),Y 
+
+LDA #0
+LDY #$1
+STA (paddr),Y
+
+
+JMP :+
+
+:
+;next page
+.endmacro
+
 .macro add_to_Frontier byteID, bitID
 ;multiply by 2, 2 bytes required per element in list
 LDA frontier_listQ1_size

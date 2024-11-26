@@ -254,14 +254,16 @@ palette_loop:
     add_to_Frontier #$0, #$0
     
     ;16
-    ;add_to_Frontier #$42, #$35
-    ;add_to_Frontier #$39, #$05
-    ;add_to_Frontier #$18, #$47
-    ;add_to_Frontier #$57, #$38
-    ;add_to_Frontier #$42, #$35
-    ;add_to_Frontier #$39, #$05
-    ;add_to_Frontier #$18, #$47
-    ;add_to_Frontier #$57, #$38
+    add_to_Frontier #$42, #$35
+    add_to_Frontier #$39, #$05
+    add_to_Frontier #$18, #$47
+    add_to_Frontier #$57, #$38
+    add_to_Frontier #$42, #$35
+    add_to_Frontier #$39, #$05
+    add_to_Frontier #$18, #$47
+    add_to_Frontier #$57, #$38
+
+    remove_from_Frontier #0, #2
 
     RTS
 .endproc
