@@ -188,20 +188,8 @@ irq:
 ;*****************************************************************
 .segment "CODE"
 .proc main
-    LDX #0
-palette_loop:
-    LDA default_palette, x  ;load palettes
-    STA palette, x
-    INX
-    CPX #32
-    BCC palette_loop
 
-    JSR ppu_off
-    JSR clear_nametable
-    JSR ppu_update
-
-    LDA #$42
-    STA RandomSeed
+JSR Init
 
 mainloop:
     LDA has_generation_started
@@ -242,7 +230,31 @@ loop:
 ;*****************************************************************
 
 ;*****************************************************************
+; Init
+;*****************************************************************
+.segment "CODE"
+.proc Init
+    LDX #0
+palette_loop:
+    LDA default_palette, x  ;load palettes
+    STA palette, x
+    INX
+    CPX #32
+    BCC palette_loop
+
+    JSR ppu_off
+    JSR clear_nametable
+    JSR ppu_update
+
+    LDA #$42
+    STA RandomSeed
+
+    RTS
+.endproc
+
+;*****************************************************************
 ; Start
+;       Gets called until the generation of the maze starts
 ;*****************************************************************
 .proc start
     JSR gamepad_poll
