@@ -67,10 +67,12 @@ MAP_BUFFER_ADDRESS = $00
 MAP_COLUMNS = 32 ;32 bits
 MAP_ROWS = 30 
 
-FRONTIER_LIST_ADDRESS = $0320
-FRONTIER_LIST_Q1 = $0500
-FRONTIER_LIST_HALFWAY = $0504
-FRONTIER_LIST_CAPACITY = 0964
+FRONTIER_LISTQ1 = $0320
+FRONTIER_LISTQ2 = $041E
+FRONTIER_LISTQ3 = $051C
+FRONTIER_LISTQ4 = $061A
+
+FRONTIER_LIST_CAPACITY = 0960
 ;*****************************************************************
 
 .segment "HEADER"
@@ -115,7 +117,13 @@ ppu_ctl1:		    	.res 1 ; PPU Control Register 2 Value
 
 a_pressed_last_frame: 	.res 1
 
-RandomSeed:				.res 1 ; Initial seed value (can be anything)
+RandomSeed:				.res 1 ; Initial seed value
+
+frontier_listQ1_size:	.res 1
+frontier_listQ2_size:	.res 1
+frontier_listQ3_size:	.res 1
+frontier_listQ4_size:	.res 1
+
 ;*****************************************************************
 
 .segment "OAM"

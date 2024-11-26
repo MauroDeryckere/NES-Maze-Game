@@ -249,164 +249,19 @@ palette_loop:
     LDA #$42
     STA RandomSeed
     
+    ;choose a first frontier cell, does not matter which one (can be made random in future)
+    add_to_Frontier #$0, #$0
+    
     ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-
-        ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-
-    ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-
- ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-
-     ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38 
-    ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-
-         ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38 
-    ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-         ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38 
-    ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-         ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38 
-    ;16
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
-    add_to_Frontier #$42, #$35
-    add_to_Frontier #$39, #$05
-    add_to_Frontier #$18, #$47
-    add_to_Frontier #$57, #$38
+    ;add_to_Frontier #$42, #$35
+    ;add_to_Frontier #$39, #$05
+    ;add_to_Frontier #$18, #$47
+    ;add_to_Frontier #$57, #$38
+    ;add_to_Frontier #$42, #$35
+    ;add_to_Frontier #$39, #$05
+    ;add_to_Frontier #$18, #$47
+    ;add_to_Frontier #$57, #$38
+    
     RTS
 .endproc
 
