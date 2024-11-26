@@ -92,23 +92,25 @@ INES_SRAM = 0                                                       ; 1 = batter
 ; 6502 Zero Page Memory (256 bytes)
 ;*****************************************************************
 .segment "ZEROPAGE"
-maze_buffer:        .res 120
+maze_buffer:        	.res 120
 
-nmi_ready:		    .res 1 ; set to 1 to push a PPU frame update, 
+nmi_ready:		    	.res 1 ; set to 1 to push a PPU frame update, 
 					       ;        2 to turn rendering off next NMI
-gamepad:		    .res 1 ; stores the current gamepad values
+gamepad:		    	.res 1 ; stores the current gamepad values
 
-paddr:              .res 2 ; 16-bit address pointer
+paddr:              	.res 2 ; 16-bit address pointer
 
-byte_loop_couter:   .res 1 ; counter for the bits in map transfer
+byte_loop_couter:   	.res 1 ; counter for the bits in map transfer
 
-should_show_map:    .res 1 ; temp var for testing 
+has_generation_started: .res 1 
 
-ppu_ctl0:		    .res 1 ; PPU Control Register 2 Value
+ppu_ctl0:		    	.res 1 ; PPU Control Register 2 Value
 
-ppu_ctl1:		    .res 1 ; PPU Control Register 2 Value
+ppu_ctl1:		    	.res 1 ; PPU Control Register 2 Value
 
-a_pressed_last_frame: .res 1
+a_pressed_last_frame: 	.res 1
+
+RandomSeed:				.res 1 ; Initial seed value (can be anything)
 ;*****************************************************************
 
 .segment "OAM"

@@ -199,8 +199,15 @@ palette_loop:
     JSR ppu_off
     JSR clear_nametable
     JSR ppu_update
+
+    LDA #$42
+    STA RandomSeed
+
 mainloop:
-    JSR start
+    LDA has_generation_started
+    BNE :+
+        JSR start
+    :
 
     JMP mainloop
 .endproc
@@ -245,11 +252,9 @@ loop:
         ;code for button press here  
         lda a_pressed_last_frame
         bne A_NOT_PRESSED           ;check for pressed this frame
-        lda should_show_map
-        bne A_NOT_PRESSED           ;check if map is already visible
 
         lda #1
-        sta should_show_map         ;set map visible
+        sta has_generation_started         ;set map visible
 
         jsr display_map             ;copy map to ppu
 
@@ -261,6 +266,10 @@ loop:
         lda #0
         sta a_pressed_last_frame
     :
+
+    LDX RandomSeed
+    INX
+    STX RandomSeed   
 
     rts
 .endproc
@@ -323,8 +332,7 @@ NoXor:
     STA RandomSeed  ; Store the new seed
     RTS             ; Return
 
-RandomSeed:
-    .byte $99     ; Initial seed value (can be anything)
+
 
 .endproc
 ;*****************************************************************
