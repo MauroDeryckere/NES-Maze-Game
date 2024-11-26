@@ -31,339 +31,339 @@
 ;page 0 - 3
 .macro remove_from_Frontier page, offset
 
-LDA page
-CMP #0
-BNE :+
+    LDA page
+    CMP #0
+    BNE :+
 
-; Calculate the address of the last item in the list
-LDA frontier_listQ1_size
+    ; Calculate the address of the last item in the list
+    LDA frontier_listQ1_size
 
-TAX
-DEX
-TXA
+    TAX
+    DEX
+    TXA
 
-ASL
+    ASL
 
-CLC 
-ADC #<FRONTIER_LISTQ1       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-STA tempPadrToLast             ; Store the low byte of the calculated address.
+    CLC 
+    ADC #<FRONTIER_LISTQ1       ; Add the low byte of FRONTIER_LIST_ADDRESS.
+    STA tempPadrToLast             ; Store the low byte of the calculated address.
 
-LDA #>FRONTIER_LISTQ1      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-ADC #$00              ; Add carry if crossing a page boundary.
-STA tempPadrToLast+1  
+    LDA #>FRONTIER_LISTQ1      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+    ADC #$00              ; Add carry if crossing a page boundary.
+    STA tempPadrToLast+1  
 
-; Calculate the address to be removed
-LDA offset
-ASL
+    ; Calculate the address to be removed
+    LDA offset
+    ASL
 
-CLC 
-ADC #<FRONTIER_LISTQ1       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-STA paddr             ; Store the low byte of the calculated address.
+    CLC 
+    ADC #<FRONTIER_LISTQ1       ; Add the low byte of FRONTIER_LIST_ADDRESS.
+    STA paddr             ; Store the low byte of the calculated address.
 
-LDA #>FRONTIER_LISTQ1      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-ADC #$00              ; Add carry if crossing a page boundary.
-STA paddr+1  
+    LDA #>FRONTIER_LISTQ1      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+    ADC #$00              ; Add carry if crossing a page boundary.
+    STA paddr+1  
 
-;write the last values to the location to be removed
-LDY #0
-LDA (tempPadrToLast),Y
-STA (paddr),Y 
+    ;write the last values to the location to be removed
+    LDY #0
+    LDA (tempPadrToLast),Y
+    STA (paddr),Y 
 
-LDY #$1
-LDA (tempPadrToLast),Y
-STA (paddr),Y
+    LDY #$1
+    LDA (tempPadrToLast),Y
+    STA (paddr),Y
 
-;clear the last values
-LDA #0
-LDY #0
-STA (tempPadrToLast),Y 
+    ;clear the last values
+    LDA #0
+    LDY #0
+    STA (tempPadrToLast),Y 
 
-LDA #0
-LDY #$1
-STA (tempPadrToLast),Y
+    LDA #0
+    LDY #$1
+    STA (tempPadrToLast),Y
 
-DEC frontier_listQ1_size
-JMP :+
+    DEC frontier_listQ1_size
+    JMP :+
 
-:
-CMP #1
-BNE :+
+    :
+    CMP #1
+    BNE :+
 
-; Calculate the address of the last item in the list
-LDA frontier_listQ2_size
+    ; Calculate the address of the last item in the list
+    LDA frontier_listQ2_size
 
-TAX
-DEX
-TXA
+    TAX
+    DEX
+    TXA
 
-ASL
+    ASL
 
-CLC 
-ADC #<FRONTIER_LISTQ2       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-STA tempPadrToLast             ; Store the low byte of the calculated address.
+    CLC 
+    ADC #<FRONTIER_LISTQ2       ; Add the low byte of FRONTIER_LIST_ADDRESS.
+    STA tempPadrToLast             ; Store the low byte of the calculated address.
 
-LDA #>FRONTIER_LISTQ2      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-ADC #$00              ; Add carry if crossing a page boundary.
-STA tempPadrToLast+1  
+    LDA #>FRONTIER_LISTQ2      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+    ADC #$00              ; Add carry if crossing a page boundary.
+    STA tempPadrToLast+1  
 
-; Calculate the address to be removed
-LDA offset
-ASL
+    ; Calculate the address to be removed
+    LDA offset
+    ASL
 
-CLC 
-ADC #<FRONTIER_LISTQ2       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-STA paddr             ; Store the low byte of the calculated address.
+    CLC 
+    ADC #<FRONTIER_LISTQ2       ; Add the low byte of FRONTIER_LIST_ADDRESS.
+    STA paddr             ; Store the low byte of the calculated address.
 
-LDA #>FRONTIER_LISTQ2      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-ADC #$00              ; Add carry if crossing a page boundary.
-STA paddr+1  
+    LDA #>FRONTIER_LISTQ2      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+    ADC #$00              ; Add carry if crossing a page boundary.
+    STA paddr+1  
 
-;write the last values to the location to be removed
-LDY #0
-LDA (tempPadrToLast),Y
-STA (paddr),Y 
+    ;write the last values to the location to be removed
+    LDY #0
+    LDA (tempPadrToLast),Y
+    STA (paddr),Y 
 
-LDY #$1
-LDA (tempPadrToLast),Y
-STA (paddr),Y
+    LDY #$1
+    LDA (tempPadrToLast),Y
+    STA (paddr),Y
 
-;clear the last values
-LDA #0
-LDY #0
-STA (tempPadrToLast),Y 
+    ;clear the last values
+    LDA #0
+    LDY #0
+    STA (tempPadrToLast),Y 
 
-LDA #0
-LDY #$1
-STA (tempPadrToLast),Y
+    LDA #0
+    LDY #$1
+    STA (tempPadrToLast),Y
 
-DEC frontier_listQ2_size
-JMP :+
+    DEC frontier_listQ2_size
+    JMP :+
 
-:
-CMP #2
-BNE :+
+    :
+    CMP #2
+    BNE :+
 
-; Calculate the address of the last item in the list
-LDA frontier_listQ3_size
+    ; Calculate the address of the last item in the list
+    LDA frontier_listQ3_size
 
-TAX
-DEX
-TXA
+    TAX
+    DEX
+    TXA
 
-ASL
+    ASL
 
-CLC 
-ADC #<FRONTIER_LISTQ3       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-STA tempPadrToLast             ; Store the low byte of the calculated address.
+    CLC 
+    ADC #<FRONTIER_LISTQ3       ; Add the low byte of FRONTIER_LIST_ADDRESS.
+    STA tempPadrToLast             ; Store the low byte of the calculated address.
 
-LDA #>FRONTIER_LISTQ3      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-ADC #$00              ; Add carry if crossing a page boundary.
-STA tempPadrToLast+1  
+    LDA #>FRONTIER_LISTQ3      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+    ADC #$00              ; Add carry if crossing a page boundary.
+    STA tempPadrToLast+1  
 
-; Calculate the address to be removed
-LDA offset
-ASL
+    ; Calculate the address to be removed
+    LDA offset
+    ASL
 
-CLC 
-ADC #<FRONTIER_LISTQ3       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-STA paddr             ; Store the low byte of the calculated address.
+    CLC 
+    ADC #<FRONTIER_LISTQ3       ; Add the low byte of FRONTIER_LIST_ADDRESS.
+    STA paddr             ; Store the low byte of the calculated address.
 
-LDA #>FRONTIER_LISTQ3      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-ADC #$00              ; Add carry if crossing a page boundary.
-STA paddr+1  
+    LDA #>FRONTIER_LISTQ3      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+    ADC #$00              ; Add carry if crossing a page boundary.
+    STA paddr+1  
 
-;write the last values to the location to be removed
-LDY #0
-LDA (tempPadrToLast),Y
-STA (paddr),Y 
+    ;write the last values to the location to be removed
+    LDY #0
+    LDA (tempPadrToLast),Y
+    STA (paddr),Y 
 
-LDY #$1
-LDA (tempPadrToLast),Y
-STA (paddr),Y
+    LDY #$1
+    LDA (tempPadrToLast),Y
+    STA (paddr),Y
 
-;clear the last values
-LDA #0
-LDY #0
-STA (tempPadrToLast),Y 
+    ;clear the last values
+    LDA #0
+    LDY #0
+    STA (tempPadrToLast),Y 
 
-LDA #0
-LDY #$1
-STA (tempPadrToLast),Y
+    LDA #0
+    LDY #$1
+    STA (tempPadrToLast),Y
 
-DEC frontier_listQ3_size
-JMP :+
+    DEC frontier_listQ3_size
+    JMP :+
 
-:
-CMP #3
-BNE :+
+    :
+    CMP #3
+    BNE :+
 
-; Calculate the address of the last item in the list
-LDA frontier_listQ4_size
+    ; Calculate the address of the last item in the list
+    LDA frontier_listQ4_size
 
-TAX
-DEX
-TXA
+    TAX
+    DEX
+    TXA
 
-ASL
+    ASL
 
-CLC 
-ADC #<FRONTIER_LISTQ4       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-STA tempPadrToLast             ; Store the low byte of the calculated address.
+    CLC 
+    ADC #<FRONTIER_LISTQ4       ; Add the low byte of FRONTIER_LIST_ADDRESS.
+    STA tempPadrToLast             ; Store the low byte of the calculated address.
 
-LDA #>FRONTIER_LISTQ4      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-ADC #$00              ; Add carry if crossing a page boundary.
-STA tempPadrToLast+1  
+    LDA #>FRONTIER_LISTQ4      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+    ADC #$00              ; Add carry if crossing a page boundary.
+    STA tempPadrToLast+1  
 
-; Calculate the address to be removed
-LDA offset
-ASL
+    ; Calculate the address to be removed
+    LDA offset
+    ASL
 
-CLC 
-ADC #<FRONTIER_LISTQ4       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-STA paddr             ; Store the low byte of the calculated address.
+    CLC 
+    ADC #<FRONTIER_LISTQ4       ; Add the low byte of FRONTIER_LIST_ADDRESS.
+    STA paddr             ; Store the low byte of the calculated address.
 
-LDA #>FRONTIER_LISTQ4      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-ADC #$00              ; Add carry if crossing a page boundary.
-STA paddr+1  
+    LDA #>FRONTIER_LISTQ4      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+    ADC #$00              ; Add carry if crossing a page boundary.
+    STA paddr+1  
 
-;write the last values to the location to be removed
-LDY #0
-LDA (tempPadrToLast),Y
-STA (paddr),Y 
+    ;write the last values to the location to be removed
+    LDY #0
+    LDA (tempPadrToLast),Y
+    STA (paddr),Y 
 
-LDY #$1
-LDA (tempPadrToLast),Y
-STA (paddr),Y
+    LDY #$1
+    LDA (tempPadrToLast),Y
+    STA (paddr),Y
 
-;clear the last values
-LDA #0
-LDY #0
-STA (tempPadrToLast),Y 
+    ;clear the last values
+    LDA #0
+    LDY #0
+    STA (tempPadrToLast),Y 
 
-LDA #0
-LDY #$1
-STA (tempPadrToLast),Y
+    LDA #0
+    LDY #$1
+    STA (tempPadrToLast),Y
 
-DEC frontier_listQ4_size
-JMP :+
+    DEC frontier_listQ4_size
+    JMP :+
 
-:
+    :
 .endmacro
 
 .macro add_to_Frontier byteID, bitID
-;multiply by 2, 2 bytes required per element in list
-LDA frontier_listQ1_size
-ASL
+    ;multiply by 2, 2 bytes required per element in list
+    LDA frontier_listQ1_size
+    ASL
 
-CMP #%11111110
-BEQ :+
+    CMP #%11111110
+    BEQ :+
 
-; Calculate the new address
-CLC 
-ADC #<FRONTIER_LISTQ1       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-STA paddr             ; Store the low byte of the calculated address.
+    ; Calculate the new address
+    CLC 
+    ADC #<FRONTIER_LISTQ1       ; Add the low byte of FRONTIER_LIST_ADDRESS.
+    STA paddr             ; Store the low byte of the calculated address.
 
-LDA #>FRONTIER_LISTQ1      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-ADC #$00              ; Add carry if crossing a page boundary.
-STA paddr+1           ; Store the high byte of the calculated address.
+    LDA #>FRONTIER_LISTQ1      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+    ADC #$00              ; Add carry if crossing a page boundary.
+    STA paddr+1           ; Store the high byte of the calculated address.
 
-; Store the values into the calculated address
-LDA byteID
-LDY #0
-STA (paddr),Y 
+    ; Store the values into the calculated address
+    LDA byteID
+    LDY #0
+    STA (paddr),Y 
 
-LDA bitID
-LDY #$1
-STA (paddr),Y
+    LDA bitID
+    LDY #$1
+    STA (paddr),Y
 
-INC frontier_listQ1_size 
-JMP :++++
+    INC frontier_listQ1_size 
+    JMP :++++
 
-:
-;multiply by 2, 2 bytes required per element in list
-LDA frontier_listQ2_size
-ASL
+    :
+    ;multiply by 2, 2 bytes required per element in list
+    LDA frontier_listQ2_size
+    ASL
 
-CMP #%11111110
-BEQ :+
+    CMP #%11111110
+    BEQ :+
 
-; Calculate the new address
-CLC 
-ADC #<FRONTIER_LISTQ2    ; Add the low byte of FRONTIER_LIST_ADDRESS.
-STA paddr             ; Store the low byte of the calculated address.
+    ; Calculate the new address
+    CLC 
+    ADC #<FRONTIER_LISTQ2    ; Add the low byte of FRONTIER_LIST_ADDRESS.
+    STA paddr             ; Store the low byte of the calculated address.
 
-LDA #>FRONTIER_LISTQ2      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-ADC #$00              ; Add carry if crossing a page boundary.
-STA paddr+1           ; Store the high byte of the calculated address.
+    LDA #>FRONTIER_LISTQ2      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+    ADC #$00              ; Add carry if crossing a page boundary.
+    STA paddr+1           ; Store the high byte of the calculated address.
 
-; Store the values into the calculated address
-LDA byteID
-LDY #0
-STA (paddr),Y 
+    ; Store the values into the calculated address
+    LDA byteID
+    LDY #0
+    STA (paddr),Y 
 
-LDA bitID
-LDY #$1
-STA (paddr),Y
+    LDA bitID
+    LDY #$1
+    STA (paddr),Y
 
-INC frontier_listQ2_size
-JMP :+++
+    INC frontier_listQ2_size
+    JMP :+++
 
-:
-;multiply by 2, 2 bytes required per element in list
-LDA frontier_listQ3_size
-ASL
+    :
+    ;multiply by 2, 2 bytes required per element in list
+    LDA frontier_listQ3_size
+    ASL
 
-CMP #%11111110
-BEQ :+
+    CMP #%11111110
+    BEQ :+
 
-; Calculate the new address
-CLC 
-ADC #<FRONTIER_LISTQ3    ; Add the low byte of FRONTIER_LIST_ADDRESS.
-STA paddr             ; Store the low byte of the calculated address.
+    ; Calculate the new address
+    CLC 
+    ADC #<FRONTIER_LISTQ3    ; Add the low byte of FRONTIER_LIST_ADDRESS.
+    STA paddr             ; Store the low byte of the calculated address.
 
-LDA #>FRONTIER_LISTQ3      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-ADC #$00              ; Add carry if crossing a page boundary.
-STA paddr+1           ; Store the high byte of the calculated address.
+    LDA #>FRONTIER_LISTQ3      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+    ADC #$00              ; Add carry if crossing a page boundary.
+    STA paddr+1           ; Store the high byte of the calculated address.
 
-; Store the values into the calculated address
-LDA byteID
-LDY #0
-STA (paddr),Y 
+    ; Store the values into the calculated address
+    LDA byteID
+    LDY #0
+    STA (paddr),Y 
 
-LDA bitID
-LDY #$1
-STA (paddr),Y
+    LDA bitID
+    LDY #$1
+    STA (paddr),Y
 
-INC frontier_listQ3_size
-JMP :++
+    INC frontier_listQ3_size
+    JMP :++
 
-:
-;multiply by 2, 2 bytes required per element in list
-LDA frontier_listQ4_size
-ASL
+    :
+    ;multiply by 2, 2 bytes required per element in list
+    LDA frontier_listQ4_size
+    ASL
 
-CMP #%11111110
-BEQ :+
+    CMP #%11111110
+    BEQ :+
 
-; Calculate the new address
-CLC 
-ADC #<FRONTIER_LISTQ4   ; Add the low byte of FRONTIER_LIST_ADDRESS.
-STA paddr             ; Store the low byte of the calculated address.
+    ; Calculate the new address
+    CLC 
+    ADC #<FRONTIER_LISTQ4   ; Add the low byte of FRONTIER_LIST_ADDRESS.
+    STA paddr             ; Store the low byte of the calculated address.
 
-LDA #>FRONTIER_LISTQ4      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-ADC #$00              ; Add carry if crossing a page boundary.
-STA paddr+1           ; Store the high byte of the calculated address.
+    LDA #>FRONTIER_LISTQ4      ; Load the high byte of FRONTIER_LIST_ADDRESS.
+    ADC #$00              ; Add carry if crossing a page boundary.
+    STA paddr+1           ; Store the high byte of the calculated address.
 
-; Store the values into the calculated address
-LDA byteID
-LDY #0
-STA (paddr),Y 
+    ; Store the values into the calculated address
+    LDA byteID
+    LDY #0
+    STA (paddr),Y 
 
-LDA bitID
-LDY #$1
-STA (paddr),Y
+    LDA bitID
+    LDY #$1
+    STA (paddr),Y
 
-INC frontier_listQ4_size
-JMP :+
-:
+    INC frontier_listQ4_size
+    JMP :+
+    :
 .endmacro
