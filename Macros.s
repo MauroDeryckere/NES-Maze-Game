@@ -29,6 +29,23 @@
     :
 .endmacro
 
+;*****************************************************************
+; Map buffer macros
+;*****************************************************************
+;sets a tile as passable for a given byte of the map and bit of that byte
+.macro set_map_tile_passable byteID, bitID
+.endmacro
+
+;returns the value of the neighbor, byteID and bitID of the neighbor in X and Y register (useful to add to frontier afterwards)
+;when there is no neighbor, the decimal flag is set | decimal flag is cleared at the start of this macro!
+.macro access_map_neighbor byteID, bitID
+.endmacro
+
+;*****************************************************************
+
+;*****************************************************************
+; Frontier list macros
+;*****************************************************************
 ;page 0 - 3 | offset 0-127
 ;loads the byte in the X register, bit in the Y register
 .macro access_Frontier page, offset
@@ -473,3 +490,4 @@
     JMP :+
     :
 .endmacro
+;*****************************************************************
