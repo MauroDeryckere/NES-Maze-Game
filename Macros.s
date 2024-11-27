@@ -491,3 +491,16 @@
     :
 .endmacro
 ;*****************************************************************
+
+
+; result = value % modulus
+; => result is stored in the A register
+.macro modulo value, modulus
+    LDA value
+    SEC
+    :
+    SBC modulus
+    CMP modulus
+    BPL :-
+
+.endmacro
