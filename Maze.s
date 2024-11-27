@@ -254,7 +254,7 @@ palette_loop:
     add_to_Frontier #$0, #$0
     
     ;16
-    add_to_Frontier #$11, #$11
+    ;add_to_Frontier #$11, #$11
     ; add_to_Frontier #$22, #$22
     ; add_to_Frontier #$33, #$33
     ; add_to_Frontier #$44, #$44
@@ -264,12 +264,20 @@ palette_loop:
     ; add_to_Frontier #$88, #$88
 
     ;remove_from_Frontier #1, #2
-    access_Frontier #0, #1
+    ;access_Frontier #0, #1
 
-    STX x_val
-    STY y_val
+    ;STX x_val
+    ;STY y_val
     
-    add_to_Frontier x_val, y_val
+    ;add_to_Frontier x_val, y_val
+
+    ; loop:
+    ; access_Frontier #0, #1
+    ; STX x_val
+    ; STY y_val
+    ; add_to_Frontier x_val, y_val
+
+    ; JMP loop
     
     RTS
 .endproc

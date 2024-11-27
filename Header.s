@@ -72,7 +72,7 @@ FRONTIER_LISTQ2 = $041E
 FRONTIER_LISTQ3 = $051C
 FRONTIER_LISTQ4 = $061A
 
-FRONTIER_LIST_CAPACITY = 0960
+FRONTIER_LIST_CAPACITY = 1016
 ;*****************************************************************
 
 .segment "HEADER"
