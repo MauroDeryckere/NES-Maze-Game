@@ -126,6 +126,9 @@ frontier_listQ4_size:	.res 1
 
 tempPadrToLast: 		.res 2 ;last item in address for a given quarter, used for the remove from list macro
 
+x_val:					.res 1 ;x and y value stored in zero page for fast accesss when it's necessary to store these
+y_val:					.res 1
+
 ;*****************************************************************
 
 .segment "OAM"
