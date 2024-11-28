@@ -65,7 +65,7 @@ ATTRIBUTE_TABLE_1_ADDRESS	= $27C0
 MAP_BUFFER_SIZE = 120
 MAP_BUFFER_ADDRESS = $00
 MAP_COLUMNS = 32 ;32 bits
-MAP_ROWS = 30 
+MAP_ROWS = 30
 
 FRONTIER_LISTQ1 = $0320
 FRONTIER_LISTQ2 = $041E
@@ -128,6 +128,8 @@ tempPadrToLast: 		.res 2 ;last item in address for a given quarter, used for the
 
 x_val:					.res 1 ;x and y value stored in zero page for fast accesss when it's necessary to store these
 y_val:					.res 1
+
+temp_address:			.res 1
 
 ;*****************************************************************
 

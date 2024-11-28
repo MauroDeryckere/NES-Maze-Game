@@ -32,22 +32,80 @@
 ;*****************************************************************
 ; Map buffer macros
 ;*****************************************************************
-;byteID is the row, bitID te col
 ;Example: 
 ;   BitID: 0123 4567  89...
 ;ByteID 0: 0000 0000  0000 0000   0000 0000   0000 0000   0000 0000
 ;ByteID 1: 0000 0000  0000 0000   0000 0000   0000 0000   0000 0000
 ;...
 
-;sets a tile as passable for a given byte of the map and bit of that byte
+;sets a tile as passable for a given cell of the map
+;byteID: Row index in the map buffer (0 to MAP_ROWS - 1)
+;bitID:  Column index (0 to 31, across 4 bytes per row);
 .macro set_map_tile_passable byteID, bitID
+    ;Calculate the base address of the row (byteID * 4)
+    LDA byteID
+    ASL
+    ASL
+    CLC
+    ADC #MAP_BUFFER_ADDRESS ; Add base address of the map buffer
+    STA x_val
+
+    ;Calculate the byte offset within the row (bitID / 8)
+    LDA bitID
+    LSR
+    LSR
+    LSR
+    STA y_val
+
+    ;Add the byte offset to the base row address
+    LDA x_val
+    CLC 
+    ADC y_val
+    STA temp_address
+    
+    ;Clamp the 0-31 bitID to 0-7 
+    LDA bitID
+    : ;Loop
+    CMP #$08       ; Compare the number with 8 (i.e., check if it's greater than 7)
+    BCC :+       ; If the number is less than or equal to 7, branch to Done
+    SEC            ; Set the Carry flag before subtraction (since we're subtracting)
+    SBC #$08       ; Subtract 8 from the number
+    JMP :-
+
+    : ;end clamp loop
+    STA x_val
+
+    LDA #%00000001
+    STA y_val
+
+    ;Calculate how many times we should shift
+    LDA #7
+    SEC
+    SBC x_val    
+    BEQ :++
+    TAX
+    
+    LDA y_val
+    :    
+    ASL
+    DEX
+    BNE :-
+
+    STA y_val
+    :
+
+    LDY #0
+    LDA (temp_address), Y
+    ORA y_val
+    STA (temp_address), Y
 .endmacro
 
 ;returns the value of the neighbor, byteID and bitID of the neighbor in X and Y register (useful to add to frontier afterwards)
 ;when there is no neighbor, the decimal flag is set | decimal flag is cleared at the start of this macro!
+;byteID: Row index in the map buffer (0 to MAP_ROWS - 1)
+;bitID:  Column index (0 to 31, across 4 bytes per row);
 .macro access_map_neighbor byteID, bitID
 .endmacro
-
 ;*****************************************************************
 
 ;*****************************************************************

@@ -252,9 +252,18 @@ palette_loop:
     
     ;choose a first frontier cell, does not matter which one (can be made random in future)
     add_to_Frontier #$0, #$0
-    
+
+    ; set_map_tile_passable #29, #10
+    ; set_map_tile_passable #29, #30
+    ; set_map_tile_passable #29, #5
+    ; set_map_tile_passable #29, #27
+    ; set_map_tile_passable #29, #1
+    ; set_map_tile_passable #29, #4
+    ; set_map_tile_passable #29, #9
+    ; set_map_tile_passable #29, #8
+
     ;16
-    ;add_to_Frontier #$11, #$11
+    ; add_to_Frontier #$11, #$11
     ; add_to_Frontier #$22, #$22
     ; add_to_Frontier #$33, #$33
     ; add_to_Frontier #$44, #$44
@@ -270,14 +279,6 @@ palette_loop:
     ;STY y_val
     
     ;add_to_Frontier x_val, y_val
-
-    ; loop:
-    ; access_Frontier #0, #1
-    ; STX x_val
-    ; STY y_val
-    ; add_to_Frontier x_val, y_val
-
-    ; JMP loop
     
     RTS
 .endproc
@@ -325,7 +326,7 @@ palette_loop:
     JSR ppu_off
     JSR clear_nametable
 
-    JSR run_prims_maze ;temporarily do this here every frame - this is just for resting and will be moved later.
+    ;JSR run_prims_maze ;temporarily do this here every frame - this is just for resting and will be moved later.
 
     vram_set_address (NAME_TABLE_0_ADDRESS) 
     assign_16i paddr, MAP_BUFFER_ADDRESS    ;load map into ppu
