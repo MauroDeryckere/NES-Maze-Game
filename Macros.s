@@ -32,6 +32,14 @@
 ;*****************************************************************
 ; Map buffer macros
 ;*****************************************************************
+
+;byteID is the row, bitID te col
+;Example: 
+;   BitID: 0123 4567  ...
+;ByteID 0: 0000 0000  0000 0000   0000 0000   0000 0000   0000 0000
+;ByteID 1: 0000 0000  0000 0000   0000 0000   0000 0000   0000 0000
+;...
+
 ;sets a tile as passable for a given byte of the map and bit of that byte
 .macro set_map_tile_passable byteID, bitID
 .endmacro
@@ -373,6 +381,7 @@
     :
 .endmacro
 
+;Defintion of byteID and bitID can be found in the map buffer section.
 .macro add_to_Frontier byteID, bitID
     ;multiply by 2, 2 bytes required per element in list
     LDA frontier_listQ1_size
