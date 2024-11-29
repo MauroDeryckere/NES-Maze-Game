@@ -253,14 +253,14 @@ palette_loop:
     ;choose a first frontier cell, does not matter which one (can be made random in future)
     add_to_Frontier #$0, #$0
 
-    toggle_map_tile #29, #10
-    toggle_map_tile #29, #30
-    toggle_map_tile #29, #5
-    toggle_map_tile #29, #27
-    toggle_map_tile #29, #1
-    toggle_map_tile #29, #4
-    toggle_map_tile #29, #9
-    toggle_map_tile #29, #8
+    ; toggle_map_tile #29, #10
+    ; toggle_map_tile #29, #30
+    ; toggle_map_tile #29, #5
+    ; toggle_map_tile #29, #27
+    ; toggle_map_tile #29, #1
+    ; toggle_map_tile #29, #4
+    ; toggle_map_tile #29, #9
+    ; toggle_map_tile #29, #8
 
     ;16
     ; add_to_Frontier #$11, #$11
@@ -279,7 +279,26 @@ palette_loop:
     ;STY y_val
     
     ;add_to_Frontier x_val, y_val
+
+    ;Bound check of acces map neighbor testing
+    ;expect 0
+    ;access_map_neighbor #TOP_N, #0, #0 ;works
+    ;access_map_neighbor #RIGHT_N, #8, #31 ;works
+    ;access_map_neighbor #BOTTOM_N, #29, #10 ;works
+    ;access_map_neighbor #LEFT_N, #0, #0 ;works
+
+    ;expect 0
+    ;access_map_neighbor #TOP_N, #1, #0 ;works
+    ;access_map_neighbor #RIGHT_N, #12, #30 ;works
+    ;access_map_neighbor #BOTTOM_N, #28, #0 ;works
+    ;access_map_neighbor #LEFT_N, #1, #1  ;works
     
+    ;expect 1
+    ;access_map_neighbor #TOP_N, #10, #15 ;works
+    ;access_map_neighbor #RIGHT_N, #0, #8 ;works
+    ;access_map_neighbor #BOTTOM_N, #0, #31 ;works
+    ;access_map_neighbor #LEFT_N, #29, #31 ;works
+
     RTS
 .endproc
 
@@ -332,31 +351,31 @@ palette_loop:
     assign_16i paddr, MAP_BUFFER_ADDRESS    ;load map into ppu
 
     LDY #0          ;reset value of y
-loop:
-	LDA (paddr),y   ;get byte to load
-    TAX
-    LDA #8          ;8 bits in a byte
-    STA byte_loop_couter
+    loop:
+        LDA (paddr),y   ;get byte to load
+        TAX
+        LDA #8          ;8 bits in a byte
+        STA byte_loop_couter
 
-    byteloop:
-    TXA             ;copy x into a to preform actions on a copy
-    set_Carry_to_highest_bit_A  ;rol sets bit 0 to the value of the carry flag, so we make sure the carry flag is set to the value of bit 7 to rotate correctly
-    ROL             ;rotate to get the correct bit on pos 0
-    TAX             ;copy current rotation back to x
-    AND #%00000001  ;and with 1, to check if tile is filled
-	STA PPU_VRAM_IO ;write to ppu
+        byteloop:
+        TXA             ;copy x into a to preform actions on a copy
+        set_Carry_to_highest_bit_A  ;rol sets bit 0 to the value of the carry flag, so we make sure the carry flag is set to the value of bit 7 to rotate correctly
+        ROL             ;rotate to get the correct bit on pos 0
+        TAX             ;copy current rotation back to x
+        AND #%00000001  ;and with 1, to check if tile is filled
+        STA PPU_VRAM_IO ;write to ppu
 
-    DEC byte_loop_couter    ;decrease counter
-    LDA byte_loop_couter    ;get value into A
-    BNE byteloop            ;repeat byteloop if not done with byte yet
+        DEC byte_loop_couter    ;decrease counter
+        LDA byte_loop_couter    ;get value into A
+        BNE byteloop            ;repeat byteloop if not done with byte yet
 
-    INY
-        CPY #MAP_BUFFER_SIZE              ;the screen is 120 bytes in total, so check if 120 bytes have been displayed to know if we're done
-        BNE loop
+        INY
+            CPY #MAP_BUFFER_SIZE              ;the screen is 120 bytes in total, so check if 120 bytes have been displayed to know if we're done
+            BNE loop
 
-    JSR ppu_update
+        JSR ppu_update
 
-    RTS
+        RTS
 .endproc
 ;*****************************************************************
 
@@ -365,30 +384,16 @@ loop:
 ;*****************************************************************
 .segment "CODE"
 .proc random_number_generator
-RNG:
-    LDA RandomSeed  ; Load the current seed
-    ASL             ; Shift left
-    BCC NoXor       ; Branch if no carry
-    EOR #$B4        ; XOR with a feedback value (tweak as needed)
+    RNG:
+        LDA RandomSeed  ; Load the current seed
+        ASL             ; Shift left
+        BCC NoXor       ; Branch if no carry
+        EOR #$B4        ; XOR with a feedback value (tweak as needed)
 
-NoXor:
-    STA RandomSeed  ; Store the new seed
-    RTS             ; Return
+    NoXor:
+        STA RandomSeed  ; Store the new seed
+        RTS             ; Return
 
-
-
-.endproc
-;*****************************************************************
-
-;*****************************************************************
-; Map buffer functions
-;*****************************************************************
-.segment "CODE"
-.proc access_map_buffer
-    ;check bounds
-    ;not in bounds -> show somehow / return
-    ;convert bit to byte && correct bit in byte
-    ;load the value at bitIdx
 .endproc
 ;*****************************************************************
 

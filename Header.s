@@ -67,12 +67,19 @@ MAP_BUFFER_ADDRESS = $00
 MAP_COLUMNS = 32 ;32 bits
 MAP_ROWS = 30
 
+; Frontier list
 FRONTIER_LISTQ1 = $0320
 FRONTIER_LISTQ2 = $041E
 FRONTIER_LISTQ3 = $051C
 FRONTIER_LISTQ4 = $061A
 
 FRONTIER_LIST_CAPACITY = 1016
+
+; Neighbor util
+TOP_N = 0
+RIGHT_N = 1 
+BOTTOM_N = 2
+LEFT_N = 3
 ;*****************************************************************
 
 .segment "HEADER"
@@ -130,7 +137,6 @@ x_val:					.res 1 ;x and y value stored in zero page for fast accesss when it's 
 y_val:					.res 1
 
 temp_address:			.res 1
-
 ;*****************************************************************
 
 .segment "OAM"

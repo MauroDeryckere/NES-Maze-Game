@@ -121,11 +121,73 @@
     STA (temp_address), Y
 .endmacro
 
+.macro bounds_check_neighbor Direction, Row, Col
+    ;Jump to the correct direction check
+    LDA Direction
+    CMP #TOP_N
+    BEQ :+
+
+    CMP #RIGHT_N
+    BEQ :++
+
+    CMP #BOTTOM_N
+    BEQ :+++
+
+    CMP #LEFT_N
+    BEQ :++++
+
+    JMP :+++++ ;no valid direction, invalid neighbor
+
+    : ;top check
+    ; If Row is 0 or 1, it's out of bounds
+    LDA Row
+    CMP #2 
+    BCC :++++ ; row < 2
+    JMP :+++++ 
+
+    : ;right check
+    ; If col is 31 or 30, it's out of bounds
+    LDA Col
+    CMP #30
+    BCS :+++ ; col >= 30
+    JMP :++++ 
+
+    : ;bottom check
+    ; If Row is 28 or 29, it's out of bounds
+    LDA Row
+    CMP #28
+    BCS :++ ; row >= 28
+    JMP :+++ 
+
+    : ;left check
+    ; If col is 0 or 1, it's out of bounds
+    LDA Col
+    CMP #2 
+    BCC :+ ; col < 2
+    JMP :++ 
+
+    : ;out of bounds
+    LDA #$0 ;0 indicates invalid neighbor
+    JMP :++
+
+    : ;in bounds
+    LDA #$1 ;1 indicates valid neighbor 
+
+    : ;end
+.endmacro
+
 ;returns the value of the neighbor, Row and Column of the neighbor in X and Y register (useful to add to frontier afterwards)
 ;when there is no neighbor, the decimal flag is set | decimal flag is cleared at the start of this macro!
+;Direction: The direction of the neighbor we are polling (0-3, defines are stored in the header for this)
 ;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
 ;Column:  Column index (0 to 31, across 4 bytes per row);
-.macro access_map_neighbor Row, Column
+.macro access_map_neighbor Direction, Row, Column
+    CLD
+    
+    bounds_check_neighbor Direction, Row, Column
+
+    STA x_val
+
 .endmacro
 ;*****************************************************************
 
