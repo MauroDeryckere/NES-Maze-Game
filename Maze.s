@@ -189,7 +189,7 @@ irq:
 .segment "CODE"
 .proc main
 
-JSR Init
+    JSR Init
 
 mainloop:
     LDA has_generation_started
@@ -293,28 +293,28 @@ palette_loop:
     AND #PAD_A
     BEQ A_NOT_PRESSED
         ;code for button press here  
-        lda a_pressed_last_frame
-        bne A_NOT_PRESSED           ;check for pressed this frame
+        LDA a_pressed_last_frame
+        BNE A_NOT_PRESSED           ;check for pressed this frame
 
-        lda #1
-        sta has_generation_started         ;set map visible
+        LDA #1
+        STA has_generation_started         ;set map visible
 
-        jsr display_map             ;copy map to ppu
+        JSR display_map             ;copy map to ppu
 
-        lda #1
-        sta a_pressed_last_frame
-        jmp :+
+        LDA #1
+        STA a_pressed_last_frame
+        JMP :+
     A_NOT_PRESSED:
         ;code for other buttons etc here
-        lda #0
-        sta a_pressed_last_frame
+        LDA #0
+        STA a_pressed_last_frame
     :
 
     LDX RandomSeed
     INX
     STX RandomSeed   
 
-    rts
+    RTS
 .endproc
 ;*****************************************************************
 
