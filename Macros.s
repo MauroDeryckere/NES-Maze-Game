@@ -97,7 +97,7 @@
     :
 .endmacro
 
-;loads the state (0 or 1) for a given tile in the Y register
+;loads the state for a given tile in the Y register - 0 when not passable, or any bit is set when it is passable
 ;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
 ;Column:  Column index (0 to 31, across 4 bytes per row);
 .macro get_map_tile_state Row, Column
