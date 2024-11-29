@@ -38,10 +38,8 @@
 ; Row 1: 0000 0000  0000 0000   0000 0000   0000 0000   0000 0000
 ;...
 
-;sets a tile as passable for a given cell of the map
-;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
-;Column:  Column index (0 to 31, across 4 bytes per row);
-.macro set_map_tile_passable Row, Column
+;loads 1 or 0 into y_val
+.macro get_map_tile_state Row, Column
     ;Calculate the base address of the row (Row * 4)
     LDA Row
     ASL             ;== times 2
@@ -93,10 +91,16 @@
 
     STA y_val
     :
+.endmacro
+;sets a tile as passable for a given cell of the map
+;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
+;Column:  Column index (0 to 31, across 4 bytes per row);
+.macro toggle_map_tile Row, Column
+    get_map_tile_state Row, Column
 
     LDY #0
     LDA (temp_address), Y
-    ORA y_val
+    EOR y_val
     STA (temp_address), Y
 .endmacro
 
