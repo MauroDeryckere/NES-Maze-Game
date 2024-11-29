@@ -253,14 +253,14 @@ palette_loop:
     ;choose a first frontier cell, does not matter which one (can be made random in future)
     add_to_Frontier #$0, #$0
 
-    ; toggle_map_tile #29, #10
-    ; toggle_map_tile #29, #30
-    ; toggle_map_tile #29, #5
-    ; toggle_map_tile #29, #27
-    ; toggle_map_tile #29, #1
-    ; toggle_map_tile #29, #4
-    ; toggle_map_tile #29, #9
-    ; toggle_map_tile #29, #8
+    toggle_map_tile #29, #10
+    toggle_map_tile #29, #30
+    toggle_map_tile #29, #5
+    toggle_map_tile #29, #27
+    toggle_map_tile #29, #1
+    toggle_map_tile #29, #4
+    toggle_map_tile #29, #9
+    toggle_map_tile #29, #8
 
     ;16
     ; add_to_Frontier #$11, #$11

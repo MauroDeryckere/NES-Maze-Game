@@ -38,8 +38,12 @@
 ; Row 1: 0000 0000  0000 0000   0000 0000   0000 0000   0000 0000
 ;...
 
-;loads 1 or 0 into y_val
-.macro get_map_tile_state Row, Column
+;util macro to calculate the mask and address for a given tile
+;mask: the bitmask for the requested row and column
+;e.g row 0, column 1 == 0100 0000
+;address: the address in the buffer for the requested row and column
+;e.g row 2, column 1 == $00 + $4 == $04
+.macro calculate_tile_address_and_mask Row, Column
     ;Calculate the base address of the row (Row * 4)
     LDA Row
     ASL             ;== times 2
@@ -92,14 +96,27 @@
     STA y_val
     :
 .endmacro
+
+;loads the state (0 or 1) for a given tile in the Y register
+;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
+;Column:  Column index (0 to 31, across 4 bytes per row);
+.macro get_map_tile_state Row, Column
+    calculate_tile_address_and_mask Row, Column
+
+    LDY #0
+    LDA (temp_address), Y   
+    AND y_val
+    TAY
+.endmacro
+
 ;sets a tile as passable for a given cell of the map
 ;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
 ;Column:  Column index (0 to 31, across 4 bytes per row);
 .macro toggle_map_tile Row, Column
-    get_map_tile_state Row, Column
-
+    calculate_tile_address_and_mask Row, Column
+    
     LDY #0
-    LDA (temp_address), Y
+    LDA (temp_address), Y   
     EOR y_val
     STA (temp_address), Y
 .endmacro
