@@ -33,9 +33,9 @@
 ; Map buffer macros
 ;*****************************************************************
 ;Example: 
-;   BitID: 0123 4567  89...
-;ByteID 0: 0000 0000  0000 0000   0000 0000   0000 0000   0000 0000
-;ByteID 1: 0000 0000  0000 0000   0000 0000   0000 0000   0000 0000
+;Column: 0123 4567  89...
+; Row 0: 0000 0000  0000 0000   0000 0000   0000 0000   0000 0000
+; Row 1: 0000 0000  0000 0000   0000 0000   0000 0000   0000 0000
 ;...
 
 ;sets a tile as passable for a given cell of the map
@@ -100,11 +100,11 @@
     STA (temp_address), Y
 .endmacro
 
-;returns the value of the neighbor, byteID and bitID of the neighbor in X and Y register (useful to add to frontier afterwards)
+;returns the value of the neighbor, Row and Column of the neighbor in X and Y register (useful to add to frontier afterwards)
 ;when there is no neighbor, the decimal flag is set | decimal flag is cleared at the start of this macro!
-;byteID: Row index in the map buffer (0 to MAP_ROWS - 1)
-;bitID:  Column index (0 to 31, across 4 bytes per row);
-.macro access_map_neighbor byteID, bitID
+;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
+;Column:  Column index (0 to 31, across 4 bytes per row);
+.macro access_map_neighbor Row, Column
 .endmacro
 ;*****************************************************************
 
