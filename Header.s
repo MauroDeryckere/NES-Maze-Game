@@ -124,13 +124,16 @@ ppu_ctl1:		    	.res 1 ; PPU Control Register 2 Value
 
 a_pressed_last_frame: 	.res 1
 
+;Used internally for random function, do not overwrite
 RandomSeed:				.res 1 ; Initial seed value
 
+;Internal use for frontier list, do not overwrite
 frontier_listQ1_size:	.res 1
 frontier_listQ2_size:	.res 1
 frontier_listQ3_size:	.res 1
 frontier_listQ4_size:	.res 1
 
+;Not used between calls to macros so space is okay to overwrite temporarily
 tempPadrToLast: 		.res 2 ;last item in address for a given quarter, used for the remove from list macro
 
 ;reserverd for macro functions, careful with what's stored here, could be overwritten 
