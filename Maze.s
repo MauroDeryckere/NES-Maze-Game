@@ -252,80 +252,6 @@ palette_loop:
     
     ;choose a first frontier cell, does not matter which one (can be made random in future)
     add_to_Frontier #$0, #$0
-
-    ; toggle_map_tile #29, #10
-    ; toggle_map_tile #29, #30
-    ; toggle_map_tile #29, #5
-    ; toggle_map_tile #29, #27
-    ; toggle_map_tile #29, #1
-    ; toggle_map_tile #29, #4
-    ; toggle_map_tile #29, #9
-    ; toggle_map_tile #29, #8
-
-    ;16
-    ; add_to_Frontier #$11, #$11
-    ; add_to_Frontier #$22, #$22
-    ; add_to_Frontier #$33, #$33
-    ; add_to_Frontier #$44, #$44
-    ; add_to_Frontier #$55, #$55
-    ; add_to_Frontier #$66, #$66
-    ; add_to_Frontier #$77, #$77
-    ; add_to_Frontier #$88, #$88
-
-    ;remove_from_Frontier #1, #2
-    ;access_Frontier #0, #1
-
-    ;STX x_val
-    ;STY y_val
-    
-    ;add_to_Frontier x_val, y_val
-
-
-
-    ; toggle_map_tile #0, #0
-    ; toggle_map_tile #0, #5
-
-    ; toggle_map_tile #0, #10
-
-    ; toggle_map_tile #28, #30
-    ; toggle_map_tile #28, #3
-
-
-    ;access_map_neighbor #LEFT_N, #0, #2 ;expect 0 works
-    ;access_map_neighbor #LEFT_N, #0, #1 ;expect 0 works
-    ;access_map_neighbor #LEFT_N, #0, #0 ;expect 0 works
-    
-
-    ;access_map_neighbor #RIGHT_N, #0, #8 ;works
-    ;access_map_neighbor #RIGHT_N, #0, #3 ;works
-    ;access_map_neighbor #RIGHT_N, #0, #4 ;works
-    ;access_map_neighbor #RIGHT_N, #0, #31 ;works
-    ;access_map_neighbor #RIGHT_N, #0, #30 ;works
-
-    ;access_map_neighbor #TOP_N, #2, #5 ;works
-    ;access_map_neighbor #TOP_N, #2, #10 ;works
-    ;access_map_neighbor #TOP_N, #2, #11 ;works
-    ;access_map_neighbor #TOP_N, #1, #10 ;works
-    ;access_map_neighbor #TOP_N, #0, #10 ;works
-
-    ;access_map_neighbor #BOTTOM_N, #28, #30  ;works
-    ;access_map_neighbor #BOTTOM_N, #29, #30  ;works
-    ;access_map_neighbor #BOTTOM_N, #25, #30  ;works
-    ;access_map_neighbor #BOTTOM_N, #26, #30 ;works
-    ;access_map_neighbor #BOTTOM_N, #27, #30 ;works
-    ;access_map_neighbor #BOTTOM_N, #26, #3 ;works
-    
-    ;access_map_neighbor #LEFT_N, #0, #4 ;works
-    ;access_map_neighbor #LEFT_N, #0, #2 ;works
-    ;access_map_neighbor #LEFT_N, #0, #10 ;works
-
-
-    ;stored in valus for testing
-    ;STY a_val ;row
-    ;STX b_val ;col
-
-    ;STA temp_address ;valid or invalid? - 0 == inv, 1 == valid
-
     RTS
 .endproc
 
@@ -356,9 +282,7 @@ palette_loop:
         STA a_pressed_last_frame
     :
 
-    LDX RandomSeed
-    INX
-    STX RandomSeed   
+    INC RandomSeed 
 
     RTS
 .endproc
@@ -429,16 +353,9 @@ palette_loop:
 ;*****************************************************************
 .segment "CODE"
 .proc run_prims_maze
-    ;choose random cell and mark as passage - for now just cell 0 marked as 1
-    ;LDA #%10000000
     JSR random_number_generator
     STA MAP_BUFFER_ADDRESS
 
-    JSR random_number_generator
-    STA MAP_BUFFER_ADDRESS + 1
-
-    JSR random_number_generator
-    STA MAP_BUFFER_ADDRESS + 1
-    rts
+    RTS
 .endproc
 ;*****************************************************************
