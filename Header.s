@@ -133,9 +133,15 @@ frontier_listQ4_size:	.res 1
 
 tempPadrToLast: 		.res 2 ;last item in address for a given quarter, used for the remove from list macro
 
+;reserverd for macro functions, careful with what's stored here, could be overwritten 
 x_val:					.res 1 ;x and y value stored in zero page for fast accesss when it's necessary to store these
 y_val:					.res 1
 
+;reserverd for macro functions, careful with what's stored here, could be overwritten 
+a_val: 					.res 1
+b_val: 					.res 1
+
+;reserverd for macro functions, careful with what's stored here, could be overwritten 
 temp_address:			.res 1
 ;*****************************************************************
 

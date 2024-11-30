@@ -97,7 +97,7 @@
     :
 .endmacro
 
-;loads the state for a given tile in the Y register - 0 when not passable, or any bit is set when it is passable
+;loads the state for a given tile in the A register - 0 when not passable, or any bit is set when it is passable
 ;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
 ;Column:  Column index (0 to 31, across 4 bytes per row);
 .macro get_map_tile_state Row, Column
@@ -106,7 +106,6 @@
     LDY #0
     LDA (temp_address), Y   
     AND y_val
-    TAY
 .endmacro
 
 ;sets a tile as passable for a given cell of the map
@@ -176,17 +175,120 @@
     : ;end
 .endmacro
 
-;returns the value of the neighbor, Row and Column of the neighbor in X and Y register (useful to add to frontier afterwards)
-;when there is no neighbor, the decimal flag is set | decimal flag is cleared at the start of this macro!
+; stores the new row and col in Y and X reg
+.macro calculate_neighbor_position Direction, Row, Col
+    ;Jump to the correct direction check
+    LDA Direction
+    CMP #TOP_N
+    BEQ :+
+
+    CMP #RIGHT_N
+    BEQ :++
+
+    CMP #BOTTOM_N
+    BEQ :+++
+
+    CMP #LEFT_N
+    BEQ :++++
+    
+    JMP :+++++ ;no valid direction, invalid neighbor
+
+    ;top
+    : 
+    LDA Row
+    SEC
+    SBC #2
+    TAY
+    LDX Col
+    JMP :++++
+
+    ;right
+    :
+    LDA Col
+    CLC
+    ADC #2
+    TAX
+    LDY Row
+    JMP :+++
+
+    ;bottom
+    :
+    LDA Row
+    CLC
+    ADC #2
+    TAY
+    LDX Col
+    JMP :++
+
+    ;left
+    :
+    LDA Col
+    SEC
+    SBC #2
+    TAX
+    LDY Row
+
+    ;end
+    :
+.endmacro
+
+;When there is no valid neighbor, the A register will be set to 0, when there is a valid neighbor it will be set to 1.
+;Row and Column of the neighbor in X and Y register (useful to add to frontier afterwards) note: these are not set when there is not a valid neighbor; check this first! 
 ;Direction: The direction of the neighbor we are polling (0-3, defines are stored in the header for this)
 ;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
-;Column:  Column index (0 to 31, across 4 bytes per row);
+;Column: Column index (0 to 31, across 4 bytes per row)
 .macro access_map_neighbor Direction, Row, Column
-    CLD
-    
     bounds_check_neighbor Direction, Row, Column
+    ;Check if A is valid (1)
+    CMP #0
+    BNE :+ ;else return   
+    JMP set_invalid
+    :
+    ;calculate the neighbors row and col
+    calculate_neighbor_position Direction, Row, Column ;returns row in y and col in x register
 
-    STA x_val
+    ;store before getting state of neighbor
+    STX a_val ;col 
+    STY b_val ;row
+
+    ;store the new row and col on the stack
+    TXA
+    PHA
+    TYA
+    PHA 
+        
+    get_map_tile_state b_val, a_val
+    CMP #0
+    BNE no_wall ;if the neighbor is not a wall (wall == 0) it is not a valid neighbor    
+    
+    ;valid neighbor
+    ;restore the neighbors row and col
+    PLA
+    TAY
+    PLA
+    TAX
+
+    LDA #1 ;valid neighbor -> non zero value
+    JMP return
+
+    .local set_invalid
+    set_invalid:
+        LDA #0 ;invalid -> zero
+        JMP return
+
+    ;in the case of no wall we still have to restore the stack
+    .local no_wall
+    no_wall: ;invalid neighbor
+        ;restore the neighbors row and col
+        PLA
+        TAY
+        PLA
+        TAX
+
+        LDA #0 ;invalid -> zero
+
+    .local return
+    return:
 
 .endmacro
 ;*****************************************************************

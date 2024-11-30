@@ -280,24 +280,51 @@ palette_loop:
     
     ;add_to_Frontier x_val, y_val
 
-    ;Bound check of acces map neighbor testing
-    ;expect 0
-    ;access_map_neighbor #TOP_N, #0, #0 ;works
-    ;access_map_neighbor #RIGHT_N, #8, #31 ;works
-    ;access_map_neighbor #BOTTOM_N, #29, #10 ;works
-    ;access_map_neighbor #LEFT_N, #0, #0 ;works
 
-    ;expect 0
-    ;access_map_neighbor #TOP_N, #1, #0 ;works
-    ;access_map_neighbor #RIGHT_N, #12, #30 ;works
-    ;access_map_neighbor #BOTTOM_N, #28, #0 ;works
-    ;access_map_neighbor #LEFT_N, #1, #1  ;works
+
+    ; toggle_map_tile #0, #0
+    ; toggle_map_tile #0, #5
+
+    ; toggle_map_tile #0, #10
+
+    ; toggle_map_tile #28, #30
+    ; toggle_map_tile #28, #3
+
+
+    ;access_map_neighbor #LEFT_N, #0, #2 ;expect 0 works
+    ;access_map_neighbor #LEFT_N, #0, #1 ;expect 0 works
+    ;access_map_neighbor #LEFT_N, #0, #0 ;expect 0 works
     
-    ;expect 1
-    ;access_map_neighbor #TOP_N, #10, #15 ;works
+
     ;access_map_neighbor #RIGHT_N, #0, #8 ;works
-    ;access_map_neighbor #BOTTOM_N, #0, #31 ;works
-    ;access_map_neighbor #LEFT_N, #29, #31 ;works
+    ;access_map_neighbor #RIGHT_N, #0, #3 ;works
+    ;access_map_neighbor #RIGHT_N, #0, #4 ;works
+    ;access_map_neighbor #RIGHT_N, #0, #31 ;works
+    ;access_map_neighbor #RIGHT_N, #0, #30 ;works
+
+    ;access_map_neighbor #TOP_N, #2, #5 ;works
+    ;access_map_neighbor #TOP_N, #2, #10 ;works
+    ;access_map_neighbor #TOP_N, #2, #11 ;works
+    ;access_map_neighbor #TOP_N, #1, #10 ;works
+    ;access_map_neighbor #TOP_N, #0, #10 ;works
+
+    ;access_map_neighbor #BOTTOM_N, #28, #30  ;works
+    ;access_map_neighbor #BOTTOM_N, #29, #30  ;works
+    ;access_map_neighbor #BOTTOM_N, #25, #30  ;works
+    ;access_map_neighbor #BOTTOM_N, #26, #30 ;works
+    ;access_map_neighbor #BOTTOM_N, #27, #30 ;works
+    ;access_map_neighbor #BOTTOM_N, #26, #3 ;works
+    
+    ;access_map_neighbor #LEFT_N, #0, #4 ;works
+    ;access_map_neighbor #LEFT_N, #0, #2 ;works
+    ;access_map_neighbor #LEFT_N, #0, #10 ;works
+
+
+    ;stored in valus for testing
+    ;STY a_val ;row
+    ;STX b_val ;col
+
+    ;STA temp_address ;valid or invalid? - 0 == inv, 1 == valid
 
     RTS
 .endproc
