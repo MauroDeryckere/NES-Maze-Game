@@ -417,12 +417,6 @@
         DEX         ;decrease size
         TXA
 
-        CPX #0
-        BNE :+
-            LDX #0
-            STX frontier_pages_used
-        :
-
         ASL
 
         CLC 
@@ -476,12 +470,6 @@
         TAX
         DEX         ;decrease size
         TXA
-
-        CPX #0
-        BNE :+
-            LDX #1
-            STX frontier_pages_used
-        :
 
         ASL
 
@@ -537,12 +525,6 @@
         DEX         ;decrease size
         TXA
 
-        CPX #0
-        BNE :+
-            LDX #2
-            STX frontier_pages_used
-        :
-
         ASL
 
         CLC 
@@ -596,12 +578,6 @@
         TAX
         DEX         ;decrease size
         TXA
-
-        CPX #0
-        BNE :+
-            LDX #3
-            STX frontier_pages_used
-        :
 
         ASL
 
@@ -676,9 +652,7 @@
         LDY #$1
         STA (paddr),Y
 
-        INC frontier_listQ1_size 
-        LDA #1
-        STA frontier_pages_used     
+        INC frontier_listQ1_size   
         JMP :++++                   ;jump to end
 
     :
@@ -709,9 +683,7 @@
         LDY #$1
         STA (paddr),Y
 
-        INC frontier_listQ2_size
-        LDA #2
-        STA frontier_pages_used     
+        INC frontier_listQ2_size 
         JMP :+++                   ;jump to end
 
     :
@@ -742,9 +714,7 @@
         LDY #$1
         STA (paddr),Y
 
-        INC frontier_listQ3_size
-        LDA #3
-        STA frontier_pages_used     
+        INC frontier_listQ3_size   
         JMP :++                   ;jump to end
 
     :
@@ -776,8 +746,6 @@
         STA (paddr),Y
 
         INC frontier_listQ4_size
-        LDA #4
-        STA frontier_pages_used     
         JMP :+                   ;jump to end
     :
 .endmacro
@@ -797,45 +765,122 @@
 
 .endmacro
 
+;calculates how many frontier list pages are used and stores it in the variable in zero page.
+.macro calculate_pages_used
+    ;calculate how many pages are currently in use
+    LDX #0
+
+    LDA frontier_listQ1_size
+    CMP #0
+    BEQ :+
+    INX
+    
+    :
+    LDA frontier_listQ2_size
+    CMP #0
+    BEQ :+
+    INX
+
+    :
+    LDA frontier_listQ3_size
+    CMP #0
+    BEQ :+
+    INX
+
+    :
+    LDA frontier_listQ4_size
+    CMP #0
+    BEQ :+
+    INX
+
+    :
+    ;store the pages that are used 
+    STX frontier_pages_used
+.endmacro
+
 ;stores a random frontier page in a_val and a random offset from that page into b_val, then calls access_frontier on that tile
 .macro get_random_frontier_tile
+    calculate_pages_used ;macro calculating how many pages are used, in the final project it is possible to just call this once per frame after any adding / removing to 'optimize' slightly
+
+    ;random number for page
     JSR random_number_generator
 
+    ;clamp page
     modulo RandomSeed, frontier_pages_used
     STA a_val
 
+    ;random number for offset
     JSR random_number_generator
-    TAX
 
-    LDA a_val
+    ;pages checked stored in y
+    LDY #0
 
+    ;pick the page with a size larger > 0 corresponding to a_val
+    ;page 0: 
+    LDA frontier_listQ1_size
     CMP #0
-    BNE page1
-        modulo RandomSeed, frontier_listQ1_size
-        STA b_val
-        JMP endSwitch
+    BEQ page1
+        ;page has items in it, check if we should use this page
+        TYA
+        CMP a_val
+        BNE incP1
+            ;clamp the offset
+            modulo RandomSeed, frontier_listQ1_size
+            STA b_val
+            JMP endSwitch
+    .local incP1
+    incP1:
+    ;increase checked pages
+    INY
+
     .local page1
-    page1:
-    CMP #1
-    BNE page2
-        modulo RandomSeed, frontier_listQ2_size
-        STA b_val
-        JMP endSwitch
+    page1: 
+    LDA frontier_listQ2_size
+    CMP #0
+    BEQ page2
+        ;page has items in it, check if we should use this page
+        TYA
+        CMP a_val
+        BNE incP2
+            ;clamp the offset
+            modulo RandomSeed, frontier_listQ2_size
+            STA b_val
+            JMP endSwitch
+    .local incP2
+    incP2:
+    ;increase checked pages
+    INY
+
     .local page2
-    page2:
-    CMP #2
-    BNE page3
-        modulo RandomSeed, frontier_listQ3_size
-        STA b_val
-        JMP endSwitch
+    page2: 
+    LDA frontier_listQ3_size
+    CMP #0
+    BEQ page3
+        ;page has items in it, check if we should use this page
+        TYA
+        CMP a_val
+        BNE incP3
+            ;clamp the offset
+            modulo RandomSeed, frontier_listQ3_size
+            STA b_val
+            JMP endSwitch
+    .local incP3
+    incP3:
+    ;increase checked pages
+    INY
+
     .local page3
-    page3:
+    page3: 
+    LDA frontier_listQ4_size
+    CMP #0
+    BEQ endSwitch
+        ;page has items in it, check if we should use this page
         modulo RandomSeed, frontier_listQ4_size
         STA b_val
+        JMP endSwitch
 
     .local endSwitch
     endSwitch:
-
-    access_Frontier a_val, b_val
+        access_Frontier a_val, b_val
 
 .endmacro

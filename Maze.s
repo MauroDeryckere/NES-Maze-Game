@@ -420,16 +420,16 @@ palette_loop:
     get_random_frontier_tile
     get_random_frontier_tile
     get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
+    ;get_random_frontier_tile
+    ;get_random_frontier_tile
+    ;get_random_frontier_tile
+    ;get_random_frontier_tile
+    ;get_random_frontier_tile
+    ;get_random_frontier_tile
+    ;get_random_frontier_tile
+    ;get_random_frontier_tile
+    ;get_random_frontier_tile
+    ;get_random_frontier_tile
 
     RTS
 .endproc
