@@ -252,6 +252,185 @@ palette_loop:
     
     ;choose a first frontier cell, does not matter which one (can be made random in future)
     add_to_Frontier #$0, #$0
+
+    add_to_Frontier #1, #2
+    add_to_Frontier #1, #3
+    add_to_Frontier #1, #4
+    add_to_Frontier #1, #5
+    add_to_Frontier #1, #6
+    add_to_Frontier #1, #7
+    add_to_Frontier #1, #8
+    add_to_Frontier #1, #9
+
+    add_to_Frontier #1, #10
+    add_to_Frontier #1, #11
+    add_to_Frontier #1, #12
+    add_to_Frontier #1, #13
+    add_to_Frontier #1, #14
+    add_to_Frontier #1, #15
+    add_to_Frontier #1, #16
+    add_to_Frontier #1, #17
+    add_to_Frontier #1, #18
+    add_to_Frontier #1, #19
+    add_to_Frontier #1, #20
+
+    add_to_Frontier #1, #21
+    add_to_Frontier #1, #22
+    add_to_Frontier #1, #23
+    add_to_Frontier #1, #24
+    add_to_Frontier #1, #25
+    add_to_Frontier #1, #26
+    add_to_Frontier #1, #27
+    add_to_Frontier #1, #28
+    add_to_Frontier #1, #29
+    add_to_Frontier #1, #30
+
+    add_to_Frontier #2, #2
+    add_to_Frontier #2, #3
+    add_to_Frontier #2, #4
+    add_to_Frontier #2, #5
+    add_to_Frontier #2, #6
+    add_to_Frontier #2, #7
+    add_to_Frontier #2, #8
+    add_to_Frontier #2, #9
+    add_to_Frontier #2, #10
+    add_to_Frontier #2, #11
+    add_to_Frontier #2, #12
+    add_to_Frontier #2, #13
+    add_to_Frontier #2, #14
+    add_to_Frontier #2, #15
+    add_to_Frontier #2, #16
+    add_to_Frontier #2, #17
+    add_to_Frontier #2, #18
+    add_to_Frontier #2, #19
+    add_to_Frontier #2, #20
+    add_to_Frontier #2, #21
+    add_to_Frontier #2, #22
+    add_to_Frontier #2, #23
+    add_to_Frontier #2, #24
+    add_to_Frontier #2, #25
+    add_to_Frontier #2, #26
+    add_to_Frontier #2, #27
+    add_to_Frontier #2, #28
+    add_to_Frontier #2, #29
+    add_to_Frontier #2, #30
+
+    add_to_Frontier #3, #2
+    add_to_Frontier #3, #3
+    add_to_Frontier #3, #4
+    add_to_Frontier #3, #5
+    add_to_Frontier #3, #6
+    add_to_Frontier #3, #7
+    add_to_Frontier #3, #8
+    add_to_Frontier #3, #9
+    add_to_Frontier #3, #10
+    add_to_Frontier #3, #11
+    add_to_Frontier #3, #12
+    add_to_Frontier #3, #13
+    add_to_Frontier #3, #14
+    add_to_Frontier #3, #15
+    add_to_Frontier #3, #16
+    add_to_Frontier #3, #17
+    add_to_Frontier #3, #18
+    add_to_Frontier #3, #19
+    add_to_Frontier #3, #20
+    add_to_Frontier #3, #21
+    add_to_Frontier #3, #22
+    add_to_Frontier #3, #23
+    add_to_Frontier #3, #24
+    add_to_Frontier #3, #25
+    add_to_Frontier #3, #26
+    add_to_Frontier #3, #27
+    add_to_Frontier #3, #28
+    add_to_Frontier #3, #29
+    add_to_Frontier #3, #30
+
+    add_to_Frontier #4, #2
+    add_to_Frontier #4, #3
+    add_to_Frontier #4, #4
+    add_to_Frontier #4, #5
+    add_to_Frontier #4, #6
+    add_to_Frontier #4, #7
+    add_to_Frontier #4, #8
+    add_to_Frontier #4, #9
+    add_to_Frontier #4, #10
+    add_to_Frontier #4, #11
+    add_to_Frontier #4, #12
+    add_to_Frontier #4, #13
+    add_to_Frontier #4, #14
+    add_to_Frontier #4, #15
+    add_to_Frontier #4, #16
+    add_to_Frontier #4, #17
+    add_to_Frontier #4, #18
+    add_to_Frontier #4, #19
+    add_to_Frontier #4, #20
+    add_to_Frontier #4, #21
+    add_to_Frontier #4, #22
+    add_to_Frontier #4, #23
+    add_to_Frontier #4, #24
+    add_to_Frontier #4, #25
+    add_to_Frontier #4, #26
+    add_to_Frontier #4, #27
+    add_to_Frontier #4, #28
+    add_to_Frontier #4, #29
+    add_to_Frontier #4, #30
+
+    add_to_Frontier #5, #2
+    add_to_Frontier #5, #3
+    add_to_Frontier #5, #4
+    add_to_Frontier #5, #5
+    add_to_Frontier #5, #6
+    add_to_Frontier #5, #7
+    add_to_Frontier #5, #8
+    add_to_Frontier #5, #9
+    add_to_Frontier #5, #10
+    add_to_Frontier #5, #11
+    add_to_Frontier #5, #12
+    add_to_Frontier #5, #13
+    add_to_Frontier #5, #14
+    add_to_Frontier #5, #15
+    add_to_Frontier #5, #16
+    add_to_Frontier #5, #17
+    add_to_Frontier #5, #18
+    add_to_Frontier #5, #19
+    add_to_Frontier #5, #20
+    add_to_Frontier #5, #21
+    add_to_Frontier #5, #22
+    add_to_Frontier #5, #23
+    add_to_Frontier #5, #24
+    add_to_Frontier #5, #25
+    add_to_Frontier #5, #26
+    add_to_Frontier #5, #27
+    add_to_Frontier #5, #28
+    add_to_Frontier #5, #29
+    add_to_Frontier #5, #30
+
+    add_to_Frontier #15, #$16
+    
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+    get_random_frontier_tile
+
     RTS
 .endproc
 
@@ -337,7 +516,8 @@ palette_loop:
 .proc random_number_generator
     RNG:
         LDA RandomSeed  ; Load the current seed
-        ASL             ; Shift left
+        set_Carry_to_highest_bit_A ;to make sure the rotation happens properly (makes odd numbers possible)
+        ROL             ; Shift left
         BCC NoXor       ; Branch if no carry
         EOR #$B4        ; XOR with a feedback value (tweak as needed)
 

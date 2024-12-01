@@ -417,6 +417,12 @@
         DEX         ;decrease size
         TXA
 
+        CPX #0
+        BNE :+
+            LDX #0
+            STX frontier_pages_used
+        :
+
         ASL
 
         CLC 
@@ -470,6 +476,12 @@
         TAX
         DEX         ;decrease size
         TXA
+
+        CPX #0
+        BNE :+
+            LDX #1
+            STX frontier_pages_used
+        :
 
         ASL
 
@@ -525,6 +537,12 @@
         DEX         ;decrease size
         TXA
 
+        CPX #0
+        BNE :+
+            LDX #2
+            STX frontier_pages_used
+        :
+
         ASL
 
         CLC 
@@ -578,6 +596,12 @@
         TAX
         DEX         ;decrease size
         TXA
+
+        CPX #0
+        BNE :+
+            LDX #3
+            STX frontier_pages_used
+        :
 
         ASL
 
@@ -653,6 +677,8 @@
         STA (paddr),Y
 
         INC frontier_listQ1_size 
+        LDA #1
+        STA frontier_pages_used     
         JMP :++++                   ;jump to end
 
     :
@@ -684,6 +710,8 @@
         STA (paddr),Y
 
         INC frontier_listQ2_size
+        LDA #2
+        STA frontier_pages_used     
         JMP :+++                   ;jump to end
 
     :
@@ -715,6 +743,8 @@
         STA (paddr),Y
 
         INC frontier_listQ3_size
+        LDA #3
+        STA frontier_pages_used     
         JMP :++                   ;jump to end
 
     :
@@ -746,6 +776,8 @@
         STA (paddr),Y
 
         INC frontier_listQ4_size
+        LDA #4
+        STA frontier_pages_used     
         JMP :+                   ;jump to end
     :
 .endmacro
@@ -757,9 +789,53 @@
 .macro modulo value, modulus
     LDA value
     SEC
+
     :
     SBC modulus
     CMP modulus
-    BPL :-
+    BCS :-
+
+.endmacro
+
+;stores a random frontier page in a_val and a random offset from that page into b_val, then calls access_frontier on that tile
+.macro get_random_frontier_tile
+    JSR random_number_generator
+
+    modulo RandomSeed, frontier_pages_used
+    STA a_val
+
+    JSR random_number_generator
+    TAX
+
+    LDA a_val
+
+    CMP #0
+    BNE page1
+        modulo RandomSeed, frontier_listQ1_size
+        STA b_val
+        JMP endSwitch
+    .local page1
+    page1:
+    CMP #1
+    BNE page2
+        modulo RandomSeed, frontier_listQ2_size
+        STA b_val
+        JMP endSwitch
+    .local page2
+    page2:
+    CMP #2
+    BNE page3
+        modulo RandomSeed, frontier_listQ3_size
+        STA b_val
+        JMP endSwitch
+    .local page3
+    page3:
+        modulo RandomSeed, frontier_listQ4_size
+        STA b_val
+
+    .local endSwitch
+    endSwitch:
+
+    access_Frontier a_val, b_val
 
 .endmacro

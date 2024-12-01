@@ -132,6 +132,7 @@ frontier_listQ1_size:	.res 1
 frontier_listQ2_size:	.res 1
 frontier_listQ3_size:	.res 1
 frontier_listQ4_size:	.res 1
+frontier_pages_used:	.res 1
 
 ;Not used between calls to macros so space is okay to overwrite temporarily
 tempPadrToLast: 		.res 2 ;last item in address for a given quarter, used for the remove from list macro
