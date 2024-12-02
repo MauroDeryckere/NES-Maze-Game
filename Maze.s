@@ -252,32 +252,31 @@ palette_loop:
     STA RandomSeed
     
     ;step 0 of the maze generation, set a random cell as passage and calculate its frontier cells
-    ;for now we just take cell 0, 0 for easier debugging
-    set_map_tile #0, #0
+    ;for now we just take cell 2, 2 for easier debugging
+    set_map_tile #2, #2
 
-    ;no left and top neighbor for the cell 0, 0 but still check for these since a random cell could have these
-        access_map_neighbor #LEFT_N, #0, #0
+        access_map_neighbor #LEFT_N, #2, #2
         CMP #0 
         BNE TopN
 
         JSR add_cell
 
     TopN: ;top neighbor
-        access_map_neighbor #TOP_N, #0, #0
+        access_map_neighbor #TOP_N, #2, #2
         CMP #0 
         BNE RightN
 
         JSR add_cell
 
     RightN: ;right neighbor
-        access_map_neighbor #RIGHT_N, #0, #0
+        access_map_neighbor #RIGHT_N, #2, #2
         CMP #0 
         BNE BottomN
 
         JSR add_cell
 
     BottomN: ;bottom neighbor
-        access_map_neighbor #BOTTOM_N, #0, #0
+        access_map_neighbor #BOTTOM_N, #2, #2
         CMP #0
         BNE End
 
@@ -294,7 +293,7 @@ palette_loop:
 .proc add_cell
     STX x_val
     STY y_val
-    add_to_Frontier x_val, y_val
+    add_to_Frontier y_val, x_val
     RTS
 .endproc  
 
@@ -407,12 +406,12 @@ palette_loop:
 ;*****************************************************************
 .segment "CODE"
 .proc run_prims_maze
-    loop: 
-
+    loop:
+    
     LDA execs
     CMP #1
     BNE :+
-        RTS ;early return if debugging amt of execs is completed
+       RTS ;early return if debugging amt of execs is completed
     :
     ;calculate pages used to see if all are empty - if so the maze is finished
     calculate_pages_used
@@ -422,14 +421,17 @@ palette_loop:
         RTS ;early return if finished
     :
     
+    LDA #%11111111
+    STA used_direction
+
     ;step one of the agorithm: pick a random frontier cell of the list
-    get_random_frontier_tile ;returns row and col in x and y reg respectively | page and offset are maintained in a and b val
+    get_random_frontier_tile ;returns col and row in x and y reg respectively | page and offset are maintained in a and b val
     
     ;store row and col in zero page to use in the access function.
-    STX frontier_row
-    STY frontier_col
+    STX frontier_col
+    STY frontier_row
 
-    ;store a and b vam in a new value since these will be overwritten in the access map neighbor function
+    ;store a and b val in a new value since a and b will be overwritten in the access map neighbor function
     LDA a_val
     STA frontier_page
     LDA b_val
@@ -472,14 +474,18 @@ palette_loop:
         LDA #LEFT_N 
         STA used_direction
         JMP nextstep
+    
+    : ;debugging break
+        RTS
 
+    ;calculate the cell between picked frontier and passage cell and set this to a passage 
     nextstep: 
     LDA used_direction
     CMP #TOP_N
     BNE :+
         LDA frontier_row
         STA a_val
-        INC a_val
+        DEC a_val
 
         LDA frontier_col
         STA b_val
@@ -493,7 +499,7 @@ palette_loop:
 
         LDA frontier_col
         STA b_val
-        INC b_val
+        DEC b_val
         JMP nextnextstep
 
     :; bottom
@@ -501,23 +507,27 @@ palette_loop:
     BNE :+
         LDA frontier_row
         STA a_val
-        DEC a_val
+        INC a_val
 
         LDA frontier_col
         STA b_val
         JMP nextnextstep
-    
+
     : ;left
+    CMP #LEFT_N
+    BNE :+
         LDA frontier_row
         STA a_val
 
         LDA frontier_col
         STA b_val
-        DEC b_val
+        INC b_val
         JMP nextnextstep
-    
-    nextnextstep: 
-        set_map_tile a_val, b_val
+    :
+    RTS ;debugging return
+
+     nextnextstep: 
+          set_map_tile a_val, b_val
 
     ;calculate the new frontier cells for the chosen frontier cell and add them
         access_map_neighbor #LEFT_N, frontier_row, frontier_col
@@ -548,11 +558,11 @@ palette_loop:
         JSR add_cell
 
     end: 
-    ;remove the chosen frontier cell from the list
+    ; ;remove the chosen frontier cell from the list
     set_map_tile frontier_row, frontier_col
     remove_from_Frontier frontier_page, frontier_offset
 
-    INC execs
+    ;INC execs
 
     JMP loop
 

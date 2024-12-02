@@ -233,7 +233,7 @@
 .endmacro
 
 ;When there is no valid neighbor, the A register will be set to 255, when there is a valid neighbor it will be set to 0 or 1; 0 when its a wall, 1 when its a passable tiles.
-;Row and Column of the neighbor in X and Y register (useful to add to frontier afterwards) note: these are not set when there is not a valid neighbor; check this first! 
+;Row (Y) and Column (X) of the neighbor in Y and X register (useful to add to frontier afterwards) note: these are not set when there is not a valid neighbor; check this first! 
 ;Direction: The direction of the neighbor we are polling (0-3, defines are stored in the header for this)
 ;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
 ;Column: Column index (0 to 31, across 4 bytes per row)
@@ -316,12 +316,12 @@
     STA paddr+1  
 
     ;Load the value from the pointer into X and Y
-    LDY #0
+    LDY #1
     LDA (paddr),Y
     TAX         
-    INY                    
+    DEY                    
     LDA (paddr),Y    
-    TAY                   
+    TAY                
 
     JMP :++++
 
@@ -342,12 +342,12 @@
     STA paddr+1  
 
     ;Load the value from the pointer into X and Y
-    LDY #0
+    LDY #1
     LDA (paddr),Y
     TAX         
-    INY                    
+    DEY                    
     LDA (paddr),Y    
-    TAY                   
+    TAY                
 
     JMP :+++
 
@@ -368,10 +368,10 @@
     STA paddr+1  
 
     ;Load the value from the pointer into X and Y
-    LDY #0
+    LDY #1
     LDA (paddr),Y
     TAX         
-    INY                    
+    DEY                    
     LDA (paddr),Y    
     TAY                   
 
@@ -394,12 +394,12 @@
     STA paddr+1  
 
     ;Load the value from the pointer into X and Y
-    LDY #0
+    LDY #1
     LDA (paddr),Y
     TAX         
-    INY                    
+    DEY                    
     LDA (paddr),Y    
-    TAY                   
+    TAY               
     :
 
 .endmacro
