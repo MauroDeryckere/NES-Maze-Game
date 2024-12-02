@@ -159,6 +159,9 @@ used_direction:			.res 1
 
 execs: 					.res 1
 
+temp_row:				.res 1
+temp_col:				.res 1
+
 ;*****************************************************************
 
 .segment "OAM"

@@ -404,6 +404,31 @@
 
 .endmacro
 
+;TOOD
+.macro exists_in_Frontier row, col
+    LDA frontier_listQ1_size ;check page 0    
+    CMP #0
+    BEQ :+
+
+    : ;page 1
+    LDA frontier_listQ2_size
+    CMP #0
+    BEQ :+
+
+    : ;page 2
+    LDA frontier_listQ3_size
+    CMP #0
+    BEQ :+
+
+    : ;page 3
+    LDA frontier_listQ4_size
+    CMP #0
+    BEQ :+
+
+    .local return
+    return: 
+.endmacro
+
 ;page 0 - 3 | offset 0-127
 .macro remove_from_Frontier page, offset
     LDA page

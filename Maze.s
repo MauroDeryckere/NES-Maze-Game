@@ -251,8 +251,10 @@ palette_loop:
     LDA #$42
     STA RandomSeed
     
-    ;step 0 of the maze generation, set a random cell as passage and calculate its frontier cells
-    ;for now we just take cell 2, 2 for easier debugging
+;    JSR test_frontier 
+
+    ; step 0 of the maze generation, set a random cell as passage and calculate its frontier cells
+    ; for now we just take cell 2, 2 for easier debugging
     set_map_tile #2, #2
 
         access_map_neighbor #LEFT_N, #2, #2
@@ -409,7 +411,7 @@ palette_loop:
     loop:
     
     LDA execs
-    CMP #1
+    CMP #3
     BNE :+
        RTS ;early return if debugging amt of execs is completed
     :
@@ -475,8 +477,10 @@ palette_loop:
         STA used_direction
         JMP nextstep
     
-    : ;debugging break
-        RTS
+    : 
+    ;means we have a duplicate because we do not do a if is in frontier list check
+    remove_from_Frontier frontier_page, frontier_offset
+    JMP loop
 
     ;calculate the cell between picked frontier and passage cell and set this to a passage 
     nextstep: 
@@ -484,50 +488,52 @@ palette_loop:
     CMP #TOP_N
     BNE :+
         LDA frontier_row
-        STA a_val
-        DEC a_val
+        STA temp_row
+        DEC temp_row
 
         LDA frontier_col
-        STA b_val
+        STA temp_col
         JMP nextnextstep
 
     :; right
     CMP #RIGHT_N
     BNE :+
         LDA frontier_row
-        STA a_val
+        STA temp_row
 
         LDA frontier_col
-        STA b_val
-        DEC b_val
+        STA temp_col
+        INC temp_col
         JMP nextnextstep
 
     :; bottom
     CMP #BOTTOM_N
     BNE :+
         LDA frontier_row
-        STA a_val
-        INC a_val
+        STA temp_row
+        INC temp_row
 
         LDA frontier_col
-        STA b_val
+        STA temp_col
         JMP nextnextstep
 
     : ;left
     CMP #LEFT_N
     BNE :+
         LDA frontier_row
-        STA a_val
+        STA temp_row
 
         LDA frontier_col
-        STA b_val
-        INC b_val
+        STA temp_col
+        DEC temp_col
         JMP nextnextstep
     :
-    RTS ;debugging return
+    ;means we have a duplicate because we do not do a if is in frontier list check
+    remove_from_Frontier frontier_page, frontier_offset
+    JMP loop
 
-     nextnextstep: 
-          set_map_tile a_val, b_val
+    nextnextstep: 
+        set_map_tile temp_row, temp_col
 
     ;calculate the new frontier cells for the chosen frontier cell and add them
         access_map_neighbor #LEFT_N, frontier_row, frontier_col
@@ -563,9 +569,33 @@ palette_loop:
     remove_from_Frontier frontier_page, frontier_offset
 
     ;INC execs
-
     JMP loop
 
     RTS
+.endproc
+
+.proc test_frontier
+    loop: 
+        LDA frontier_listQ2_size
+        CMP #0
+        BEQ :+
+        JMP l2
+        :
+            add_to_Frontier #$FF, #$FF
+            JMP loop
+
+    l2:
+  ;  add_to_Frontier #$AA, #$AA
+
+    remove_from_Frontier #0, #10
+    remove_from_Frontier #1, #0
+
+    ;add_to_Frontier #$AA, #$AA
+
+    modulo #255, #0
+    STA a_val
+
+    RTS
+
 .endproc
 ;*****************************************************************
