@@ -147,6 +147,18 @@ b_val: 					.res 1
 
 ;reserverd for macro functions, careful with what's stored here, could be overwritten 
 temp_address:			.res 1
+
+;temp vals used for prims algorithm loop
+frontier_page: 			.res 1
+frontier_offset:		.res 1
+
+frontier_row:			.res 1
+frontier_col:			.res 1
+
+used_direction:			.res 1
+
+execs: 					.res 1
+
 ;*****************************************************************
 
 .segment "OAM"

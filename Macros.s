@@ -108,15 +108,15 @@
     AND y_val
 .endmacro
 
-;toggles the state for a given cell of the map
+;sets the state for a given cell of the map to passage (1)
 ;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
 ;Column:  Column index (0 to 31, across 4 bytes per row);
-.macro toggle_map_tile Row, Column
+.macro set_map_tile Row, Column
     calculate_tile_address_and_mask Row, Column
     
     LDY #0
     LDA (temp_address), Y   
-    EOR y_val
+    ORA y_val
     STA (temp_address), Y
 .endmacro
 
@@ -232,7 +232,7 @@
     :
 .endmacro
 
-;When there is no valid neighbor, the A register will be set to 0, when there is a valid neighbor it will be set to 1.
+;When there is no valid neighbor, the A register will be set to 255, when there is a valid neighbor it will be set to 0 or 1; 0 when its a wall, 1 when its a passable tiles.
 ;Row and Column of the neighbor in X and Y register (useful to add to frontier afterwards) note: these are not set when there is not a valid neighbor; check this first! 
 ;Direction: The direction of the neighbor we are polling (0-3, defines are stored in the header for this)
 ;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
@@ -259,33 +259,33 @@
         
     get_map_tile_state b_val, a_val
     CMP #0
-    BNE no_wall ;if the neighbor is not a wall (wall == 0) it is not a valid neighbor    
+    BNE passable ;if the neighbor is not a wall (wall == 0) it is passable 
     
-    ;valid neighbor
-    ;restore the neighbors row and col
-    PLA
-    TAY
-    PLA
-    TAX
-
-    LDA #1 ;valid neighbor -> non zero value
-    JMP return
-
-    .local set_invalid
-    set_invalid:
-        LDA #0 ;invalid -> zero
-        JMP return
-
-    ;in the case of no wall we still have to restore the stack
-    .local no_wall
-    no_wall: ;invalid neighbor
+        ;wall neighbor
         ;restore the neighbors row and col
         PLA
         TAY
         PLA
         TAX
 
-        LDA #0 ;invalid -> zero
+        LDA #0 ;the neighbor is a wall
+        JMP return
+
+    .local set_invalid
+    set_invalid:
+        LDA #%11111111 ;invalid -> max val
+        JMP return
+
+    ;in the case of no wall we still have to restore the stack
+    .local passable
+    passable:
+        ;restore the neighbors row and col
+        PLA
+        TAY
+        PLA
+        TAX
+
+        LDA #1
 
     .local return
     return:
@@ -297,7 +297,7 @@
 ; Frontier list macros
 ;*****************************************************************
 ;page 0 - 3 | offset 0-127
-;loads the byte in the X register, bit in the Y register
+;loads the row in the X register, col in the Y register
 .macro access_Frontier page, offset
     LDA page
     CMP #0
@@ -623,8 +623,8 @@
     :
 .endmacro
 
-;Defintion of byteID and bitID can be found in the map buffer section.
-.macro add_to_Frontier byteID, bitID
+;Defintion of row and col can be found in the map buffer section.
+.macro add_to_Frontier Row, Col
     ;multiply current size of Q1 by 2, 2 bytes required per element in list
     LDA frontier_listQ1_size
     ASL
@@ -644,11 +644,11 @@
         ;=> address of next item in list is now stored in paddr
 
         ; Store the values into the calculated address
-        LDA byteID
+        LDA Row
         LDY #$0             
         STA (paddr),Y
 
-        LDA bitID
+        LDA Col
         LDY #$1
         STA (paddr),Y
 
@@ -675,11 +675,11 @@
         ;=> address of next item in list is now stored in paddr
 
         ; Store the values into the calculated address
-        LDA byteID
+        LDA Row
         LDY #0
         STA (paddr),Y 
 
-        LDA bitID
+        LDA Col
         LDY #$1
         STA (paddr),Y
 
@@ -706,11 +706,11 @@
         ;=> address of next item in list is now stored in paddr
 
         ; Store the values into the calculated address
-        LDA byteID
+        LDA Row
         LDY #0
         STA (paddr),Y 
 
-        LDA bitID
+        LDA Col
         LDY #$1
         STA (paddr),Y
 
@@ -737,11 +737,11 @@
         ;=> address of next item in list is now stored in paddr
 
         ; Store the values into the calculated address
-        LDA byteID
+        LDA Row
         LDY #0
         STA (paddr),Y 
 
-        LDA bitID
+        LDA Col
         LDY #$1
         STA (paddr),Y
 
@@ -827,6 +827,8 @@
             ;clamp the offset
             modulo RandomSeed, frontier_listQ1_size
             STA b_val
+            LDA #0
+            STA a_val
             JMP endSwitch
     .local incP1
     incP1:
@@ -845,6 +847,8 @@
             ;clamp the offset
             modulo RandomSeed, frontier_listQ2_size
             STA b_val
+            LDA #1
+            STA a_val
             JMP endSwitch
     .local incP2
     incP2:
@@ -863,6 +867,8 @@
             ;clamp the offset
             modulo RandomSeed, frontier_listQ3_size
             STA b_val
+            LDA #2
+            STA a_val
             JMP endSwitch
     .local incP3
     incP3:
@@ -877,6 +883,8 @@
         ;page has items in it, check if we should use this page
         modulo RandomSeed, frontier_listQ4_size
         STA b_val
+        LDA #3
+        STA a_val
         JMP endSwitch
 
     .local endSwitch

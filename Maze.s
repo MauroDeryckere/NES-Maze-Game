@@ -195,8 +195,9 @@ mainloop:
     LDA has_generation_started
     BNE :+
         JSR start
+        JMP mainloop
     :
-
+   ; JSR game_loop
     JMP mainloop
 .endproc
 ;*****************************************************************
@@ -246,193 +247,56 @@ palette_loop:
     JSR clear_nametable
     JSR ppu_update
 
-    ;set an initial randomseed value
+    ;set an initial randomseed value - must be non zero
     LDA #$42
     STA RandomSeed
     
-    ;choose a first frontier cell, does not matter which one (can be made random in future)
-    add_to_Frontier #$0, #$0
+    ;step 0 of the maze generation, set a random cell as passage and calculate its frontier cells
+    ;for now we just take cell 0, 0 for easier debugging
+    set_map_tile #0, #0
 
-    add_to_Frontier #1, #2
-    add_to_Frontier #1, #3
-    add_to_Frontier #1, #4
-    add_to_Frontier #1, #5
-    add_to_Frontier #1, #6
-    add_to_Frontier #1, #7
-    add_to_Frontier #1, #8
-    add_to_Frontier #1, #9
+    ;no left and top neighbor for the cell 0, 0 but still check for these since a random cell could have these
+        access_map_neighbor #LEFT_N, #0, #0
+        CMP #0 
+        BNE TopN
 
-    add_to_Frontier #1, #10
-    add_to_Frontier #1, #11
-    add_to_Frontier #1, #12
-    add_to_Frontier #1, #13
-    add_to_Frontier #1, #14
-    add_to_Frontier #1, #15
-    add_to_Frontier #1, #16
-    add_to_Frontier #1, #17
-    add_to_Frontier #1, #18
-    add_to_Frontier #1, #19
-    add_to_Frontier #1, #20
+        JSR add_cell
 
-    add_to_Frontier #1, #21
-    add_to_Frontier #1, #22
-    add_to_Frontier #1, #23
-    add_to_Frontier #1, #24
-    add_to_Frontier #1, #25
-    add_to_Frontier #1, #26
-    add_to_Frontier #1, #27
-    add_to_Frontier #1, #28
-    add_to_Frontier #1, #29
-    add_to_Frontier #1, #30
+    TopN: ;top neighbor
+        access_map_neighbor #TOP_N, #0, #0
+        CMP #0 
+        BNE RightN
 
-    add_to_Frontier #2, #2
-    add_to_Frontier #2, #3
-    add_to_Frontier #2, #4
-    add_to_Frontier #2, #5
-    add_to_Frontier #2, #6
-    add_to_Frontier #2, #7
-    add_to_Frontier #2, #8
-    add_to_Frontier #2, #9
-    add_to_Frontier #2, #10
-    add_to_Frontier #2, #11
-    add_to_Frontier #2, #12
-    add_to_Frontier #2, #13
-    add_to_Frontier #2, #14
-    add_to_Frontier #2, #15
-    add_to_Frontier #2, #16
-    add_to_Frontier #2, #17
-    add_to_Frontier #2, #18
-    add_to_Frontier #2, #19
-    add_to_Frontier #2, #20
-    add_to_Frontier #2, #21
-    add_to_Frontier #2, #22
-    add_to_Frontier #2, #23
-    add_to_Frontier #2, #24
-    add_to_Frontier #2, #25
-    add_to_Frontier #2, #26
-    add_to_Frontier #2, #27
-    add_to_Frontier #2, #28
-    add_to_Frontier #2, #29
-    add_to_Frontier #2, #30
+        JSR add_cell
 
-    add_to_Frontier #3, #2
-    add_to_Frontier #3, #3
-    add_to_Frontier #3, #4
-    add_to_Frontier #3, #5
-    add_to_Frontier #3, #6
-    add_to_Frontier #3, #7
-    add_to_Frontier #3, #8
-    add_to_Frontier #3, #9
-    add_to_Frontier #3, #10
-    add_to_Frontier #3, #11
-    add_to_Frontier #3, #12
-    add_to_Frontier #3, #13
-    add_to_Frontier #3, #14
-    add_to_Frontier #3, #15
-    add_to_Frontier #3, #16
-    add_to_Frontier #3, #17
-    add_to_Frontier #3, #18
-    add_to_Frontier #3, #19
-    add_to_Frontier #3, #20
-    add_to_Frontier #3, #21
-    add_to_Frontier #3, #22
-    add_to_Frontier #3, #23
-    add_to_Frontier #3, #24
-    add_to_Frontier #3, #25
-    add_to_Frontier #3, #26
-    add_to_Frontier #3, #27
-    add_to_Frontier #3, #28
-    add_to_Frontier #3, #29
-    add_to_Frontier #3, #30
+    RightN: ;right neighbor
+        access_map_neighbor #RIGHT_N, #0, #0
+        CMP #0 
+        BNE BottomN
 
-    add_to_Frontier #4, #2
-    add_to_Frontier #4, #3
-    add_to_Frontier #4, #4
-    add_to_Frontier #4, #5
-    add_to_Frontier #4, #6
-    add_to_Frontier #4, #7
-    add_to_Frontier #4, #8
-    add_to_Frontier #4, #9
-    add_to_Frontier #4, #10
-    add_to_Frontier #4, #11
-    add_to_Frontier #4, #12
-    add_to_Frontier #4, #13
-    add_to_Frontier #4, #14
-    add_to_Frontier #4, #15
-    add_to_Frontier #4, #16
-    add_to_Frontier #4, #17
-    add_to_Frontier #4, #18
-    add_to_Frontier #4, #19
-    add_to_Frontier #4, #20
-    add_to_Frontier #4, #21
-    add_to_Frontier #4, #22
-    add_to_Frontier #4, #23
-    add_to_Frontier #4, #24
-    add_to_Frontier #4, #25
-    add_to_Frontier #4, #26
-    add_to_Frontier #4, #27
-    add_to_Frontier #4, #28
-    add_to_Frontier #4, #29
-    add_to_Frontier #4, #30
+        JSR add_cell
 
-    add_to_Frontier #5, #2
-    add_to_Frontier #5, #3
-    add_to_Frontier #5, #4
-    add_to_Frontier #5, #5
-    add_to_Frontier #5, #6
-    add_to_Frontier #5, #7
-    add_to_Frontier #5, #8
-    add_to_Frontier #5, #9
-    add_to_Frontier #5, #10
-    add_to_Frontier #5, #11
-    add_to_Frontier #5, #12
-    add_to_Frontier #5, #13
-    add_to_Frontier #5, #14
-    add_to_Frontier #5, #15
-    add_to_Frontier #5, #16
-    add_to_Frontier #5, #17
-    add_to_Frontier #5, #18
-    add_to_Frontier #5, #19
-    add_to_Frontier #5, #20
-    add_to_Frontier #5, #21
-    add_to_Frontier #5, #22
-    add_to_Frontier #5, #23
-    add_to_Frontier #5, #24
-    add_to_Frontier #5, #25
-    add_to_Frontier #5, #26
-    add_to_Frontier #5, #27
-    add_to_Frontier #5, #28
-    add_to_Frontier #5, #29
-    add_to_Frontier #5, #30
+    BottomN: ;bottom neighbor
+        access_map_neighbor #BOTTOM_N, #0, #0
+        CMP #0
+        BNE End
 
-    add_to_Frontier #15, #$16
-    
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    get_random_frontier_tile
-    ;get_random_frontier_tile
-    ;get_random_frontier_tile
-    ;get_random_frontier_tile
-    ;get_random_frontier_tile
-    ;get_random_frontier_tile
-    ;get_random_frontier_tile
-    ;get_random_frontier_tile
-    ;get_random_frontier_tile
-    ;get_random_frontier_tile
-    ;get_random_frontier_tile
+        JSR add_cell
+ 
+    End: ;end
+
+   JSR run_prims_maze
 
     RTS
 .endproc
+
+;subroutine to add a cell to the frontierlist after accessing the neighbor and checking if it is valid
+.proc add_cell
+    STX x_val
+    STY y_val
+    add_to_Frontier x_val, y_val
+    RTS
+.endproc  
 
 ;*****************************************************************
 ; Start
@@ -468,15 +332,25 @@ palette_loop:
 ;*****************************************************************
 
 ;*****************************************************************
+; Main gameloop
+;*****************************************************************
+.segment "CODE"
+.proc game_loop
+    JSR display_map
+    JSR run_prims_maze
+
+    RTS
+.endproc
+;*****************************************************************
+
+;*****************************************************************
 ; Graphics
 ;*****************************************************************
 .segment "CODE"
 .proc display_map
     JSR ppu_off
     JSR clear_nametable
-
-    ;JSR run_prims_maze ;temporarily do this here every frame - this is just for resting and will be moved later.
-
+    
     vram_set_address (NAME_TABLE_0_ADDRESS) 
     assign_16i paddr, MAP_BUFFER_ADDRESS    ;load map into ppu
 
@@ -533,8 +407,154 @@ palette_loop:
 ;*****************************************************************
 .segment "CODE"
 .proc run_prims_maze
-    JSR random_number_generator
-    STA MAP_BUFFER_ADDRESS
+    loop: 
+
+    LDA execs
+    CMP #1
+    BNE :+
+        RTS ;early return if debugging amt of execs is completed
+    :
+    ;calculate pages used to see if all are empty - if so the maze is finished
+    calculate_pages_used
+    LDA frontier_pages_used
+    CMP #0
+    BNE :+
+        RTS ;early return if finished
+    :
+    
+    ;step one of the agorithm: pick a random frontier cell of the list
+    get_random_frontier_tile ;returns row and col in x and y reg respectively | page and offset are maintained in a and b val
+    
+    ;store row and col in zero page to use in the access function.
+    STX frontier_row
+    STY frontier_col
+
+    ;store a and b vam in a new value since these will be overwritten in the access map neighbor function
+    LDA a_val
+    STA frontier_page
+    LDA b_val
+    STA frontier_offset
+
+
+    ;pick a neighbor of the frontier cell that's in state passage
+    ;for now just the first one we can find in this state
+    access_map_neighbor #TOP_N, frontier_row, frontier_col
+    CMP #1 ;we want something in state passage
+    BNE :+
+        ;valid cell, Jump to next step
+        LDA #TOP_N 
+        STA used_direction
+        JMP nextstep
+
+    : ;right
+    access_map_neighbor #RIGHT_N, frontier_row, frontier_col
+    CMP #1 ;we want something in state passage
+    BNE :+
+        ;valid cell, Jump to next step
+        LDA #RIGHT_N 
+        STA used_direction
+        JMP nextstep
+
+    : ;bottom
+    access_map_neighbor #BOTTOM_N, frontier_row, frontier_col
+    CMP #1 ;we want something in state passage
+    BNE :+
+        ;valid cell, Jump to next step
+        LDA #BOTTOM_N 
+        STA used_direction
+        JMP nextstep
+        
+    : ;left
+    access_map_neighbor #LEFT_N, frontier_row, frontier_col
+    CMP #1 ;we want something in state passage
+    BNE :+
+        ;valid cell, Jump to next step
+        LDA #LEFT_N 
+        STA used_direction
+        JMP nextstep
+
+    nextstep: 
+    LDA used_direction
+    CMP #TOP_N
+    BNE :+
+        LDA frontier_row
+        STA a_val
+        INC a_val
+
+        LDA frontier_col
+        STA b_val
+        JMP nextnextstep
+
+    :; right
+    CMP #RIGHT_N
+    BNE :+
+        LDA frontier_row
+        STA a_val
+
+        LDA frontier_col
+        STA b_val
+        INC b_val
+        JMP nextnextstep
+
+    :; bottom
+    CMP #BOTTOM_N
+    BNE :+
+        LDA frontier_row
+        STA a_val
+        DEC a_val
+
+        LDA frontier_col
+        STA b_val
+        JMP nextnextstep
+    
+    : ;left
+        LDA frontier_row
+        STA a_val
+
+        LDA frontier_col
+        STA b_val
+        DEC b_val
+        JMP nextnextstep
+    
+    nextnextstep: 
+        set_map_tile a_val, b_val
+
+    ;calculate the new frontier cells for the chosen frontier cell and add them
+        access_map_neighbor #LEFT_N, frontier_row, frontier_col
+        CMP #0 
+        BNE TopN
+
+        JSR add_cell
+
+    TopN: ;top neighbor
+        access_map_neighbor #TOP_N, frontier_row, frontier_col
+        CMP #0 
+        BNE RightN
+
+        JSR add_cell
+
+    RightN: ;right neighbor
+        access_map_neighbor #RIGHT_N, frontier_row, frontier_col
+        CMP #0 
+        BNE BottomN
+
+        JSR add_cell
+
+    BottomN: ;bottom neighbor
+        access_map_neighbor #BOTTOM_N, frontier_row, frontier_col
+        CMP #0 
+        BNE end
+
+        JSR add_cell
+
+    end: 
+    ;remove the chosen frontier cell from the list
+    set_map_tile frontier_row, frontier_col
+    remove_from_Frontier frontier_page, frontier_offset
+
+    INC execs
+
+    JMP loop
 
     RTS
 .endproc
