@@ -189,15 +189,37 @@ irq:
 .segment "CODE"
 .proc main
 
-    JSR Init
-
+    JSR Init    
 mainloop:
+    INC RandomSeed 
+
     LDA has_generation_started
     BNE :+
         JSR start
+
+        ;auto generation
+        ; LDA #1
+        ; STA has_generation_started
+
         JMP mainloop
     :
-   ; JSR game_loop
+
+     LDA has_generation_started
+     BEQ stop
+        JSR clear_maze
+        JSR start_prims_maze
+        JSR run_prims_maze
+        
+        ;JSR wait_frame
+        
+        JSR display_map
+
+        LDA #0
+        STA has_generation_started
+     stop:
+
+    
+    ;JSR game_loop
     JMP mainloop
 .endproc
 ;*****************************************************************
@@ -248,50 +270,21 @@ palette_loop:
     JSR ppu_update
 
     ;set an initial randomseed value - must be non zero
-    LDA #$42
+    LDA #$10
     STA RandomSeed
     
 ;    JSR test_frontier 
 
-    ; step 0 of the maze generation, set a random cell as passage and calculate its frontier cells
-    ; for now we just take cell 2, 2 for easier debugging
-    set_map_tile #2, #2
-
-        access_map_neighbor #LEFT_N, #2, #2
-        CMP #0 
-        BNE TopN
-
-        JSR add_cell
-
-    TopN: ;top neighbor
-        access_map_neighbor #TOP_N, #2, #2
-        CMP #0 
-        BNE RightN
-
-        JSR add_cell
-
-    RightN: ;right neighbor
-        access_map_neighbor #RIGHT_N, #2, #2
-        CMP #0 
-        BNE BottomN
-
-        JSR add_cell
-
-    BottomN: ;bottom neighbor
-        access_map_neighbor #BOTTOM_N, #2, #2
-        CMP #0
-        BNE End
-
-        JSR add_cell
- 
-    End: ;end
-
-   JSR run_prims_maze
+    ;JSR start_prims_maze    
+    LDA #1
+    STA has_generation_started
 
     RTS
 .endproc
 
+
 ;subroutine to add a cell to the frontierlist after accessing the neighbor and checking if it is valid
+.segment "CODE"
 .proc add_cell
     STX x_val
     STY y_val
@@ -312,22 +305,19 @@ palette_loop:
         LDA a_pressed_last_frame
         BNE A_NOT_PRESSED           ;check for pressed this frame
 
-        LDA #1
-        STA has_generation_started         ;set map visible
+        
 
-        JSR display_map             ;copy map to ppu
 
         LDA #1
+        STA has_generation_started
         STA a_pressed_last_frame
+
         JMP :+
     A_NOT_PRESSED:
         ;code for other buttons etc here
         LDA #0
         STA a_pressed_last_frame
     :
-
-    INC RandomSeed 
-
     RTS
 .endproc
 ;*****************************************************************
@@ -407,6 +397,55 @@ palette_loop:
 ; The main algorithm loop (prims)
 ;*****************************************************************
 .segment "CODE"
+.proc start_prims_maze
+    ; step 0 of the maze generation, set a random cell as passage and calculate its frontier cells
+    
+    JSR random_number_generator
+    modulo RandomSeed, #29
+    ;LDA #29
+    STA a_val
+STA temp
+    JSR random_number_generator
+    modulo RandomSeed, #31
+    ;LDA #31
+    STA b_val
+STA temp
+
+    set_map_tile a_val, b_val
+
+        access_map_neighbor #LEFT_N, a_val, b_val
+        CMP #0 
+        BNE TopN
+
+        JSR add_cell
+
+    TopN: ;top neighbor
+        access_map_neighbor #TOP_N, a_val, b_val
+        CMP #0 
+        BNE RightN
+
+        JSR add_cell
+
+    RightN: ;right neighbor
+        access_map_neighbor #RIGHT_N, a_val, b_val
+        CMP #0 
+        BNE BottomN
+
+        JSR add_cell
+
+    BottomN: ;bottom neighbor
+        access_map_neighbor #BOTTOM_N, a_val, b_val
+        CMP #0
+        BNE End
+
+        JSR add_cell
+ 
+    End: ;end
+
+   RTS
+.endproc
+
+.segment "CODE"
 .proc run_prims_maze
     loop:
     
@@ -418,7 +457,6 @@ palette_loop:
     ;calculate pages used to see if all are empty - if so the maze is finished
     calculate_pages_used
     LDA frontier_pages_used
-    CMP #0
     BNE :+
         RTS ;early return if finished
     :
@@ -597,5 +635,20 @@ palette_loop:
 
     RTS
 
+.endproc
+
+.segment "CODE"
+.proc clear_maze
+    LDY #0
+
+    loop: 
+    LDA #$0
+    STA maze_buffer, Y
+
+    INY
+    CPY #120
+    BNE loop
+    
+    RTS
 .endproc
 ;*****************************************************************
