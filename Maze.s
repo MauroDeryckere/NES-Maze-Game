@@ -153,6 +153,7 @@ irq:
 	STX PPU_VRAM_ADDRESS2
 	LDX #0 ; transfer the 32 bytes to VRAM
 	LDX #0 ; transfer the 32 bytes to VRAM
+
 @loop:
 	LDA palette, x
 	STA PPU_VRAM_IO
@@ -169,6 +170,32 @@ irq:
 	LDA ppu_ctl1
 	STA PPU_MASK
 
+    vram_set_address (NAME_TABLE_0_ADDRESS)
+    assign_16i paddr, MAP_BUFFER_ADDRESS
+
+    LDY #0          ;reset value of y
+    loop:
+        LDA (paddr),y   ;get byte to load
+        TAX
+        LDA #8          ;8 bits in a byte
+        STA byte_loop_couter
+
+        byteloop:
+        ; TXA             ;copy x into a to preform actions on a copy
+        ; set_Carry_to_highest_bit_A  ;rol sets bit 0 to the value of the carry flag, so we make sure the carry flag is set to the value of bit 7 to rotate correctly
+        ; ROL             ;rotate to get the correct bit on pos 0
+        ; TAX             ;copy current rotation back to x
+        AND #%00000001  ;and with 1, to check if tile is filled
+        STA PPU_VRAM_IO ;write to ppu
+
+        DEC byte_loop_couter    ;decrease counter
+        LDA byte_loop_couter    ;get value into A
+        BNE byteloop            ;repeat byteloop if not done with byte yet
+
+        INY
+            CPY #120              ;the screen is 120 bytes in total, so check if 120 bytes have been displayed to know if we're done
+            BNE loop
+
 	; flag PPU update complete
 	LDX #0
 	STX nmi_ready
@@ -179,6 +206,7 @@ irq:
 	PLA
 	TAX
 	PLA
+
 	RTI
 .endproc
 ;*****************************************************************
@@ -208,14 +236,22 @@ mainloop:
      BEQ stop
         JSR clear_maze
         JSR start_prims_maze
-        JSR run_prims_maze
-        
-        ;JSR wait_frame
-        
-        JSR display_map
 
-        LDA #0
-        STA has_generation_started
+        l2:
+            JSR run_prims_maze
+            JSR run_prims_maze
+            JSR run_prims_maze
+            JSR run_prims_maze
+            
+            ;JSR display_map
+
+            LDA has_generation_started
+            BEQ stop
+
+
+        JMP l2
+
+
      stop:
 
     
@@ -368,7 +404,14 @@ palette_loop:
             CPY #MAP_BUFFER_SIZE              ;the screen is 120 bytes in total, so check if 120 bytes have been displayed to know if we're done
             BNE loop
 
+        WaitForVblank:
+            BIT $2002
+            BPL WaitForVblank
         JSR ppu_update
+        
+        ; LDA PPU_CONTROL
+        ; ORA #%00000010
+        ; STA PPU_CONTROL
 
         RTS
 .endproc
@@ -458,6 +501,10 @@ STA temp
     calculate_pages_used
     LDA frontier_pages_used
     BNE :+
+
+        LDA #0
+        STA has_generation_started
+
         RTS ;early return if finished
     :
     
@@ -607,7 +654,7 @@ STA temp
     remove_from_Frontier frontier_page, frontier_offset
 
     ;INC execs
-    JMP loop
+    ;JMP loop
 
     RTS
 .endproc
