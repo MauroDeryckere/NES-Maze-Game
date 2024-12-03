@@ -162,7 +162,13 @@ execs: 					.res 1
 temp_row:				.res 1
 temp_col:				.res 1
 
+;useful for debugging
 temp: .res 1
+			
+changed_tiles_buffer: .res 40
+
+low_byte: .res 1
+high_byte: .res 1
 
 ;*****************************************************************
 

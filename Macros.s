@@ -29,6 +29,30 @@
     :
 .endmacro
 
+.macro add_to_changed_tiles_buffer Row, Col
+    LDY #0
+    .local loop
+    loop:
+
+        LDA changed_tiles_buffer, y
+        CMP #$FF
+        BEQ add_vals
+        
+        INY
+        INY
+
+        CPY #40
+        BNE loop
+
+    .local add_vals
+    add_vals:
+        LDA Row
+        STA changed_tiles_buffer, y
+        INY
+        LDA Col
+        STA changed_tiles_buffer, y
+.endmacro
+
 ;*****************************************************************
 ; Map buffer macros
 ;*****************************************************************

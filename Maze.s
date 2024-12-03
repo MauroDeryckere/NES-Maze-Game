@@ -5,6 +5,35 @@
 ; Utility functions
 ;*****************************************************************
 .segment "CODE"
+.proc clear_changed_tiles_buffer
+    LDY #0
+
+    loop: 
+    LDA #$FF
+    STA changed_tiles_buffer, Y
+
+    INY
+    CPY #40
+    BNE loop
+    
+    RTS
+.endproc
+
+.segment "CODE"
+.proc clear_maze
+    LDY #0
+
+    loop: 
+    LDA #$0
+    STA maze_buffer, Y
+
+    INY
+    CPY #120
+    BNE loop
+    
+    RTS
+.endproc
+
 .proc wait_frame
 	INC nmi_ready
 @loop:
@@ -138,7 +167,43 @@ irq:
     PHA
 
     BIT PPU_STATUS
-	; transfer sprite OAM data using DMA
+
+        LDY #0
+        LDA #0
+        STA temp
+    loop: 
+        LDA #0
+        STA high_byte
+        STA low_byte
+
+        ;row
+        ;LDA changed_tiles_buffer, y
+        LDA #28
+        CMP #$FF ;end of buffer
+        BEQ done 
+        
+        ;col
+        INY
+        ;LDA changed_tiles_buffer, y
+        
+        
+
+        LDA #$20 ;add high byte
+        STA $2006
+
+        LDA #0 ;add low byte
+        STA $2006
+
+        LDA #1
+        STA PPU_VRAM_IO
+
+        INY
+        CPY #40
+        ;BNE loop    
+    done: 
+        JSR clear_changed_tiles_buffer
+
+    ; transfer sprite OAM data using DMA
 	LDX #0
 	STX PPU_SPRRAM_ADDRESS
 	LDA #>oam
@@ -154,14 +219,14 @@ irq:
 	LDX #0 ; transfer the 32 bytes to VRAM
 	LDX #0 ; transfer the 32 bytes to VRAM
 
-@loop:
-	LDA palette, x
-	STA PPU_VRAM_IO
-	INX
-	CPX #32
-	BCC @loop
+    @loop:
+        LDA palette, x
+        STA PPU_VRAM_IO
+        INX
+        CPX #32
+        BCC @loop
 
-	; write current scroll and control settings
+    ; write current scroll and control settings
 	LDA #0
 	STA PPU_VRAM_ADDRESS1
 	STA PPU_VRAM_ADDRESS1
@@ -170,36 +235,11 @@ irq:
 	LDA ppu_ctl1
 	STA PPU_MASK
 
-    vram_set_address (NAME_TABLE_0_ADDRESS)
-    assign_16i paddr, MAP_BUFFER_ADDRESS
-
-    LDY #0          ;reset value of y
-    loop:
-        LDA (paddr),y   ;get byte to load
-        TAX
-        LDA #8          ;8 bits in a byte
-        STA byte_loop_couter
-
-        byteloop:
-        ; TXA             ;copy x into a to preform actions on a copy
-        ; set_Carry_to_highest_bit_A  ;rol sets bit 0 to the value of the carry flag, so we make sure the carry flag is set to the value of bit 7 to rotate correctly
-        ; ROL             ;rotate to get the correct bit on pos 0
-        ; TAX             ;copy current rotation back to x
-        AND #%00000001  ;and with 1, to check if tile is filled
-        STA PPU_VRAM_IO ;write to ppu
-
-        DEC byte_loop_couter    ;decrease counter
-        LDA byte_loop_couter    ;get value into A
-        BNE byteloop            ;repeat byteloop if not done with byte yet
-
-        INY
-            CPY #120              ;the screen is 120 bytes in total, so check if 120 bytes have been displayed to know if we're done
-            BNE loop
 
 	; flag PPU update complete
 	LDX #0
 	STX nmi_ready
-
+    
 	; restore registers and return
 	PLA
 	TAY
@@ -239,21 +279,15 @@ mainloop:
 
         l2:
             JSR run_prims_maze
-            JSR run_prims_maze
-            JSR run_prims_maze
-            JSR run_prims_maze
             
             ;JSR display_map
 
             LDA has_generation_started
             BEQ stop
-
-
         JMP l2
 
 
      stop:
-
     
     ;JSR game_loop
     JMP mainloop
@@ -294,24 +328,27 @@ loop:
 .segment "CODE"
 .proc Init
     LDX #0
-palette_loop:
-    LDA default_palette, x  ;load palettes
-    STA palette, x
-    INX
-    CPX #32
-    BCC palette_loop
+    palette_loop:
+        LDA default_palette, x  ;load palettes
+        STA palette, x
+        INX
+        CPX #32
+        BCC palette_loop
 
+    ;clear stuff
     JSR ppu_off
     JSR clear_nametable
     JSR ppu_update
+
+    JSR clear_changed_tiles_buffer
+    JSR clear_maze
 
     ;set an initial randomseed value - must be non zero
     LDA #$10
     STA RandomSeed
     
-;    JSR test_frontier 
+   ;JSR test_frontier ;test code
 
-    ;JSR start_prims_maze    
     LDA #1
     STA has_generation_started
 
@@ -447,14 +484,15 @@ palette_loop:
     modulo RandomSeed, #29
     ;LDA #29
     STA a_val
-STA temp
+    ;STA temp
     JSR random_number_generator
     modulo RandomSeed, #31
     ;LDA #31
     STA b_val
-STA temp
+    ;STA temp
 
     set_map_tile a_val, b_val
+    add_to_changed_tiles_buffer a_val, b_val
 
         access_map_neighbor #LEFT_N, a_val, b_val
         CMP #0 
@@ -619,6 +657,7 @@ STA temp
 
     nextnextstep: 
         set_map_tile temp_row, temp_col
+        add_to_changed_tiles_buffer temp_row, temp_col
 
     ;calculate the new frontier cells for the chosen frontier cell and add them
         access_map_neighbor #LEFT_N, frontier_row, frontier_col
@@ -651,6 +690,7 @@ STA temp
     end: 
     ; ;remove the chosen frontier cell from the list
     set_map_tile frontier_row, frontier_col
+    add_to_changed_tiles_buffer frontier_row, frontier_col
     remove_from_Frontier frontier_page, frontier_offset
 
     ;INC execs
@@ -682,20 +722,5 @@ STA temp
 
     RTS
 
-.endproc
-
-.segment "CODE"
-.proc clear_maze
-    LDY #0
-
-    loop: 
-    LDA #$0
-    STA maze_buffer, Y
-
-    INY
-    CPY #120
-    BNE loop
-    
-    RTS
 .endproc
 ;*****************************************************************
