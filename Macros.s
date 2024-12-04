@@ -41,7 +41,7 @@
         INY
         INY
 
-        CPY #40
+        CPY #CHANGED_TILES_BUFFER_SIZE
         BNE loop
 
     .local add_vals
