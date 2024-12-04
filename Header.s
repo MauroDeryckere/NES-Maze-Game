@@ -80,6 +80,9 @@ TOP_N = 0
 RIGHT_N = 1 
 BOTTOM_N = 2
 LEFT_N = 3
+
+;changed tiles util
+CHANGED_TILES_BUFFER_SIZE = 20
 ;*****************************************************************
 
 .segment "HEADER"
@@ -161,15 +164,16 @@ execs: 					.res 1
 
 temp_row:				.res 1
 temp_col:				.res 1
-
-;useful for debugging
-temp: .res 1
 			
-changed_tiles_buffer: .res 40
+should_clear_buffer: 	.res 1
+changed_tiles_buffer: 	.res 20
 
-low_byte: .res 1
-high_byte: .res 1
+low_byte: 				.res 1
+high_byte: 				.res 1
 
+
+;flag to toggle displaying step by step
+display_steps:			.res 1
 ;*****************************************************************
 
 .segment "OAM"

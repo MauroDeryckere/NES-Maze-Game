@@ -13,9 +13,9 @@
     STA changed_tiles_buffer, Y
 
     INY
-    CPY #40
+    CPY #CHANGED_TILES_BUFFER_SIZE
     BNE loop
-    
+
     RTS
 .endproc
 
@@ -165,43 +165,62 @@ irq:
     PHA
     TYA
     PHA
-
+    
     BIT PPU_STATUS
 
-        LDY #0
-        LDA #0
-        STA temp
-    loop: 
+    LDA display_steps
+    BEQ done
+
+    ;update the map
+    LDY #0
+    LDA #0
+    maploop: 
+        CLC
         LDA #0
         STA high_byte
-        STA low_byte
 
         ;row
-        ;LDA changed_tiles_buffer, y
-        LDA #28
+        LDA changed_tiles_buffer, y
+        ;LDA #0
         CMP #$FF ;end of buffer
         BEQ done 
+
+        STA low_byte
+
+        ASL low_byte ;x2
+        ROL high_byte
+        ASL low_byte ;x2
+        ROL high_byte
+        ASL low_byte ;x2
+        ROL high_byte
+        ASL low_byte ;x2
+        ROL high_byte
+        ASL low_byte ;x2 == 32
+        ROL high_byte
+
+        LDA #$20 ;add high byte
+        CLC
+        ADC high_byte
+        STA $2006
         
         ;col
         INY
-        ;LDA changed_tiles_buffer, y
+        LDA changed_tiles_buffer, y
+        ;LDA #0
         
-        
-
-        LDA #$20 ;add high byte
-        STA $2006
-
-        LDA #0 ;add low byte
+        CLC
+        ADC low_byte
         STA $2006
 
         LDA #1
         STA PPU_VRAM_IO
 
         INY
-        CPY #40
-        ;BNE loop    
+        CPY #CHANGED_TILES_BUFFER_SIZE
+        BNE maploop    
     done: 
-        JSR clear_changed_tiles_buffer
+        LDA #1
+        STA should_clear_buffer
 
     ; transfer sprite OAM data using DMA
 	LDX #0
@@ -226,6 +245,7 @@ irq:
         CPX #32
         BCC @loop
 
+
     ; write current scroll and control settings
 	LDA #0
 	STA PPU_VRAM_ADDRESS1
@@ -234,7 +254,6 @@ irq:
 	STA PPU_CONTROL
 	LDA ppu_ctl1
 	STA PPU_MASK
-
 
 	; flag PPU update complete
 	LDX #0
@@ -265,7 +284,7 @@ mainloop:
     BNE :+
         JSR start
 
-        ;auto generation
+        ;auto generation once maze is completed (useful for debugging)
         ; LDA #1
         ; STA has_generation_started
 
@@ -274,22 +293,46 @@ mainloop:
 
      LDA has_generation_started
      BEQ stop
+        ;clear everything and display empty map at start of generation
         JSR clear_maze
+        JSR clear_changed_tiles_buffer
+        JSR wait_frame
+        JSR display_map
+
         JSR start_prims_maze
 
-        l2:
+       LDA display_steps
+       BEQ display_once
+
+        step_by_step_generation_loop:
+            JSR wait_frame ;wait until a vblank has happened
+
+            LDA should_clear_buffer
+            BEQ :+
+                JSR clear_changed_tiles_buffer
+                LDA #0
+                STA should_clear_buffer
+            :
+
+            ;current version works up to 5x speed - TODO add a flag to adjust this speed
+            ; JSR run_prims_maze
+            ; JSR run_prims_maze
+            ; JSR run_prims_maze
+            ; JSR run_prims_maze
             JSR run_prims_maze
             
-            ;JSR display_map
-
             LDA has_generation_started
             BEQ stop
-        JMP l2
+            JMP step_by_step_generation_loop
 
+        display_once: 
+            JSR run_prims_maze
+            LDA has_generation_started
+            BNE display_once
+            JSR display_map
 
      stop:
-    
-    ;JSR game_loop
+
     JMP mainloop
 .endproc
 ;*****************************************************************
@@ -351,7 +394,8 @@ loop:
 
     LDA #1
     STA has_generation_started
-
+    LDA #1
+    STA display_steps
     RTS
 .endproc
 
@@ -378,9 +422,6 @@ loop:
         LDA a_pressed_last_frame
         BNE A_NOT_PRESSED           ;check for pressed this frame
 
-        
-
-
         LDA #1
         STA has_generation_started
         STA a_pressed_last_frame
@@ -391,18 +432,6 @@ loop:
         LDA #0
         STA a_pressed_last_frame
     :
-    RTS
-.endproc
-;*****************************************************************
-
-;*****************************************************************
-; Main gameloop
-;*****************************************************************
-.segment "CODE"
-.proc game_loop
-    JSR display_map
-    JSR run_prims_maze
-
     RTS
 .endproc
 ;*****************************************************************
@@ -441,14 +470,7 @@ loop:
             CPY #MAP_BUFFER_SIZE              ;the screen is 120 bytes in total, so check if 120 bytes have been displayed to know if we're done
             BNE loop
 
-        WaitForVblank:
-            BIT $2002
-            BPL WaitForVblank
         JSR ppu_update
-        
-        ; LDA PPU_CONTROL
-        ; ORA #%00000010
-        ; STA PPU_CONTROL
 
         RTS
 .endproc
