@@ -165,6 +165,7 @@ execs: 					.res 1
 
 temp_row:				.res 1
 temp_col:				.res 1
+temp: 					.res 1
 			
 should_clear_buffer: 	.res 1
 changed_tiles_buffer: 	.res 20 ;changed tiles this frame - used for graphics during vblank | layout: row, col, row, col; FF by default
@@ -172,7 +173,6 @@ added_frontier_buffer: 	.res 40 ;added frontier cells this frame - used for grap
 
 low_byte: 				.res 1
 high_byte: 				.res 1
-
 
 ;flag to toggle displaying step by step
 display_steps:			.res 1

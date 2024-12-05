@@ -455,29 +455,117 @@
 
 .endmacro
 
-;TOOD
-.macro exists_in_Frontier row, col
-    LDA frontier_listQ1_size ;check page 0    
-    CMP #0
-    BEQ :+
+;returns whether or not the row and col pair exist in the frontier list in the X register (1 found, 0 not found)
+.macro exists_in_Frontier Row, Col
+    LDX #0
+    STX temp
 
-    : ;page 1
-    LDA frontier_listQ2_size
-    CMP #0
-    BEQ :+
+    .local loop_p0
+    loop_p0:        
+        LDX temp
+        CPX frontier_listQ1_size
+        BNE :+
+            LDX #0
+            STX temp
+            JMP loop_p1
+        :
+        
+        access_Frontier #0, temp
+        INC temp
+        
+        CPY Row
+        BEQ :+
+            JMP loop_p0
+        :
+        CPX Col
+        BEQ :+
+            JMP loop_p0
+        :
 
-    : ;page 2
-    LDA frontier_listQ3_size
-    CMP #0
-    BEQ :+
+        JMP return_found
 
-    : ;page 3
-    LDA frontier_listQ4_size
-    CMP #0
-    BEQ :+
+    .local loop_p1
+    loop_p1:        
+        LDX temp
+        CPX frontier_listQ2_size
+        BNE :+
+            LDX #0
+            STX temp
+            JMP loop_p2
+        :
+        
+        access_Frontier #1, temp
+        INC temp
+        
+        CPY Row
+        BEQ :+
+            JMP loop_p1
+        :
+        CPX Col
+        BEQ :+
+            JMP loop_p1
+        :
 
-    .local return
-    return: 
+        JMP return_found
+
+    .local loop_p2
+    loop_p2:        
+        LDX temp
+        CPX frontier_listQ3_size
+        BNE :+
+            LDX #0
+            STX temp
+            JMP loop_p3
+        :
+        
+        access_Frontier #2, temp
+        INC temp
+        
+        CPY Row
+        BEQ :+
+            JMP loop_p2
+        :
+        CPX Col
+        BEQ :+
+            JMP loop_p2
+        :
+
+        JMP return_found
+
+    .local loop_p3
+    loop_p3:        
+        LDX temp
+        CPX frontier_listQ4_size
+        BNE :+
+            JMP return_not_found 
+        :
+        
+        access_Frontier #3, temp
+        INC temp
+        
+        CPY Row
+        BEQ :+
+            JMP loop_p3
+        :
+        CPX Col
+        BEQ :+
+            JMP loop_p3
+        :
+
+        JMP return_found
+
+    .local return_not_found
+    return_not_found:
+        LDX #0
+        JMP n
+
+    .local return_found
+    return_found:
+        LDX #1
+        JMP n
+
+    .local n
+    n: 
 .endmacro
 
 ;page 0 - 3 | offset 0-127

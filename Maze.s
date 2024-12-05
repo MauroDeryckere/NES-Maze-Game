@@ -459,7 +459,7 @@ loop:
     LDA #$10
     STA RandomSeed
     
-   ;JSR test_frontier ;test code
+    ;JSR test_frontier ;test code
 
     LDA #1
     STA has_generation_started
@@ -474,6 +474,7 @@ loop:
 .proc add_cell
     STX x_val
     STY y_val
+
     add_to_Frontier y_val, x_val
     add_to_added_frontier_buffer y_val, x_val
 
@@ -640,7 +641,8 @@ loop:
 
         RTS ;early return if finished
     :
-    
+
+    ;useful for debugging but not necessary for algorithm    
     LDA #%11111111
     STA used_direction
 
@@ -695,11 +697,9 @@ loop:
         STA used_direction
         JMP nextstep
     
-    : 
-    ;means we have a duplicate because we do not do a if is in frontier list check
-    remove_from_Frontier frontier_page, frontier_offset
-    JMP loop
-
+    :
+    ;wont reach this label in algorithm but useful for debugging 
+    
     ;calculate the cell between picked frontier and passage cell and set this to a passage 
     nextstep: 
     LDA used_direction
@@ -746,9 +746,7 @@ loop:
         DEC temp_col
         JMP nextnextstep
     :
-    ;means we have a duplicate because we do not do a if is in frontier list check
-    remove_from_Frontier frontier_page, frontier_offset
-    JMP loop
+    ;wont reach this label in algorithm but useful for debugging 
 
     nextnextstep: 
         set_map_tile temp_row, temp_col
@@ -757,31 +755,78 @@ loop:
     ;calculate the new frontier cells for the chosen frontier cell and add them
         access_map_neighbor #LEFT_N, frontier_row, frontier_col
         CMP #0 
-        BNE TopN
+        BEQ :+
+            JMP TopN
+        :
+
+        ;if exists check
+        STY temp_row        
+        STX temp_col
+        exists_in_Frontier temp_row, temp_col
+        CPX #1
+        BEQ TopN 
+
+        LDY temp_row
+        LDX temp_col
 
         JSR add_cell
 
     TopN: ;top neighbor
         access_map_neighbor #TOP_N, frontier_row, frontier_col
         CMP #0 
-        BNE RightN
+        BEQ :+
+            JMP RightN
+        :
+
+        ;if exists check
+        STY temp_row        
+        STX temp_col
+        exists_in_Frontier temp_row, temp_col
+        CPX #1
+        BEQ RightN 
+
+        LDY temp_row
+        LDX temp_col
 
         JSR add_cell
 
     RightN: ;right neighbor
         access_map_neighbor #RIGHT_N, frontier_row, frontier_col
         CMP #0 
-        BNE BottomN
+        BEQ :+
+            JMP BottomN
+        :
+
+        ;if exists check
+        STY temp_row        
+        STX temp_col
+        exists_in_Frontier temp_row, temp_col
+        CPX #1
+        BEQ BottomN
+
+        LDY temp_row
+        LDX temp_col
 
         JSR add_cell
 
     BottomN: ;bottom neighbor
         access_map_neighbor #BOTTOM_N, frontier_row, frontier_col
         CMP #0 
-        BNE end
+        BEQ :+
+            JMP end
+        :
+
+        ;if exists check
+        STY temp_row        
+        STX temp_col
+        exists_in_Frontier temp_row, temp_col
+        CPX #1
+        BEQ end
+
+        LDY temp_row
+        LDX temp_col
 
         JSR add_cell
-
     end: 
     ; ;remove the chosen frontier cell from the list
     set_map_tile frontier_row, frontier_col
@@ -795,24 +840,34 @@ loop:
 .endproc
 
 .proc test_frontier
-    loop: 
-        LDA frontier_listQ2_size
-        CMP #0
-        BEQ :+
-        JMP l2
-        :
-            add_to_Frontier #$FF, #$FF
-            JMP loop
+;     loop: 
+;         LDA frontier_listQ2_size
+;         CMP #0
+;         BEQ :+
+;         JMP l2
+;         :
+;             add_to_Frontier #$FF, #$FF
+;             JMP loop
 
-    l2:
-  ;  add_to_Frontier #$AA, #$AA
+;     l2:
+;   ;  add_to_Frontier #$AA, #$AA
 
-    remove_from_Frontier #0, #10
-    remove_from_Frontier #1, #0
+;     remove_from_Frontier #0, #10
+;     remove_from_Frontier #1, #0
 
-    ;add_to_Frontier #$AA, #$AA
+;     ;add_to_Frontier #$AA, #$AA
 
-    modulo #255, #0
+    add_to_Frontier #0, #1
+    add_to_Frontier #4, #5
+    add_to_Frontier #4, #5
+    add_to_Frontier #5, #5
+    add_to_Frontier #8, #5
+    add_to_Frontier #1, #0
+
+    LDA #0
+    STA a_val
+
+    exists_in_Frontier #0, #0
     STA a_val
 
     RTS
