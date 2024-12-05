@@ -660,24 +660,26 @@ loop:
     STA frontier_offset
 
 
-    ;pick a neighbor of the frontier cell that's in state passage
-    ;for now just the first one we can find in this state
+    ;pick a random neighbor of the frontier cell that's in state passage
+    ;start a counter for the amt of dirs we can use on temp val (since its not used in any of the macros we call during this section)
+    LDA #0
+    STA temp
+
     access_map_neighbor #TOP_N, frontier_row, frontier_col
     CMP #1 ;we want something in state passage
     BNE :+
         ;valid cell, Jump to next step
         LDA #TOP_N 
-        STA used_direction
-        JMP nextstep
-
+        PHA ;push direction on stack
+        INC temp
     : ;right
     access_map_neighbor #RIGHT_N, frontier_row, frontier_col
     CMP #1 ;we want something in state passage
     BNE :+
         ;valid cell, Jump to next step
         LDA #RIGHT_N 
-        STA used_direction
-        JMP nextstep
+        PHA ;push direction on stack
+        INC temp
 
     : ;bottom
     access_map_neighbor #BOTTOM_N, frontier_row, frontier_col
@@ -685,21 +687,39 @@ loop:
     BNE :+
         ;valid cell, Jump to next step
         LDA #BOTTOM_N 
-        STA used_direction
-        JMP nextstep
-        
+        PHA ;push direction on stack
+        INC temp        
     : ;left
     access_map_neighbor #LEFT_N, frontier_row, frontier_col
     CMP #1 ;we want something in state passage
     BNE :+
         ;valid cell, Jump to next step
         LDA #LEFT_N 
-        STA used_direction
-        JMP nextstep
+        PHA ;push direction on stack
+        INC temp
     
+    ;pick a random direction based on the temp counter
     :
-    ;wont reach this label in algorithm but useful for debugging 
+    JSR random_number_generator
+    modulo RandomSeed, temp ;stores val in A reg
     
+    ;the total amt of pulls from stack is stored in X    
+    LDX temp
+    ;the direction idx we want to use is stored in A
+    STA temp
+    dirloop: 
+        PLA
+        
+        DEX 
+
+        CPX temp
+        BNE :+
+            STA used_direction
+        :
+
+        CPX #0
+        BNE dirloop
+
     ;calculate the cell between picked frontier and passage cell and set this to a passage 
     nextstep: 
     LDA used_direction
