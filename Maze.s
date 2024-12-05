@@ -20,6 +20,21 @@
 .endproc
 
 .segment "CODE"
+.proc cleared_added_frontier_buffer
+    LDY #0
+
+    loop: 
+    LDA #$FF
+    STA added_frontier_buffer, Y
+
+    INY
+    CPY #ADDED_FRONTIER_BUFFER_SIZE
+    BNE loop
+
+    RTS
+.endproc
+
+.segment "CODE"
 .proc clear_maze
     LDY #0
 
@@ -169,9 +184,60 @@ irq:
     BIT PPU_STATUS
 
     LDA display_steps
-    BEQ done
+    BEQ done_f
 
-    ;update the map
+    ;update the frontier cells
+    LDY #0
+    LDA #0
+    frontierloop: 
+        CLC
+        LDA #0
+        STA high_byte
+
+        ;row
+        LDA added_frontier_buffer, y
+        ;LDA #0
+        CMP #$FF ;end of buffer
+        BEQ done_f 
+
+        STA low_byte
+
+        ASL low_byte ;x2
+        ROL high_byte
+        ASL low_byte ;x2
+        ROL high_byte
+        ASL low_byte ;x2
+        ROL high_byte
+        ASL low_byte ;x2
+        ROL high_byte
+        ASL low_byte ;x2 == 32
+        ROL high_byte
+
+        LDA #$20 ;add high byte
+        CLC
+        ADC high_byte
+        STA $2006
+        
+        ;col
+        INY
+        LDA added_frontier_buffer, y
+        ;LDA #0
+        
+        CLC
+        ADC low_byte
+        STA $2006
+
+        LDA #2
+        STA PPU_VRAM_IO
+
+        INY
+        CPY #ADDED_FRONTIER_BUFFER_SIZE
+        BNE frontierloop        
+    done_f: 
+        LDA display_steps
+        BEQ done
+
+    ;update the map tiles
     LDY #0
     LDA #0
     maploop: 
@@ -296,6 +362,7 @@ mainloop:
         ;clear everything and display empty map at start of generation
         JSR clear_maze
         JSR clear_changed_tiles_buffer
+        JSR cleared_added_frontier_buffer
         JSR wait_frame
         JSR display_map
 
@@ -310,6 +377,7 @@ mainloop:
             LDA should_clear_buffer
             BEQ :+
                 JSR clear_changed_tiles_buffer
+                JSR cleared_added_frontier_buffer
                 LDA #0
                 STA should_clear_buffer
             :
@@ -384,6 +452,7 @@ loop:
     JSR ppu_update
 
     JSR clear_changed_tiles_buffer
+    JSR cleared_added_frontier_buffer
     JSR clear_maze
 
     ;set an initial randomseed value - must be non zero
@@ -406,6 +475,8 @@ loop:
     STX x_val
     STY y_val
     add_to_Frontier y_val, x_val
+    add_to_added_frontier_buffer y_val, x_val
+
     RTS
 .endproc  
 
@@ -506,38 +577,40 @@ loop:
     modulo RandomSeed, #29
     ;LDA #29
     STA a_val
+    STA frontier_row
     ;STA temp
     JSR random_number_generator
     modulo RandomSeed, #31
     ;LDA #31
     STA b_val
+    STA frontier_col
     ;STA temp
 
     set_map_tile a_val, b_val
-    add_to_changed_tiles_buffer a_val, b_val
+    add_to_changed_tiles_buffer frontier_row, frontier_col
 
-        access_map_neighbor #LEFT_N, a_val, b_val
+        access_map_neighbor #LEFT_N, frontier_row, frontier_col
         CMP #0 
         BNE TopN
 
         JSR add_cell
 
     TopN: ;top neighbor
-        access_map_neighbor #TOP_N, a_val, b_val
+        access_map_neighbor #TOP_N, frontier_row, frontier_col
         CMP #0 
         BNE RightN
 
         JSR add_cell
 
     RightN: ;right neighbor
-        access_map_neighbor #RIGHT_N, a_val, b_val
+        access_map_neighbor #RIGHT_N, frontier_row, frontier_col
         CMP #0 
         BNE BottomN
 
         JSR add_cell
 
     BottomN: ;bottom neighbor
-        access_map_neighbor #BOTTOM_N, a_val, b_val
+        access_map_neighbor #BOTTOM_N, frontier_row, frontier_col
         CMP #0
         BNE End
 

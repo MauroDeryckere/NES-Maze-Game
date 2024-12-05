@@ -83,6 +83,7 @@ LEFT_N = 3
 
 ;changed tiles util
 CHANGED_TILES_BUFFER_SIZE = 20
+ADDED_FRONTIER_BUFFER_SIZE = 40
 ;*****************************************************************
 
 .segment "HEADER"
@@ -166,7 +167,8 @@ temp_row:				.res 1
 temp_col:				.res 1
 			
 should_clear_buffer: 	.res 1
-changed_tiles_buffer: 	.res 20
+changed_tiles_buffer: 	.res 20 ;changed tiles this frame - used for graphics during vblank | layout: row, col, row, col; FF by default
+added_frontier_buffer: 	.res 40 ;added frontier cells this frame - used for graphics during vblank layout: row, col, row, col; FF by default
 
 low_byte: 				.res 1
 high_byte: 				.res 1

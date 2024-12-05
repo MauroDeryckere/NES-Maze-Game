@@ -28,7 +28,33 @@
     clc
     :
 .endmacro
+;*****************************************************************
+; Vblank buffers
+;*****************************************************************
+.macro add_to_added_frontier_buffer Row, Col
+    LDY #0
 
+    .local loop
+    loop:
+
+        LDA added_frontier_buffer, y
+        CMP #$FF
+        BEQ add_vals
+        
+        INY
+        INY
+
+        CPY #ADDED_FRONTIER_BUFFER_SIZE - 2
+        BNE loop
+
+    .local add_vals
+    add_vals:
+        LDA Row
+        STA added_frontier_buffer, y
+        INY
+        LDA Col
+        STA added_frontier_buffer, y
+.endmacro
 .macro add_to_changed_tiles_buffer Row, Col
     LDY #0
     .local loop
@@ -52,6 +78,7 @@
         LDA Col
         STA changed_tiles_buffer, y
 .endmacro
+;*****************************************************************
 
 ;*****************************************************************
 ; Map buffer macros
