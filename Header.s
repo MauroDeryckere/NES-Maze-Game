@@ -183,6 +183,7 @@ player_y: 				.res 1
 player_row: 			.res 1
 player_collumn: 		.res 1
 
+has_game_started:		.res 1
 
 
 ;*****************************************************************

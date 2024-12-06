@@ -83,16 +83,13 @@ irq:
     JSR Init
 
     mainloop:
-
-        jsr update_player_sprite
-
-
         INC RandomSeed 
 
         LDA has_generation_started
         BNE :+
             JSR start
 
+            JSR update_player_sprite
             ;auto generation once maze is completed (useful for debugging)
             ; LDA #1
             ; STA has_generation_started
@@ -101,8 +98,13 @@ irq:
         :
 
         LDA has_generation_started
-        BEQ stop
+        BEQ mainloop
+            LDA #0
+            STA has_game_started
             ;clear everything and display empty map at start of generation
+
+            JSR clear_player_sprite
+
             JSR clear_maze
             JSR clear_changed_tiles_buffer
             JSR cleared_added_frontier_buffer
@@ -143,10 +145,13 @@ irq:
                 LDA has_generation_started
                 BNE display_once
                 JSR display_map
+                JMP stop
 
 
 
         stop:
+            LDA #1
+            STA has_game_started
 
     JMP mainloop
 .endproc
@@ -213,10 +218,6 @@ irq:
         
     ;a register now holds the row in which the player sprite resides
     sta player_collumn
-
-    
-
-
 
     RTS
 .endproc

@@ -160,7 +160,7 @@ wait_vblank2:
 
 ;handles the background tiles during vblank using the buffers set in zero page
 .proc draw_background
-        LDA display_steps
+    LDA display_steps
     BEQ done_f
 
     ;update the frontier cells
@@ -269,6 +269,8 @@ wait_vblank2:
 ; populate oam buffer with player sprite
 .segment "CODE"
 .proc draw_player_sprite
+    LDA has_game_started
+    BEQ :+
 
     ldx #0 
 
@@ -288,11 +290,19 @@ wait_vblank2:
     lda player_x   ;X coordinate
     sta oam, x
     ;INX to go to the next sprite location 
-
+    
+    :
     rts
 
 .endproc
 
+;simply hides the sprite off screen
+.proc clear_player_sprite
+    LDX #0          ; Start at the first byte of the OAM (sprite 0 Y-coordinate)
+    LDA #$F0        ; Y-coordinate off-screen
+    STA oam, x      ; Write to OAM
+    RTS
+.endproc
 
 
 
