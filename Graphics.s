@@ -279,7 +279,7 @@ wait_vblank2:
     sta oam, x
     inx
 
-    lda #$01    ;tile pattern index
+    lda #$02   ;tile pattern index
     sta oam, x
     inx 
 

@@ -155,6 +155,14 @@ irq:
                 JMP stop
 
         stop:
+            JSR calculate_prims_start_end
+            JSR wait_frame
+
+            JSR clear_changed_tiles_buffer
+            JSR cleared_added_frontier_buffer
+            LDA #0
+            STA should_clear_buffer
+
             LDA #1
             STA has_game_started
 
@@ -196,33 +204,33 @@ irq:
     STA display_steps
 
 
-    ;SET SPRITE VARIABLES INITIAL VALUES: 
-    lda #0
-    sta player_x  
-    lda #7
-    sta player_y      ;current x = 0, current y = 7. offset is needed in Y to make sure it fits in tile.
+    ; ;SET SPRITE VARIABLES INITIAL VALUES: 
+    ; lda #0
+    ; sta player_x  
+    ; lda #7
+    ; sta player_y      ;current x = 0, current y = 7. offset is needed in Y to make sure it fits in tile.
 
 
-    ;INITIALIZE PLAYER_ROW AND PLAYER_COLLUMN VARIABLES
-    clc 
-    adc #$01 ; add 1 to y value to account for offset of initial start position
+    ; ;INITIALIZE PLAYER_ROW AND PLAYER_COLLUMN VARIABLES
+    ; clc 
+    ; adc #$01 ; add 1 to y value to account for offset of initial start position
 
-    lsr            ; Shift right by 1 (divide by 2)
-    lsr            ; Shift right by 1 (divide by 4)
-    lsr            ; Shift right by 1 (divide by 8)
+    ; lsr            ; Shift right by 1 (divide by 2)
+    ; lsr            ; Shift right by 1 (divide by 4)
+    ; lsr            ; Shift right by 1 (divide by 8)
         
-    ;a register now holds the row in which the player sprite resides
-    sta player_row
+    ; ;a register now holds the row in which the player sprite resides
+    ; sta player_row
 
-    lda player_collumn
-    clc 
+    ; lda player_collumn
+    ; clc 
 
-    lsr            ; Shift right by 1 (divide by 2)
-    lsr            ; Shift right by 1 (divide by 4)
-    lsr            ; Shift right by 1 (divide by 8)
+    ; lsr            ; Shift right by 1 (divide by 2)
+    ; lsr            ; Shift right by 1 (divide by 4)
+    ; lsr            ; Shift right by 1 (divide by 8)
         
-    ;a register now holds the row in which the player sprite resides
-    sta player_collumn
+    ; ;a register now holds the row in which the player sprite resides
+    ; sta player_collumn
 
     RTS
 .endproc
@@ -283,7 +291,6 @@ loop:
 .segment "CODE"
 .proc start_prims_maze
     ; step 0 of the maze generation, set a random cell as passage and calculate its frontier cells
-    
     JSR random_number_generator
     modulo RandomSeed, #29
     ;LDA #29
@@ -296,6 +303,34 @@ loop:
     STA b_val
     STA frontier_col
     ;STA temp
+
+
+    ;set the even / uneven row and col flag
+    LDA #0
+    STA odd_frontiers
+    
+    LDA frontier_row
+    CMP #0
+    BEQ end_row ;when zero were even
+    
+    modulo frontier_row, #2
+    CMP #0
+    BEQ end_row
+        LDA #%11110000
+        STA odd_frontiers 
+    end_row:
+
+    LDA frontier_col
+    CMP #0
+    BEQ end_col ;when zero were even  
+
+    modulo frontier_col, #2
+    CMP #0
+    BEQ end_col
+        LDA odd_frontiers 
+        ORA #%00001111
+        STA odd_frontiers
+    end_col:
 
     set_map_tile a_val, b_val
     add_to_changed_tiles_buffer frontier_row, frontier_col
@@ -570,6 +605,122 @@ loop:
 .endproc
 
 .proc calculate_prims_start_end
+    LDA odd_frontiers
+    ;are rows even
+    AND %11110000
+
+    LDA odd_frontiers      
+    AND #%11110000
+    CMP #%11110000 
+    BEQ :+
+        JMP even_rows
+    :
+    ;uneven row means black border at top
+    rowloop_ue:
+    JSR random_number_generator
+    modulo RandomSeed, #31
+    STA temp
+
+    get_map_tile_state #1, temp
+    BEQ rowloop_ue
+
+    set_map_tile #0, temp
+    add_to_changed_tiles_buffer #0, temp
+    LDA #0
+    STA player_row
+    LDA temp
+    STA player_collumn
+
+    LDA #0
+    STA player_y
+    LDA player_collumn
+    CLC
+    ASL
+    ASL
+    ASL
+    STA player_x
+
+    JMP col_check
+
+    ;even rows means black border at bottom, find a tile in row 30 with a white tile above to set as start pos
+    even_rows:
+        rowloop_e:
+        JSR random_number_generator
+        modulo RandomSeed, #31
+        STA temp
+
+        get_map_tile_state #28, temp
+        BEQ rowloop_e
+
+        set_map_tile #0, temp
+        add_to_changed_tiles_buffer #29, temp
+        LDA #29
+        STA player_row
+        LDA temp
+        STA player_collumn
+
+        LDA player_row
+        CLC
+        ASL
+        ASL
+        ASL
+        STA player_y
+        LDA player_collumn
+        CLC
+        ASL
+        ASL
+        ASL
+        STA player_x
+
+
+    col_check: 
+        LDA odd_frontiers
+        ;are cols even
+        AND 00001111
+
+        LDA odd_frontiers      
+        AND #%00001111
+        CMP #%00001111 
+        BEQ :+
+            JMP even_cols
+        :
+
+        colloop_ue:
+        JSR random_number_generator
+        modulo RandomSeed, #29
+        STA temp
+
+        get_map_tile_state temp, #1
+        BEQ colloop_ue
+
+        set_map_tile temp, #0
+        add_to_changed_tiles_buffer temp, #0
+        
+        LDA temp
+        STA end_row
+        LDA #0
+        STA end_col
+
+        JMP end
+
+    even_cols:
+        colloop_e:
+        JSR random_number_generator
+        modulo RandomSeed, #29
+        STA temp
+
+        get_map_tile_state temp, #30
+        BEQ colloop_e
+
+        set_map_tile temp, #31
+        add_to_changed_tiles_buffer temp, #31
+
+        LDA temp
+        STA end_row
+        LDA #31
+        STA end_col
+
+    end: 
 
     RTS
 .endproc
@@ -592,6 +743,12 @@ loop:
         ;UPDATE PLAYER POSITION AND SPEED
         ;--------------------------------------------------------------
         ;check is delay is reached
+
+        ;bounds check first
+        LDA player_row
+        CMP #MAP_ROWS - 1
+        BEQ NoHit
+
         modulo frame_counter, #PLAYER_MOVEMENT_DELAY
         CMP #0
         BEQ :+
@@ -641,6 +798,10 @@ loop:
     and #PAD_U
     beq NOT_GAMEPAD_UP
 
+        ;bounds check first
+        LDA player_row
+        BEQ NoHit
+
         ;check is delay is reached
         modulo frame_counter, #PLAYER_MOVEMENT_DELAY
         CMP #0
@@ -657,8 +818,6 @@ loop:
         ;COLLISION DETECTION
         ;--------------------------------------------------------------
         clc 
-        adc #$01 ; add 1 to y value to account for offset of initial start position
-
         lsr            ; Shift right by 1 (divide by 2)
         lsr            ; Shift right by 1 (divide by 4)
         lsr            ; Shift right by 1 (divide by 8)
@@ -690,6 +849,10 @@ loop:
     and #PAD_L
     beq NOT_GAMEPAD_LEFT
         ;gamepad left is pressed
+
+        ;bounds check first
+        LDA player_collumn
+        BEQ NoHit2
 
         ;check is delay is reached
         modulo frame_counter, #PLAYER_MOVEMENT_DELAY
@@ -741,6 +904,11 @@ loop:
     lda gamepad
     and #PAD_R
     beq NOT_GAMEPAD_RIGHT
+
+        ;bounds check first
+        LDA player_collumn
+        CMP #MAP_COLUMNS - 1
+        BEQ NoHit2
 
         ;check is delay is reached
         modulo frame_counter, #PLAYER_MOVEMENT_DELAY

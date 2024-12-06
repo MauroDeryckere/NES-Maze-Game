@@ -130,9 +130,13 @@ RandomSeed:				.res 1 ; Initial seed value | Used internally for random function
 has_generation_started: .res 1 
 has_game_started:		.res 1
 display_steps:			.res 1 ;flag to toggle displaying maze generation step by step
+odd_frontiers: 			.res 1 ;was the maze generated with odd or even frontier rows
 
 ;maze
 maze_buffer:        	.res 120
+
+end_row: 				.res 1
+end_col:				.res 1
 
 ;graphics buffers
 should_clear_buffer: 	.res 1
@@ -163,7 +167,7 @@ tempPadrToLast: 		.res 2 ;last item in address for a given quarter, used for the
 
 temp_address:			.res 1
 
-;temp vals used for prims algorithm loop
+;temp vals used for prims algorithm loop - only used during the generation loop so possible to overwrite outside of the loop
 frontier_page: 			.res 1
 frontier_offset:		.res 1
 
