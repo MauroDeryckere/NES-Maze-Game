@@ -192,6 +192,32 @@ irq:
     lda #7
     sta player_y      ;current x = 0, current y = 7. offset is needed in Y to make sure it fits in tile.
 
+
+    ;INITIALIZE PLAYER_ROW AND PLAYER_COLLUMN VARIABLES
+    clc 
+    adc #$01 ; add 1 to y value to account for offset of initial start position
+
+    lsr            ; Shift right by 1 (divide by 2)
+    lsr            ; Shift right by 1 (divide by 4)
+    lsr            ; Shift right by 1 (divide by 8)
+        
+    ;a register now holds the row in which the player sprite resides
+    sta player_row
+
+    lda player_collumn
+    clc 
+
+    lsr            ; Shift right by 1 (divide by 2)
+    lsr            ; Shift right by 1 (divide by 4)
+    lsr            ; Shift right by 1 (divide by 8)
+        
+    ;a register now holds the row in which the player sprite resides
+    sta player_collumn
+
+    
+
+
+
     RTS
 .endproc
 ;*****************************************************************
@@ -555,13 +581,48 @@ loop:
     beq NOT_GAMEPAD_DOWN 
 
         ;gamepad down is pressed
+
+        ;--------------------------------------------------------------
+        ;UPDATE PLAYER POSITION AND SPEED
+        ;--------------------------------------------------------------
         jsr delay
         lda player_y
         clc
         adc #8
         sta player_y
+        
 
-        rts ;in theory should avoid being able to press both left and up at the same time?
+        ;--------------------------------------------------------------
+        ;COLLISION DETECTION
+        ;--------------------------------------------------------------
+        clc 
+        adc #$01 ; add 1 to y value to account for offset of initial start position
+
+        lsr            ; Shift right by 1 (divide by 2)
+        lsr            ; Shift right by 1 (divide by 4)
+        lsr            ; Shift right by 1 (divide by 8)
+        
+        ;a register now holds the row in which the player sprite resides
+        sta player_row
+
+        lda player_x
+        lsr
+        lsr
+        lsr
+        sta player_collumn
+
+        get_map_tile_state player_row, player_collumn ;figure out which row and colom is needed
+        ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
+
+        bne NoHit
+        ;sprite collided with wall
+        lda player_y
+        sec 
+        sbc #8 ; reset position
+        sta player_y
+
+        NoHit: 
+        rts
 
     NOT_GAMEPAD_DOWN: 
     lda gamepad
@@ -574,7 +635,37 @@ loop:
         sec
         sbc #8
         sta player_y
-        rts
+
+        ;--------------------------------------------------------------
+        ;COLLISION DETECTION
+        ;--------------------------------------------------------------
+        clc 
+        adc #$01 ; add 1 to y value to account for offset of initial start position
+
+        lsr            ; Shift right by 1 (divide by 2)
+        lsr            ; Shift right by 1 (divide by 4)
+        lsr            ; Shift right by 1 (divide by 8)
+        
+        ;a register now holds the row in which the player sprite resides
+        sta player_row
+
+                
+        lda player_x
+        lsr
+        lsr
+        lsr
+        sta player_collumn
+
+        get_map_tile_state player_row, player_collumn ;figure out which row and colom is needed
+        ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
+
+        bne NoHit
+        ;sprite collided with wall
+        lda player_y
+        clc 
+        adc #8 ; reset position
+        sta player_y
+
 
     
     NOT_GAMEPAD_UP: 
@@ -588,7 +679,40 @@ loop:
         sec
         sbc #8
         sta player_x
+
+        ;--------------------------------------------------------------
+        ;COLLISION DETECTION
+        ;--------------------------------------------------------------
+
+        lsr            ; Shift right by 1 (divide by 2)
+        lsr            ; Shift right by 1 (divide by 4)
+        lsr            ; Shift right by 1 (divide by 8)
+        
+        ;a register now holds the row in which the player sprite resides
+        sta player_collumn
+
+                
+        lda player_y
+        clc
+        adc #$01
+        lsr
+        lsr
+        lsr
+        sta player_row
+
+        get_map_tile_state player_row, player_collumn ;figure out which row and colom is needed
+        ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
+
+        bne NoHit2 ; have to make it another label because the jump to NoHit is to far 
+        ;sprite collided with wall
+        lda player_x
+        clc 
+        adc #8 ; reset position
+        sta player_x
+
+        NoHit2: 
         rts
+
 
     NOT_GAMEPAD_LEFT: 
     lda gamepad
@@ -601,20 +725,47 @@ loop:
         clc
         adc #8
         sta player_x
-        rts
+        ;--------------------------------------------------------------
+        ;COLLISION DETECTION
+        ;--------------------------------------------------------------
+
+
+        lsr            ; Shift right by 1 (divide by 2)
+        lsr            ; Shift right by 1 (divide by 4)
+        lsr            ; Shift right by 1 (divide by 8)
+        
+        ;a register now holds the row in which the player sprite resides
+        sta player_collumn
+
+                lda player_y
+        clc
+        adc #$01
+        lsr
+        lsr
+        lsr
+        sta player_row
+
+        get_map_tile_state player_row, player_collumn ;figure out which row and colom is needed
+        ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
+
+        bne NoHit2
+        ;sprite collided with wall
+        lda player_x
+        sec 
+        sbc #8 ; reset position
+        sta player_x
 
     
     delay: 
-        jsr wait_frame
-        jsr wait_frame
-        jsr wait_frame
-        jsr wait_frame
-        jsr wait_frame
+       jsr wait_frame
+       jsr wait_frame
+       jsr wait_frame
+       jsr wait_frame
+       jsr wait_frame
         rts
 
     NOT_GAMEPAD_RIGHT: 
         ;neither up, down, left, or right is pressed
     rts
 .endproc
-
 

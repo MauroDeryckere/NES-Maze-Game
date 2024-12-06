@@ -89,6 +89,7 @@
 ; Row 1: 0000 0000  0000 0000   0000 0000   0000 0000   0000 0000
 ;...
 
+
 ;util macro to calculate the mask and address for a given tile
 ;mask: the bitmask for the requested row and column
 ;e.g row 0, column 1 == 0100 0000
@@ -120,7 +121,7 @@
     LDA Column
     : ;Loop
     CMP #$08       ; Compare the number with 8 (i.e., check if it's greater than 7)
-    BCC :+       ; If the number is less than or equal to 7, branch to Done
+    BCC :+         ; If the number is less than or equal to 7, branch to Done
     SEC            ; Set the Carry flag before subtraction (since we're subtracting)
     SBC #$08       ; Subtract 8 from the number
     JMP :-

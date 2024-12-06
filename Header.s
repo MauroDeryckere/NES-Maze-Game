@@ -177,9 +177,12 @@ high_byte: 				.res 1
 ;flag to toggle displaying step by step
 display_steps:			.res 1
 
-;positions of the player sprite
+;PLAYER SPRITE VARIABLES
 player_x: 				.res 1
 player_y: 				.res 1
+player_row: 			.res 1
+player_collumn: 		.res 1
+
 
 
 ;*****************************************************************
