@@ -266,4 +266,34 @@ wait_vblank2:
         STA should_clear_buffer
 .endproc
 
+; populate oam buffer with player sprite
+.segment "CODE"
+.proc draw_player_sprite
+
+    ldx #0 
+
+    ;SPRITE 0
+    lda player_y ;Y coordinate
+    sta oam, x
+    inx
+
+    lda #$01    ;tile pattern index
+    sta oam, x
+    inx 
+
+    lda #%00000000 ;flip bits to set certain sprite attributes
+    sta oam, x
+    inx
+
+    lda player_x   ;X coordinate
+    sta oam, x
+    ;INX to go to the next sprite location 
+
+    rts
+
+.endproc
+
+
+
+
 ;*****************************************************************

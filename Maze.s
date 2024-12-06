@@ -24,6 +24,8 @@ irq:
     BIT PPU_STATUS
 
     JSR draw_background
+    JSR draw_player_sprite
+
 
     ; transfer sprite OAM data using DMA
 	LDX #0
@@ -81,6 +83,10 @@ irq:
     JSR Init
 
     mainloop:
+
+        jsr update_player_sprite
+
+
         INC RandomSeed 
 
         LDA has_generation_started
@@ -130,11 +136,15 @@ irq:
                 BEQ stop
                 JMP step_by_step_generation_loop
 
+                
+
             display_once: 
                 JSR run_prims_maze
                 LDA has_generation_started
                 BNE display_once
                 JSR display_map
+
+
 
         stop:
 
@@ -174,6 +184,14 @@ irq:
     STA has_generation_started
     LDA #1
     STA display_steps
+
+
+    ;SET SPRITE VARIABLES INITIAL VALUES: 
+    lda #0
+    sta player_x  
+    lda #7
+    sta player_y      ;current x = 0, current y = 7. offset is needed in Y to make sure it fits in tile.
+
     RTS
 .endproc
 ;*****************************************************************
@@ -201,6 +219,8 @@ irq:
         LDA #0
         STA a_pressed_last_frame
     :
+
+
     RTS
 .endproc
 ;*****************************************************************
@@ -525,3 +545,76 @@ loop:
     RTS
 .endproc
 ;*****************************************************************
+
+;update player position with player input
+
+.proc update_player_sprite
+    jsr gamepad_poll 
+    lda gamepad
+    and #PAD_D
+    beq NOT_GAMEPAD_DOWN 
+
+        ;gamepad down is pressed
+        jsr delay
+        lda player_y
+        clc
+        adc #8
+        sta player_y
+
+        rts ;in theory should avoid being able to press both left and up at the same time?
+
+    NOT_GAMEPAD_DOWN: 
+    lda gamepad
+    and #PAD_U
+    beq NOT_GAMEPAD_UP
+
+        ;gamepad is pressed up
+        jsr delay
+        lda player_y
+        sec
+        sbc #8
+        sta player_y
+        rts
+
+    
+    NOT_GAMEPAD_UP: 
+    lda gamepad
+    and #PAD_L
+    beq NOT_GAMEPAD_LEFT
+
+        ;gamepad left is pressed
+        jsr delay
+        lda player_x
+        sec
+        sbc #8
+        sta player_x
+        rts
+
+    NOT_GAMEPAD_LEFT: 
+    lda gamepad
+    and #PAD_R
+    beq NOT_GAMEPAD_RIGHT
+
+        ;gamepad right is pressed
+        jsr delay
+        lda player_x
+        clc
+        adc #8
+        sta player_x
+        rts
+
+    
+    delay: 
+        jsr wait_frame
+        jsr wait_frame
+        jsr wait_frame
+        jsr wait_frame
+        jsr wait_frame
+        rts
+
+    NOT_GAMEPAD_RIGHT: 
+        ;neither up, down, left, or right is pressed
+    rts
+.endproc
+
+

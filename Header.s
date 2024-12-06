@@ -176,6 +176,12 @@ high_byte: 				.res 1
 
 ;flag to toggle displaying step by step
 display_steps:			.res 1
+
+;positions of the player sprite
+player_x: 				.res 1
+player_y: 				.res 1
+
+
 ;*****************************************************************
 
 .segment "OAM"
@@ -193,7 +199,7 @@ default_palette:
 .byte $0F,$09,$19,$29 ; bg1 green
 .byte $0F,$01,$11,$21 ; bg2 blue
 .byte $0F,$00,$10,$30 ; bg3 greyscale
-.byte $0F,$18,$28,$38 ; sp0 yellow
+.byte $0F,$11,$21,$2C ; sp0 blue (changed)
 .byte $0F,$14,$24,$34 ; sp1 purple
 .byte $0F,$1B,$2B,$3B ; sp2 teal
 .byte $0F,$12,$22,$32 ; sp3 marine
