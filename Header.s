@@ -18,6 +18,12 @@ NT_2400 = $01
 NT_2800 = $02
 NT_2C00 = $03
 
+; Useful PPU memory addresses
+NAME_TABLE_0_ADDRESS		= $2000
+ATTRIBUTE_TABLE_0_ADDRESS	= $23C0
+NAME_TABLE_1_ADDRESS		= $2400
+ATTRIBUTE_TABLE_1_ADDRESS	= $27C0
+
 VRAM_DOWN = $04 ; increment VRAM pointer by row
 
 OBJ_0000 = $00 
@@ -41,6 +47,7 @@ OBJ_ON = $14 ; turn objects on
 APU_DM_CONTROL = $4010 ; APU Delta Modulation Control Register (Write)
 APU_CLOCK = $4015 ; APU Sound/Vertical Clock Signal Register (Read/Write)
 
+; INPUT
 ; Joystick/Controller values
 JOYPAD1 = $4016 ; Joypad 1 (Read/Write)
 JOYPAD2 = $4017 ; Joypad 2 (Read/Write)
@@ -55,15 +62,8 @@ PAD_D      = $20
 PAD_L      = $40
 PAD_R      = $80
 
-; Useful PPU memory addresses
-NAME_TABLE_0_ADDRESS		= $2000
-ATTRIBUTE_TABLE_0_ADDRESS	= $23C0
-NAME_TABLE_1_ADDRESS		= $2400
-ATTRIBUTE_TABLE_1_ADDRESS	= $27C0
-
 ; MAP BUFFER
 MAP_BUFFER_SIZE = 120
-MAP_BUFFER_ADDRESS = $00
 MAP_COLUMNS = 32 ;32 bits
 MAP_ROWS = 30
 
@@ -73,9 +73,7 @@ FRONTIER_LISTQ2 = $041E
 FRONTIER_LISTQ3 = $051C
 FRONTIER_LISTQ4 = $061A
 
-FRONTIER_LIST_CAPACITY = 1016
-
-; Neighbor util
+; Neighbor util - directions
 TOP_N = 0
 RIGHT_N = 1 
 BOTTOM_N = 2
@@ -85,6 +83,7 @@ LEFT_N = 3
 CHANGED_TILES_BUFFER_SIZE = 20
 ADDED_FRONTIER_BUFFER_SIZE = 40
 
+;sets the delay for player movement (==  movement speed)
 PLAYER_MOVEMENT_DELAY = 5
 ;*****************************************************************
 
@@ -112,46 +111,56 @@ INES_SRAM = 0                                                       ; 1 = batter
 ; 6502 Zero Page Memory (256 bytes)
 ;*****************************************************************
 .segment "ZEROPAGE"
-maze_buffer:        	.res 120
-
-nmi_ready:		    	.res 1 ; set to 1 to push a PPU frame update, 
-					       ;        2 to turn rendering off next NMI
-gamepad:		    	.res 1 ; stores the current gamepad values
-
-paddr:              	.res 2 ; 16-bit address pointer
-
-byte_loop_couter:   	.res 1 ; counter for the bits in map transfer
-
-has_generation_started: .res 1 
+;internal (hardware) use flags and values
+nmi_ready:		    	.res 1 ; set to 1 to push a PPU frame update, 2 to turn rendering off next NMI
 
 ppu_ctl0:		    	.res 1 ; PPU Control Register 2 Value
-
 ppu_ctl1:		    	.res 1 ; PPU Control Register 2 Value
 
-a_pressed_last_frame: 	.res 1
+;input
+gamepad:		    	.res 1 ; stores the current gamepad values
 
-;Used internally for random function, do not overwrite
-RandomSeed:				.res 1 ; Initial seed value
+frame_counter: 			.res 1
+last_frame_ct: 			.res 1 ;for things we want to execute once per frame
 
-;Internal use for frontier list, do not overwrite
-frontier_listQ1_size:	.res 1
-frontier_listQ2_size:	.res 1
-frontier_listQ3_size:	.res 1
-frontier_listQ4_size:	.res 1
-frontier_pages_used:	.res 1
+;random
+RandomSeed:				.res 1 ; Initial seed value | Used internally for random function, do not overwrite
 
-;Not used between calls to macros so space is okay to overwrite temporarily
-tempPadrToLast: 		.res 2 ;last item in address for a given quarter, used for the remove from list macro
+;gameplay flags
+has_generation_started: .res 1 
+has_game_started:		.res 1
+display_steps:			.res 1 ;flag to toggle displaying maze generation step by step
 
-;reserverd for macro functions, careful with what's stored here, could be overwritten 
+;maze
+maze_buffer:        	.res 120
+
+;graphics buffers
+should_clear_buffer: 	.res 1
+changed_tiles_buffer: 	.res 20 ;changed tiles this frame - used for graphics during vblank | layout: row, col, row, col; FF by default
+added_frontier_buffer: 	.res 40 ;added frontier cells this frame - used for graphics during vblank layout: row, col, row, col; FF by default
+
+low_byte: 				.res 1
+high_byte: 				.res 1
+
+;frontier list specific
+frontier_listQ1_size:	.res 1 ; | Internal use for frontier list, do not overwrite
+frontier_listQ2_size:	.res 1 ; | Internal use for frontier list, do not overwrite
+frontier_listQ3_size:	.res 1 ; | Internal use for frontier list, do not overwrite
+frontier_listQ4_size:	.res 1 ; | Internal use for frontier list, do not overwrite
+frontier_pages_used:	.res 1 ; | Internal use for frontier list, do not overwrite
+
+;temporary values used in macros, ... - have to check when you use these in other routines if they arent used anywhere internally
 x_val:					.res 1 ;x and y value stored in zero page for fast accesss when it's necessary to store these
 y_val:					.res 1
 
-;reserverd for macro functions, careful with what's stored here, could be overwritten 
 a_val: 					.res 1
 b_val: 					.res 1
 
-;reserverd for macro functions, careful with what's stored here, could be overwritten 
+byte_loop_couter:   	.res 1 ; counter for the bits in map transfer
+
+paddr:              	.res 2 ; 16-bit address pointer
+tempPadrToLast: 		.res 2 ;last item in address for a given quarter, used for the remove from list macro
+
 temp_address:			.res 1
 
 ;temp vals used for prims algorithm loop
@@ -168,27 +177,12 @@ execs: 					.res 1
 temp_row:				.res 1
 temp_col:				.res 1
 temp: 					.res 1
-			
-should_clear_buffer: 	.res 1
-changed_tiles_buffer: 	.res 20 ;changed tiles this frame - used for graphics during vblank | layout: row, col, row, col; FF by default
-added_frontier_buffer: 	.res 40 ;added frontier cells this frame - used for graphics during vblank layout: row, col, row, col; FF by default
-
-low_byte: 				.res 1
-high_byte: 				.res 1
-
-;flag to toggle displaying step by step
-display_steps:			.res 1
 
 ;PLAYER SPRITE VARIABLES
 player_x: 				.res 1
 player_y: 				.res 1
 player_row: 			.res 1
 player_collumn: 		.res 1
-
-has_game_started:		.res 1
-
-frame_counter: 			.res 1
-last_frame_ct: 			.res 1 ;for things we want to execute once per frame
 ;*****************************************************************
 
 .segment "OAM"

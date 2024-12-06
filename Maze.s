@@ -230,29 +230,21 @@ irq:
 
 ;*****************************************************************
 ; Start
-;       Gets called until the generation of the maze starts
+;       Gets called multiple times per frame as long as the maze is not being generated 
 ;*****************************************************************
 .proc start
     JSR gamepad_poll
     LDA gamepad
     AND #PAD_A
     BEQ A_NOT_PRESSED
-        ;code for button press here  
-        LDA a_pressed_last_frame
-        BNE A_NOT_PRESSED           ;check for pressed this frame
 
         LDA #1
         STA has_generation_started
-        STA a_pressed_last_frame
 
         JMP :+
     A_NOT_PRESSED:
-        ;code for other buttons etc here
-        LDA #0
-        STA a_pressed_last_frame
+
     :
-
-
     RTS
 .endproc
 ;*****************************************************************
@@ -576,8 +568,18 @@ loop:
 
     RTS
 .endproc
+
+.proc calculate_prims_start_end
+
+    RTS
+.endproc
+
+
 ;*****************************************************************
 
+;*****************************************************************
+; Player
+;*****************************************************************
 ;update player position with player input
 .proc update_player_sprite
     lda gamepad
@@ -785,4 +787,4 @@ loop:
         ;neither up, down, left, or right is pressed
     rts
 .endproc
-
+;*****************************************************************

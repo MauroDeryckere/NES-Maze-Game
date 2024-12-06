@@ -101,7 +101,7 @@
     ASL             ;== times 2
     ASL             ;== times 2
     CLC
-    ADC #MAP_BUFFER_ADDRESS ; Add base address of the map buffer
+    ADC #maze_buffer ; Add base address of the map buffer
     STA x_val
 
     ;Calculate the byte offset within the row (Column / 8)

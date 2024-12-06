@@ -128,7 +128,7 @@ wait_vblank2:
     JSR clear_nametable
     
     vram_set_address (NAME_TABLE_0_ADDRESS) 
-    assign_16i paddr, MAP_BUFFER_ADDRESS    ;load map into ppu
+    assign_16i paddr, maze_buffer    ;load map into ppu
 
     LDY #0          ;reset value of y
     loop:
