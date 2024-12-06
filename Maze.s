@@ -23,6 +23,12 @@ irq:
     
     BIT PPU_STATUS
 
+    ;increase our frame counter (one vblank occurs per frame)
+    LDA frame_counter
+    STA last_frame_ct
+
+    INC frame_counter
+
     JSR draw_background
     JSR draw_player_sprite
 
@@ -89,7 +95,15 @@ irq:
         BNE :+
             JSR start
 
-            JSR update_player_sprite
+            LDA last_frame_ct
+            CMP frame_counter
+            BEQ mainloop
+
+                JSR update_player_sprite
+
+            LDA frame_counter ;sets last frame ct to the same as frame counter
+            STA last_frame_ct
+
             ;auto generation once maze is completed (useful for debugging)
             ; LDA #1
             ; STA has_generation_started
@@ -127,18 +141,11 @@ irq:
                     STA should_clear_buffer
                 :
 
-                ;current version works up to 5x speed - TODO add a flag to adjust this speed
-                ; JSR run_prims_maze
-                ; JSR run_prims_maze
-                ; JSR run_prims_maze
-                ; JSR run_prims_maze
                 JSR run_prims_maze
                 
                 LDA has_generation_started
                 BEQ stop
                 JMP step_by_step_generation_loop
-
-                
 
             display_once: 
                 JSR run_prims_maze
@@ -146,8 +153,6 @@ irq:
                 BNE display_once
                 JSR display_map
                 JMP stop
-
-
 
         stop:
             LDA #1
@@ -574,9 +579,7 @@ loop:
 ;*****************************************************************
 
 ;update player position with player input
-
 .proc update_player_sprite
-    jsr gamepad_poll 
     lda gamepad
     and #PAD_D
     beq NOT_GAMEPAD_DOWN 
@@ -586,7 +589,13 @@ loop:
         ;--------------------------------------------------------------
         ;UPDATE PLAYER POSITION AND SPEED
         ;--------------------------------------------------------------
-        jsr delay
+        ;check is delay is reached
+        modulo frame_counter, #PLAYER_MOVEMENT_DELAY
+        CMP #0
+        BEQ :+
+            RTS
+        :   
+
         lda player_y
         clc
         adc #8
@@ -630,8 +639,13 @@ loop:
     and #PAD_U
     beq NOT_GAMEPAD_UP
 
-        ;gamepad is pressed up
-        jsr delay
+        ;check is delay is reached
+        modulo frame_counter, #PLAYER_MOVEMENT_DELAY
+        CMP #0
+        BEQ :+
+            RTS
+        :   
+
         lda player_y
         sec
         sbc #8
@@ -673,9 +687,15 @@ loop:
     lda gamepad
     and #PAD_L
     beq NOT_GAMEPAD_LEFT
-
         ;gamepad left is pressed
-        jsr delay
+
+        ;check is delay is reached
+        modulo frame_counter, #PLAYER_MOVEMENT_DELAY
+        CMP #0
+        BEQ :+
+            RTS
+        :   
+
         lda player_x
         sec
         sbc #8
@@ -720,8 +740,13 @@ loop:
     and #PAD_R
     beq NOT_GAMEPAD_RIGHT
 
-        ;gamepad right is pressed
-        jsr delay
+        ;check is delay is reached
+        modulo frame_counter, #PLAYER_MOVEMENT_DELAY
+        CMP #0
+        BEQ :+
+            RTS
+        :   
+
         lda player_x
         clc
         adc #8
@@ -755,15 +780,6 @@ loop:
         sec 
         sbc #8 ; reset position
         sta player_x
-
-    
-    delay: 
-       jsr wait_frame
-       jsr wait_frame
-       jsr wait_frame
-       jsr wait_frame
-       jsr wait_frame
-        rts
 
     NOT_GAMEPAD_RIGHT: 
         ;neither up, down, left, or right is pressed

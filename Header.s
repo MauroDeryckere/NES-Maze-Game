@@ -84,6 +84,8 @@ LEFT_N = 3
 ;changed tiles util
 CHANGED_TILES_BUFFER_SIZE = 20
 ADDED_FRONTIER_BUFFER_SIZE = 40
+
+PLAYER_MOVEMENT_DELAY = 5
 ;*****************************************************************
 
 .segment "HEADER"
@@ -185,7 +187,8 @@ player_collumn: 		.res 1
 
 has_game_started:		.res 1
 
-
+frame_counter: 			.res 1
+last_frame_ct: 			.res 1 ;for things we want to execute once per frame
 ;*****************************************************************
 
 .segment "OAM"
