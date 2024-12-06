@@ -95,6 +95,10 @@ irq:
         BNE :+
             JSR start
 
+            ;auto generation once maze is completed (useful for debugging)
+            ; LDA #1
+            ; STA has_generation_started
+
             LDA last_frame_ct
             CMP frame_counter
             BEQ mainloop
@@ -104,9 +108,16 @@ irq:
             LDA frame_counter ;sets last frame ct to the same as frame counter
             STA last_frame_ct
 
-            ;auto generation once maze is completed (useful for debugging)
-            ; LDA #1
-            ; STA has_generation_started
+            ;check if we reached the end
+            LDA player_row
+            CMP end_row
+            BNE mainloop
+            LDA player_collumn 
+            CMP end_col
+            BNE mainloop
+
+            LDA #1
+            STA has_generation_started
 
             JMP mainloop
         :
