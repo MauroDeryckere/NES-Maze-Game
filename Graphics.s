@@ -42,7 +42,7 @@
     LDA #0
     STA PPU_CONTROL
     STA PPU_MASK
-    ;sta APU_DM_CONTROL
+    sta APU_DM_CONTROL
     LDA #40
     STA JOYPAD2 
 
@@ -169,11 +169,16 @@ wait_vblank2:
     LDA #$00         ; Low byte of address
     STA $2006
 
-    write_loop:
-        STA $2007        ; Write tile 0 to PPU data
-        INX              ; Increment counter
-        CPX #120 
-        BNE write_loop   ; Loop until all tiles are filled
+    LDA #03
+    LDY #30
+    rowloop:
+        LDX #32
+        columnloop:
+            STA $2007        ; Write tile 0 to PPU data
+            DEX
+            BNE columnloop
+        DEY
+        BNE rowloop
 
     JSR ppu_update
 

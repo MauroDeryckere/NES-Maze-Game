@@ -201,7 +201,7 @@ palette: .res 32 ; current palette buffer
 ;*****************************************************************
 .segment "RODATA"
 default_palette:
-.byte $0F,$15,$26,$37 ; bg0 purple/pink
+.byte $0F,$10,$26,$37 ; bg0 purple/pink
 .byte $0F,$09,$19,$29 ; bg1 green
 .byte $0F,$01,$11,$21 ; bg2 blue
 .byte $0F,$00,$10,$30 ; bg3 greyscale
