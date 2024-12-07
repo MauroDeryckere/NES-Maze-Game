@@ -158,6 +158,28 @@ wait_vblank2:
         RTS
 .endproc
 
+;displays a clear map
+.proc display_clear_map
+    JSR ppu_off
+    JSR clear_nametable
+
+    ; Set PPU address to $2000 (nametable start)
+    LDA #$20         ; High byte of address
+    STA $2006
+    LDA #$00         ; Low byte of address
+    STA $2006
+
+    write_loop:
+        STA $2007        ; Write tile 0 to PPU data
+        INX              ; Increment counter
+        CPX #120 
+        BNE write_loop   ; Loop until all tiles are filled
+
+    JSR ppu_update
+
+    RTS
+.endproc
+
 ;handles the background tiles during vblank using the buffers set in zero page
 .proc draw_background
     LDA display_steps

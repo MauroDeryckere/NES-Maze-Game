@@ -131,6 +131,7 @@ has_generation_started: .res 1
 has_game_started:		.res 1
 display_steps:			.res 1 ;flag to toggle displaying maze generation step by step
 odd_frontiers: 			.res 1 ;was the maze generated with odd or even frontier rows
+is_hard_mode:           .res 1 ;is the game running in hard mode or not
 
 ;maze
 maze_buffer:        	.res 120

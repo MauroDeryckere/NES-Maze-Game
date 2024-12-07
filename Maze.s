@@ -5,6 +5,8 @@
 .include "Graphics.s"
 .include "Util.s"
 
+.include "HardMode.s"
+
 ;*****************************************************************
 ; Interupts | Vblank
 ;*****************************************************************
@@ -92,7 +94,8 @@ irq:
         INC RandomSeed 
 
         LDA has_generation_started
-        BNE :+
+        BNE :++
+            ;poll input and similar
             JSR start
 
             ;auto generation once maze is completed (useful for debugging)
@@ -105,21 +108,29 @@ irq:
 
                 JSR update_player_sprite
 
-            LDA frame_counter ;sets last frame ct to the same as frame counter
-            STA last_frame_ct
+                LDA is_hard_mode
+                CMP #0
+                BEQ :+
+                    JSR update_visibility
+                :
 
-            ;check if we reached the end
-            LDA player_row
-            CMP end_row
-            BNE mainloop
-            LDA player_collumn 
-            CMP end_col
-            BNE mainloop
+                LDA frame_counter ;sets last frame ct to the same as frame counter
+                STA last_frame_ct
 
-            LDA #1
-            STA has_generation_started
 
-            JMP mainloop
+
+                ;check if we reached the end
+                LDA player_row
+                CMP end_row
+                BNE mainloop
+                LDA player_collumn 
+                CMP end_col
+                BNE mainloop
+
+                    LDA #1
+                    STA has_generation_started
+
+                JMP mainloop
         :
 
         LDA has_generation_started
@@ -174,6 +185,14 @@ irq:
             LDA #0
             STA should_clear_buffer
 
+            LDA is_hard_mode
+            CMP #0
+            BEQ :+
+                JSR display_clear_map
+                JSR start_hard_mode
+                JSR wait_frame
+            :
+
             LDA #1
             STA has_game_started
 
@@ -214,34 +233,8 @@ irq:
     LDA #1
     STA display_steps
 
-
-    ; ;SET SPRITE VARIABLES INITIAL VALUES: 
-    ; lda #0
-    ; sta player_x  
-    ; lda #7
-    ; sta player_y      ;current x = 0, current y = 7. offset is needed in Y to make sure it fits in tile.
-
-
-    ; ;INITIALIZE PLAYER_ROW AND PLAYER_COLLUMN VARIABLES
-    ; clc 
-    ; adc #$01 ; add 1 to y value to account for offset of initial start position
-
-    ; lsr            ; Shift right by 1 (divide by 2)
-    ; lsr            ; Shift right by 1 (divide by 4)
-    ; lsr            ; Shift right by 1 (divide by 8)
-        
-    ; ;a register now holds the row in which the player sprite resides
-    ; sta player_row
-
-    ; lda player_collumn
-    ; clc 
-
-    ; lsr            ; Shift right by 1 (divide by 2)
-    ; lsr            ; Shift right by 1 (divide by 4)
-    ; lsr            ; Shift right by 1 (divide by 8)
-        
-    ; ;a register now holds the row in which the player sprite resides
-    ; sta player_collumn
+    LDA #0 
+    STA is_hard_mode
 
     RTS
 .endproc
@@ -744,65 +737,44 @@ loop:
 ;*****************************************************************
 ;update player position with player input
 .proc update_player_sprite
+    ;check is delay is reached
+    modulo frame_counter, #PLAYER_MOVEMENT_DELAY
+    CMP #0
+    BEQ :+
+        RTS
+    :   
+
     lda gamepad
     and #PAD_D
     beq NOT_GAMEPAD_DOWN 
-
         ;gamepad down is pressed
-
-        ;--------------------------------------------------------------
-        ;UPDATE PLAYER POSITION AND SPEED
-        ;--------------------------------------------------------------
-        ;check is delay is reached
 
         ;bounds check first
         LDA player_row
         CMP #MAP_ROWS - 1
-        BEQ NoHit
-
-        modulo frame_counter, #PLAYER_MOVEMENT_DELAY
-        CMP #0
-        BEQ :+
-            RTS
+        BNE :+
+            JMP NOT_GAMEPAD_DOWN
         :   
-
-        lda player_y
-        clc
-        adc #8
-        sta player_y
-        
 
         ;--------------------------------------------------------------
         ;COLLISION DETECTION
         ;--------------------------------------------------------------
-        clc 
-        adc #$01 ; add 1 to y value to account for offset of initial start position
-
-        lsr            ; Shift right by 1 (divide by 2)
-        lsr            ; Shift right by 1 (divide by 4)
-        lsr            ; Shift right by 1 (divide by 8)
-        
-        ;a register now holds the row in which the player sprite resides
-        sta player_row
-
-        lda player_x
-        lsr
-        lsr
-        lsr
-        sta player_collumn
-
+        INC player_row
         get_map_tile_state player_row, player_collumn ;figure out which row and colom is needed
         ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
 
-        bne NoHit
-        ;sprite collided with wall
-        lda player_y
-        sec 
-        sbc #8 ; reset position
-        sta player_y
+        BEQ HitDown
+            LDA player_y
+            CLC 
+            ADC #8 ; set position
+            STA player_y
+            JMP NOT_GAMEPAD_DOWN
 
-        NoHit: 
-        rts
+        HitDown: 
+            ;sprite collided with wall
+            DEC player_row
+            JMP NOT_GAMEPAD_DOWN
+        
 
     NOT_GAMEPAD_DOWN: 
     lda gamepad
@@ -811,50 +783,29 @@ loop:
 
         ;bounds check first
         LDA player_row
-        BEQ NoHit
-
-        ;check is delay is reached
-        modulo frame_counter, #PLAYER_MOVEMENT_DELAY
-        CMP #0
-        BEQ :+
-            RTS
+        BNE :+
+            JMP NOT_GAMEPAD_UP
         :   
-
-        lda player_y
-        sec
-        sbc #8
-        sta player_y
 
         ;--------------------------------------------------------------
         ;COLLISION DETECTION
         ;--------------------------------------------------------------
-        clc 
-        lsr            ; Shift right by 1 (divide by 2)
-        lsr            ; Shift right by 1 (divide by 4)
-        lsr            ; Shift right by 1 (divide by 8)
-        
-        ;a register now holds the row in which the player sprite resides
-        sta player_row
-
-                
-        lda player_x
-        lsr
-        lsr
-        lsr
-        sta player_collumn
-
+        DEC player_row
         get_map_tile_state player_row, player_collumn ;figure out which row and colom is needed
         ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
-
-        bne NoHit
-        ;sprite collided with wall
-        lda player_y
-        clc 
-        adc #8 ; reset position
+        
+        BEQ HitUp
+        LDA player_y
+        SEC 
+        SBC #8 ; set position
         sta player_y
+        JMP NOT_GAMEPAD_UP
 
+        HitUp: 
+            ;sprite collided with wall
+            INC player_row
+            JMP NOT_GAMEPAD_UP
 
-    
     NOT_GAMEPAD_UP: 
     lda gamepad
     and #PAD_L
@@ -863,107 +814,66 @@ loop:
 
         ;bounds check first
         LDA player_collumn
-        BEQ NoHit2
-
-        ;check is delay is reached
-        modulo frame_counter, #PLAYER_MOVEMENT_DELAY
-        CMP #0
-        BEQ :+
-            RTS
-        :   
-
-        lda player_x
-        sec
-        sbc #8
-        sta player_x
+        BNE :+
+            JMP NOT_GAMEPAD_LEFT
+        :
 
         ;--------------------------------------------------------------
         ;COLLISION DETECTION
         ;--------------------------------------------------------------
-
-        lsr            ; Shift right by 1 (divide by 2)
-        lsr            ; Shift right by 1 (divide by 4)
-        lsr            ; Shift right by 1 (divide by 8)
-        
-        ;a register now holds the row in which the player sprite resides
-        sta player_collumn
-
-                
-        lda player_y
-        clc
-        adc #$01
-        lsr
-        lsr
-        lsr
-        sta player_row
+        DEC player_collumn
 
         get_map_tile_state player_row, player_collumn ;figure out which row and colom is needed
         ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
 
-        bne NoHit2 ; have to make it another label because the jump to NoHit is to far 
-        ;sprite collided with wall
-        lda player_x
-        clc 
-        adc #8 ; reset position
-        sta player_x
+        BEQ HitLeft
+            LDA player_x
+            SEC 
+            SBC #8 ; set position
+            STA player_x
+            JMP NOT_GAMEPAD_LEFT
 
-        NoHit2: 
-        rts
+
+        HitLeft: 
+            ;sprite collided with wall
+            INC player_collumn
+            JMP NOT_GAMEPAD_LEFT
 
 
     NOT_GAMEPAD_LEFT: 
     lda gamepad
     and #PAD_R
     beq NOT_GAMEPAD_RIGHT
-
         ;bounds check first
         LDA player_collumn
         CMP #MAP_COLUMNS - 1
-        BEQ NoHit2
+        BNE :+
+            JMP NOT_GAMEPAD_RIGHT
+        :
 
-        ;check is delay is reached
-        modulo frame_counter, #PLAYER_MOVEMENT_DELAY
-        CMP #0
-        BEQ :+
-            RTS
-        :   
-
-        lda player_x
-        clc
-        adc #8
-        sta player_x
         ;--------------------------------------------------------------
         ;COLLISION DETECTION
         ;--------------------------------------------------------------
-
-
-        lsr            ; Shift right by 1 (divide by 2)
-        lsr            ; Shift right by 1 (divide by 4)
-        lsr            ; Shift right by 1 (divide by 8)
+        INC player_collumn
         
-        ;a register now holds the row in which the player sprite resides
-        sta player_collumn
-
-                lda player_y
-        clc
-        adc #$01
-        lsr
-        lsr
-        lsr
-        sta player_row
-
         get_map_tile_state player_row, player_collumn ;figure out which row and colom is needed
         ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
 
-        bne NoHit2
-        ;sprite collided with wall
-        lda player_x
-        sec 
-        sbc #8 ; reset position
-        sta player_x
+        BEQ HitRight
+            LDA player_x
+            CLC 
+            ADC #8 ; set position
+            STA player_x
+            JMP NOT_GAMEPAD_RIGHT
+
+        HitRight: 
+            ;sprite collided with wall
+            DEC player_collumn
+            JMP NOT_GAMEPAD_RIGHT
+
 
     NOT_GAMEPAD_RIGHT: 
         ;neither up, down, left, or right is pressed
-    rts
+    RTS
 .endproc
 ;*****************************************************************
