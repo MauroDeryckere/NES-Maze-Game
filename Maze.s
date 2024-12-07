@@ -117,8 +117,6 @@ irq:
                 LDA frame_counter ;sets last frame ct to the same as frame counter
                 STA last_frame_ct
 
-
-
                 ;check if we reached the end
                 LDA player_row
                 CMP end_row
@@ -190,7 +188,7 @@ irq:
             BEQ :+
                 JSR display_clear_map
                 JSR start_hard_mode
-                JSR wait_frame
+
             :
 
             LDA #1
@@ -233,7 +231,7 @@ irq:
     LDA #1
     STA display_steps
 
-    LDA #0 
+    LDA #1
     STA is_hard_mode
 
     RTS
