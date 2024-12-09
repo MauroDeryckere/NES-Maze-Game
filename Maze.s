@@ -6,6 +6,7 @@
 .include "Util.s"
 
 .include "HardMode.s"
+.include "Score.s"
 
 ;*****************************************************************
 ; Interupts | Vblank
@@ -33,7 +34,7 @@ irq:
 
     JSR draw_background
     JSR draw_player_sprite
-
+    JSR display_score
 
     ; transfer sprite OAM data using DMA
 	LDX #0
@@ -241,6 +242,9 @@ irq:
     ;set gamemode
     LDA #1
     STA is_hard_mode
+    
+ ;   add_score #$FF
+    add_score #10
 
     RTS
 .endproc

@@ -299,6 +299,61 @@ wait_vblank2:
     RTS
 .endproc
 
+;display the score
+.proc display_score
+    LDX #4
 
+    LDA #10
+    STA temp
+
+    LDA #10
+    SEC
+    ROL
+
+    STA score_high
+    JSR draw_digit
+
+    CLC
+    LDA temp
+    ADC #10
+    STA temp   
+
+    ; LDA score_low
+    ; JSR draw_digit
+
+    ; CLC
+    ; LDA temp
+    ; ADC #10
+    ; STA temp    
+    
+    RTS
+.endproc
+
+;draws the digit stored in a reg
+.proc draw_digit
+    ;convert digit 0-9 to correct tile index
+    CLC
+    ADC #$10
+    TAY
+
+    LDA #10 ;Y coordinate
+    STA oam, x
+    INX
+
+    TYA
+    LDA temp
+    STA oam, x
+    INX 
+
+    LDA #%00000000 ;flip bits to set certain sprite attributes
+    STA oam, x
+    INX
+
+    LDA #20   ;X coordinate
+    STA oam, x
+    INX 
+
+    RTS
+.endproc
 
 ;*****************************************************************

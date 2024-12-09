@@ -190,6 +190,9 @@ player_x: 				.res 1
 player_y: 				.res 1
 player_row: 			.res 1
 player_collumn: 		.res 1
+
+score_low:              .res 1
+score_high:             .res 1
 ;*****************************************************************
 
 .segment "OAM"
