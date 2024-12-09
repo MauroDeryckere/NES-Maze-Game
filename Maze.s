@@ -228,6 +228,10 @@ irq:
     ;set an initial randomseed value - must be non zero
     LDA #$10
     STA RandomSeed
+
+    LDA #$FF
+    STA player_row
+    STA player_collumn
     
     ;run test code
     ;JSR test_frontier ;test code
