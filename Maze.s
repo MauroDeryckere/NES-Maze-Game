@@ -160,6 +160,11 @@ irq:
 
             step_by_step_generation_loop:
                 JSR wait_frame ;wait until a vblank has happened
+
+                modulo frame_counter, #MAZE_GENERATION_SPEED
+                CMP #0
+                BNE step_by_step_generation_loop
+
                 JSR poll_clear_buffer
                 JSR run_prims_maze
                 
@@ -222,13 +227,18 @@ irq:
     LDA #$10
     STA RandomSeed
     
+    ;run test code
     ;JSR test_frontier ;test code
 
+    ;start generation immediately
     LDA #1
     STA has_generation_started
+
+    ;display maze generation step-by-step
     LDA #1
     STA display_steps
 
+    ;set gamemode
     LDA #1
     STA is_hard_mode
 

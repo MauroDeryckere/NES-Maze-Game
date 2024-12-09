@@ -84,6 +84,8 @@ CHANGED_TILES_BUFFER_SIZE = 40
 
 ;sets the delay for player movement (==  movement speed)
 PLAYER_MOVEMENT_DELAY = 5
+
+MAZE_GENERATION_SPEED = 10 ;how much is maze generation slowed down
 ;*****************************************************************
 
 .segment "HEADER"
