@@ -93,6 +93,7 @@ irq:
     mainloop:
         INC RandomSeed 
 
+        ;only when not generating
         LDA has_generation_started
         BNE :++
             ;poll input and similar
@@ -102,6 +103,7 @@ irq:
             ; LDA #1
             ; STA has_generation_started
 
+            ;once per frame
             LDA last_frame_ct
             CMP frame_counter
             BEQ mainloop
@@ -131,6 +133,7 @@ irq:
                 JMP mainloop
         :
 
+        ;only when generating
         LDA has_generation_started
         BEQ mainloop
             LDA #0
