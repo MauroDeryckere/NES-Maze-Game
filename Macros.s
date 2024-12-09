@@ -55,7 +55,9 @@
         LDA Col
         STA added_frontier_buffer, y
 .endmacro
-.macro add_to_changed_tiles_buffer Row, Col
+
+; most significant bit is set to 1 or 0 (passable or wall) of the row.
+.macro add_to_changed_tiles_buffer Row, Col, IsWall
     LDY #0
     .local loop
     loop:
@@ -73,6 +75,12 @@
     .local add_vals
     add_vals:
         LDA Row
+        LDX IsWall
+        CPX #0
+        BEQ :+
+            ORA #%10000000       ; Set bit 7 to indicate a passable tile
+        :
+
         STA changed_tiles_buffer, y
         INY
         LDA Col

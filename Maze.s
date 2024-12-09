@@ -335,7 +335,7 @@ loop:
     end_col:
 
     set_map_tile a_val, b_val
-    add_to_changed_tiles_buffer frontier_row, frontier_col
+    add_to_changed_tiles_buffer frontier_row, frontier_col, #0
 
         access_map_neighbor #LEFT_N, frontier_row, frontier_col
         CMP #0 
@@ -517,7 +517,7 @@ loop:
 
     nextnextstep: 
         set_map_tile temp_row, temp_col
-        add_to_changed_tiles_buffer temp_row, temp_col
+        add_to_changed_tiles_buffer temp_row, temp_col, #0
 
     ;calculate the new frontier cells for the chosen frontier cell and add them
         access_map_neighbor #LEFT_N, frontier_row, frontier_col
@@ -597,7 +597,7 @@ loop:
     end: 
     ; ;remove the chosen frontier cell from the list
     set_map_tile frontier_row, frontier_col
-    add_to_changed_tiles_buffer frontier_row, frontier_col
+    add_to_changed_tiles_buffer frontier_row, frontier_col, #0
     remove_from_Frontier frontier_page, frontier_offset
 
     ;INC execs
@@ -627,7 +627,7 @@ loop:
     BEQ rowloop_ue
 
     set_map_tile #0, temp
-    add_to_changed_tiles_buffer #0, temp
+    add_to_changed_tiles_buffer #0, temp, #0
     LDA #0
     STA player_row
     LDA temp
@@ -655,7 +655,8 @@ loop:
         BEQ rowloop_e
 
         set_map_tile #0, temp
-        add_to_changed_tiles_buffer #29, temp
+        add_to_changed_tiles_buffer #29, temp, #0
+
         LDA #29
         STA player_row
         LDA temp
@@ -696,7 +697,7 @@ loop:
         BEQ colloop_ue
 
         set_map_tile temp, #0
-        add_to_changed_tiles_buffer temp, #0
+        add_to_changed_tiles_buffer temp, #0, #0
         
         LDA temp
         STA end_row
@@ -715,7 +716,7 @@ loop:
         BEQ colloop_e
 
         set_map_tile temp, #31
-        add_to_changed_tiles_buffer temp, #31
+        add_to_changed_tiles_buffer temp, #31, #0
 
         LDA temp
         STA end_row

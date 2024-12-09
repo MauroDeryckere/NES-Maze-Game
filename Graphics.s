@@ -243,9 +243,8 @@ wait_vblank2:
 
     ;update the map tiles
     LDY #0
-    LDA #0
     maploop: 
-        CLC
+        LDX #0 ; flag wall or not
         LDA #0
         STA high_byte
 
@@ -254,9 +253,19 @@ wait_vblank2:
         ;LDA #0
         CMP #$FF ;end of buffer
         BEQ done 
-
         STA low_byte
 
+        ;extract the flag (wall or not)
+        AND #%10000000
+        BNE set_tile
+            LDX #1
+        set_tile: 
+
+        LDA low_byte
+        AND #%01111111 ; Clear MSB from row to get row number
+        STA low_byte
+        
+        CLC
         ASL low_byte ;x2
         ROL high_byte
         ASL low_byte ;x2
@@ -278,12 +287,10 @@ wait_vblank2:
         LDA changed_tiles_buffer, y
         ;LDA #0
         
-        CLC
         ADC low_byte
         STA $2006
 
-        LDA #1
-        STA PPU_VRAM_IO
+        STX PPU_VRAM_IO
 
         INY
         CPY #CHANGED_TILES_BUFFER_SIZE
