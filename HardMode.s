@@ -3,8 +3,8 @@
 ;*****************************************************************
 .segment "CODE"
 .proc start_hard_mode
-    add_to_changed_tiles_buffer player_row, player_collumn, #0
-    add_to_changed_tiles_buffer end_row, end_col, #0
+    add_to_changed_tiles_buffer player_row, player_collumn, #1
+    add_to_changed_tiles_buffer end_row, end_col, #1
     LDA #0
     STA should_clear_buffer
 .endproc
@@ -14,7 +14,6 @@
     LDA should_clear_buffer
     BEQ :+
         JSR clear_changed_tiles_buffer
-        JSR cleared_added_frontier_buffer
         LDA #0
         STA should_clear_buffer
     :
@@ -34,10 +33,10 @@
 
         get_map_tile_state frontier_row, player_collumn
         BEQ a_wall
-        add_to_changed_tiles_buffer frontier_row, player_collumn, #0
+        add_to_changed_tiles_buffer frontier_row, player_collumn, #1
         JMP below
         a_wall: 
-            add_to_changed_tiles_buffer frontier_row, player_collumn, #1
+            add_to_changed_tiles_buffer frontier_row, player_collumn, #0
     below:
         LDA player_row
         CMP #MAP_ROWS - 1
@@ -50,10 +49,10 @@
 
         get_map_tile_state frontier_row, player_collumn
         BEQ b_wall
-        add_to_changed_tiles_buffer frontier_row, player_collumn, #0
+        add_to_changed_tiles_buffer frontier_row, player_collumn, #1
         JMP left
         b_wall: 
-            add_to_changed_tiles_buffer frontier_row, player_collumn, #1
+            add_to_changed_tiles_buffer frontier_row, player_collumn, #0
     
     left: 
         LDA player_collumn
@@ -67,10 +66,10 @@
 
         get_map_tile_state player_row, frontier_col
         BEQ l_wall
-        add_to_changed_tiles_buffer player_row, frontier_col, #0
+        add_to_changed_tiles_buffer player_row, frontier_col, #1
         JMP right
         l_wall: 
-            add_to_changed_tiles_buffer player_row, frontier_col, #1
+            add_to_changed_tiles_buffer player_row, frontier_col, #0
 
     right: 
         LDA player_collumn
@@ -84,10 +83,10 @@
 
         get_map_tile_state player_row, frontier_col
         BEQ r_wall
-        add_to_changed_tiles_buffer player_row, frontier_col, #0
+        add_to_changed_tiles_buffer player_row, frontier_col, #1
         JMP end
         r_wall: 
-            add_to_changed_tiles_buffer player_row, frontier_col, #1
+            add_to_changed_tiles_buffer player_row, frontier_col, #0
     end: 
 
     RTS

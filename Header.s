@@ -80,8 +80,7 @@ BOTTOM_N = 2
 LEFT_N = 3
 
 ;changed tiles util
-CHANGED_TILES_BUFFER_SIZE = 20
-ADDED_FRONTIER_BUFFER_SIZE = 40
+CHANGED_TILES_BUFFER_SIZE = 40
 
 ;sets the delay for player movement (==  movement speed)
 PLAYER_MOVEMENT_DELAY = 5
@@ -141,8 +140,7 @@ end_col:				.res 1
 
 ;graphics buffers
 should_clear_buffer: 	.res 1
-changed_tiles_buffer: 	.res 20 ;changed tiles this frame - used for graphics during vblank | layout: row, col, row, col; FF by default
-added_frontier_buffer: 	.res 40 ;added frontier cells this frame - used for graphics during vblank layout: row, col, row, col; FF by default
+changed_tiles_buffer: 	.res 40 ;changed tiles this frame - used for graphics during vblank | layout: row, col, row, col; FF by default | first 3 bits of row are the tileID
 
 low_byte: 				.res 1
 high_byte: 				.res 1

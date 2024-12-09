@@ -31,33 +31,8 @@
 ;*****************************************************************
 ; Vblank buffers
 ;*****************************************************************
-.macro add_to_added_frontier_buffer Row, Col
-    LDY #0
-
-    .local loop
-    loop:
-
-        LDA added_frontier_buffer, y
-        CMP #$FF
-        BEQ add_vals
-        
-        INY
-        INY
-
-        CPY #ADDED_FRONTIER_BUFFER_SIZE - 2
-        BNE loop
-
-    .local add_vals
-    add_vals:
-        LDA Row
-        STA added_frontier_buffer, y
-        INY
-        LDA Col
-        STA added_frontier_buffer, y
-.endmacro
-
-; most significant bit is set to 1 or 0 (passable or wall) of the row.
-.macro add_to_changed_tiles_buffer Row, Col, IsWall
+; most significant bits are set to 000 - 111 (tileID 0-7 of the row)
+.macro add_to_changed_tiles_buffer Row, Col, TileID
     LDY #0
     .local loop
     loop:
@@ -74,12 +49,16 @@
 
     .local add_vals
     add_vals:
-        LDA Row
-        LDX IsWall
-        CPX #0
-        BEQ :+
-            ORA #%10000000       ; Set bit 7 to indicate a passable tile
-        :
+        ;convert tileID (0000 0111) to te correct bits (1110 0000)
+        LDA TileID
+
+        ASL			
+        ASL			
+        ASL			
+        ASL			
+        ASL			
+
+        ORA Row
 
         STA changed_tiles_buffer, y
         INY

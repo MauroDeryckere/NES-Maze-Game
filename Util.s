@@ -17,21 +17,6 @@
 .endproc
 
 .segment "CODE"
-.proc cleared_added_frontier_buffer
-    LDY #0
-
-    loop: 
-    LDA #$FF
-    STA added_frontier_buffer, Y
-
-    INY
-    CPY #ADDED_FRONTIER_BUFFER_SIZE
-    BNE loop
-
-    RTS
-.endproc
-
-.segment "CODE"
 .proc clear_maze
     LDY #0
 
@@ -53,7 +38,7 @@
     STY y_val
 
     add_to_Frontier y_val, x_val
-    add_to_added_frontier_buffer y_val, x_val
+    add_to_changed_tiles_buffer y_val, x_val, #2
 
     RTS
 .endproc  

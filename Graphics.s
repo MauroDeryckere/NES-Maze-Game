@@ -187,60 +187,6 @@ wait_vblank2:
 
 ;handles the background tiles during vblank using the buffers set in zero page
 .proc draw_background
-    LDA display_steps
-    BEQ done_f
-
-    ;update the frontier cells
-    LDY #0
-    LDA #0
-    frontierloop: 
-        CLC
-        LDA #0
-        STA high_byte
-
-        ;row
-        LDA added_frontier_buffer, y
-        ;LDA #0
-        CMP #$FF ;end of buffer
-        BEQ done_f 
-
-        STA low_byte
-
-        ASL low_byte ;x2
-        ROL high_byte
-        ASL low_byte ;x2
-        ROL high_byte
-        ASL low_byte ;x2
-        ROL high_byte
-        ASL low_byte ;x2
-        ROL high_byte
-        ASL low_byte ;x2 == 32
-        ROL high_byte
-
-        LDA #$20 ;add high byte
-        CLC
-        ADC high_byte
-        STA $2006
-        
-        ;col
-        INY
-        LDA added_frontier_buffer, y
-        ;LDA #0
-        
-        CLC
-        ADC low_byte
-        STA $2006
-
-        LDA #2
-        STA PPU_VRAM_IO
-
-        INY
-        CPY #ADDED_FRONTIER_BUFFER_SIZE
-        BNE frontierloop        
-    done_f: 
-        LDA display_steps
-        BEQ done
-
     ;update the map tiles
     LDY #0
     maploop: 
@@ -255,14 +201,18 @@ wait_vblank2:
         BEQ done 
         STA low_byte
 
-        ;extract the flag (wall or not)
-        AND #%10000000
-        BNE set_tile
-            LDX #1
-        set_tile: 
+        ;1110 0000 -> 0000 0111
+        ;extract the tileID  
+        LSR
+        LSR
+        LSR
+        LSR
+        LSR
+
+        TAX ;Store the 3-bit TileID in X (0-7)        
 
         LDA low_byte
-        AND #%01111111 ; Clear MSB from row to get row number
+        AND #%00011111 ; Clear the tileID from the row
         STA low_byte
         
         CLC

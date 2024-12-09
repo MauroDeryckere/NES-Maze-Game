@@ -141,7 +141,6 @@ irq:
 
             JSR clear_maze
             JSR clear_changed_tiles_buffer
-            JSR cleared_added_frontier_buffer
             JSR wait_frame
             JSR display_map
 
@@ -156,7 +155,6 @@ irq:
                 LDA should_clear_buffer
                 BEQ :+
                     JSR clear_changed_tiles_buffer
-                    JSR cleared_added_frontier_buffer
                     LDA #0
                     STA should_clear_buffer
                 :
@@ -179,7 +177,6 @@ irq:
             JSR wait_frame
 
             JSR clear_changed_tiles_buffer
-            JSR cleared_added_frontier_buffer
             LDA #0
             STA should_clear_buffer
 
@@ -217,7 +214,6 @@ irq:
     JSR ppu_update
 
     JSR clear_changed_tiles_buffer
-    JSR cleared_added_frontier_buffer
     JSR clear_maze
 
     ;set an initial randomseed value - must be non zero
@@ -335,7 +331,7 @@ loop:
     end_col:
 
     set_map_tile a_val, b_val
-    add_to_changed_tiles_buffer frontier_row, frontier_col, #0
+    add_to_changed_tiles_buffer frontier_row, frontier_col, #1
 
         access_map_neighbor #LEFT_N, frontier_row, frontier_col
         CMP #0 
@@ -517,7 +513,7 @@ loop:
 
     nextnextstep: 
         set_map_tile temp_row, temp_col
-        add_to_changed_tiles_buffer temp_row, temp_col, #0
+        add_to_changed_tiles_buffer temp_row, temp_col, #1
 
     ;calculate the new frontier cells for the chosen frontier cell and add them
         access_map_neighbor #LEFT_N, frontier_row, frontier_col
@@ -597,7 +593,7 @@ loop:
     end: 
     ; ;remove the chosen frontier cell from the list
     set_map_tile frontier_row, frontier_col
-    add_to_changed_tiles_buffer frontier_row, frontier_col, #0
+    add_to_changed_tiles_buffer frontier_row, frontier_col, #1
     remove_from_Frontier frontier_page, frontier_offset
 
     ;INC execs
@@ -627,7 +623,7 @@ loop:
     BEQ rowloop_ue
 
     set_map_tile #0, temp
-    add_to_changed_tiles_buffer #0, temp, #0
+    add_to_changed_tiles_buffer #0, temp, #1
     LDA #0
     STA player_row
     LDA temp
@@ -655,7 +651,7 @@ loop:
         BEQ rowloop_e
 
         set_map_tile #0, temp
-        add_to_changed_tiles_buffer #29, temp, #0
+        add_to_changed_tiles_buffer #29, temp, #1
 
         LDA #29
         STA player_row
@@ -697,7 +693,7 @@ loop:
         BEQ colloop_ue
 
         set_map_tile temp, #0
-        add_to_changed_tiles_buffer temp, #0, #0
+        add_to_changed_tiles_buffer temp, #0, #1
         
         LDA temp
         STA end_row
@@ -716,7 +712,7 @@ loop:
         BEQ colloop_e
 
         set_map_tile temp, #31
-        add_to_changed_tiles_buffer temp, #31, #0
+        add_to_changed_tiles_buffer temp, #31, #1
 
         LDA temp
         STA end_row
