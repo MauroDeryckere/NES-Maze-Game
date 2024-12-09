@@ -140,7 +140,9 @@ end_col:				.res 1
 
 ;graphics buffers
 should_clear_buffer: 	.res 1
-changed_tiles_buffer: 	.res 40 ;changed tiles this frame - used for graphics during vblank | layout: row, col, row, col; FF by default | first 3 bits of row are the tileID
+changed_tiles_buffer: 	.res 40 ;changed tiles this frame - used for graphics during vblank 
+                                ; layout: row, col, row, col; FF by default 
+                                ; first 3 bits of row are the tileID
 
 low_byte: 				.res 1
 high_byte: 				.res 1

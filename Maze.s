@@ -93,7 +93,14 @@ irq:
     mainloop:
         INC RandomSeed 
 
-        ;only when not generating
+        ; once per frame: 
+        LDA last_frame_ct
+        CMP frame_counter
+        BEQ :+
+            JSR poll_clear_buffer
+        :
+        
+        ;only when not generating 
         LDA has_generation_started
         BNE :++
             ;poll input and similar
@@ -126,7 +133,6 @@ irq:
                 LDA player_collumn 
                 CMP end_col
                 BNE mainloop
-
                     LDA #1
                     STA has_generation_started
 
@@ -154,14 +160,7 @@ irq:
 
             step_by_step_generation_loop:
                 JSR wait_frame ;wait until a vblank has happened
-
-                LDA should_clear_buffer
-                BEQ :+
-                    JSR clear_changed_tiles_buffer
-                    LDA #0
-                    STA should_clear_buffer
-                :
-
+                JSR poll_clear_buffer
                 JSR run_prims_maze
                 
                 LDA has_generation_started

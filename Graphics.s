@@ -1,6 +1,17 @@
 ;*****************************************************************
 ; Graphics utility functions
 ;*****************************************************************
+.proc poll_clear_buffer
+    LDA should_clear_buffer
+    BEQ :+
+        JSR clear_changed_tiles_buffer
+        LDA #0
+        STA should_clear_buffer
+    :
+    RTS
+.endproc
+
+
 .proc wait_frame
 	INC nmi_ready
 @loop:
