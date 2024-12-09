@@ -27,10 +27,9 @@ irq:
     BIT PPU_STATUS
 
     ;increase our frame counter (one vblank occurs per frame)
-    LDA frame_counter
-    STA last_frame_ct
-
     INC frame_counter
+    LDA #0
+    STA checked_this_frame
 
     JSR draw_background
     JSR draw_player_sprite
@@ -95,8 +94,8 @@ irq:
         INC RandomSeed 
 
         ; once per frame: 
-        LDA last_frame_ct
-        CMP frame_counter
+        LDA checked_this_frame
+        CMP #0
         BEQ :+
             JSR poll_clear_buffer
         :
@@ -112,20 +111,22 @@ irq:
             ; STA has_generation_started
 
             ;once per frame
-            LDA last_frame_ct
-            CMP frame_counter
+            LDA checked_this_frame
+            CMP #1
             BEQ mainloop
-
                 JSR update_player_sprite
 
                 LDA is_hard_mode
                 CMP #0
                 BEQ :+
                     JSR update_visibility
-                :
+                :   
+
+                add_to_changed_tiles_buffer #0, #0, #1
 
                 LDA frame_counter ;sets last frame ct to the same as frame counter
-                STA last_frame_ct
+                LDA #1
+                STA checked_this_frame
 
                 ;check if we reached the end
                 LDA player_row
@@ -240,7 +241,7 @@ irq:
     STA display_steps
 
     ;set gamemode
-    LDA #1
+    LDA #0
     STA is_hard_mode
     
  ;   add_score #$FF

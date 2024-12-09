@@ -85,7 +85,7 @@ CHANGED_TILES_BUFFER_SIZE = 40
 ;sets the delay for player movement (==  movement speed)
 PLAYER_MOVEMENT_DELAY = 5
 
-MAZE_GENERATION_SPEED = 10 ;how much is maze generation slowed down
+MAZE_GENERATION_SPEED = 1 ;how much is maze generation slowed down
 ;*****************************************************************
 
 .segment "HEADER"
@@ -133,6 +133,7 @@ has_game_started:		.res 1
 display_steps:			.res 1 ;flag to toggle displaying maze generation step by step
 odd_frontiers: 			.res 1 ;was the maze generated with odd or even frontier rows
 is_hard_mode:           .res 1 ;is the game running in hard mode or not
+checked_this_frame:     .res 1 
 
 ;maze
 maze_buffer:        	.res 120
@@ -193,6 +194,8 @@ player_collumn: 		.res 1
 
 score_low:              .res 1
 score_high:             .res 1
+
+testvar:                .res 1
 ;*****************************************************************
 
 .segment "OAM"
