@@ -33,7 +33,7 @@ irq:
 
     JSR draw_background
     JSR draw_player_sprite
-    JSR display_score
+    ;JSR display_score
 
     ; transfer sprite OAM data using DMA
 	LDX #0
@@ -781,7 +781,10 @@ loop:
         CMP #MAP_ROWS - 1
         BNE :+
             JMP NOT_GAMEPAD_DOWN
-        :   
+        :  
+
+        LDA #BOTTOM
+        STA player_dir 
 
         ;--------------------------------------------------------------
         ;COLLISION DETECTION
@@ -814,13 +817,16 @@ loop:
             JMP NOT_GAMEPAD_UP
         :   
 
+        LDA #TOP
+        STA player_dir
+
         ;--------------------------------------------------------------
         ;COLLISION DETECTION
         ;--------------------------------------------------------------
         DEC player_row
         get_map_tile_state player_row, player_collumn ;figure out which row and colom is needed
         ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
-        
+
         BEQ HitUp
         LDA player_y
         SEC 
@@ -844,6 +850,9 @@ loop:
         BNE :+
             JMP NOT_GAMEPAD_LEFT
         :
+
+        LDA #LEFT
+        STA player_dir
 
         ;--------------------------------------------------------------
         ;COLLISION DETECTION
@@ -877,6 +886,9 @@ loop:
         BNE :+
             JMP NOT_GAMEPAD_RIGHT
         :
+
+        LDA #RIGHT
+        STA player_dir
 
         ;--------------------------------------------------------------
         ;COLLISION DETECTION

@@ -73,6 +73,12 @@ FRONTIER_LISTQ2 = $041E
 FRONTIER_LISTQ3 = $051C
 FRONTIER_LISTQ4 = $061A
 
+; player direcctions
+LEFT = 0
+BOTTOM = 1 
+RIGHT = 2
+TOP = 3
+
 ; Neighbor util - directions
 TOP_N = 0
 RIGHT_N = 1 
@@ -189,6 +195,9 @@ temp_col:				.res 1
 temp: 					.res 1
 
 ;PLAYER SPRITE VARIABLES
+player_dir:             .res 1
+
+
 player_x: 				.res 1
 player_y: 				.res 1
 player_row: 			.res 1
@@ -217,7 +226,7 @@ default_palette:
 .byte $0F,$17,$27,$37 ; bg1 orange
 .byte $0F,$01,$11,$21 ; bg2 blue
 .byte $0F,$00,$10,$30 ; bg3 greyscale
-.byte $0F,$16,$21,$2C ; sp0 blue (changed)
+.byte $0F,$1D,$20,$10 ; sp0
 .byte $0F,$17,$27,$37 ; sp1 orange
 .byte $0F,$1B,$2B,$3B ; sp2 teal
 .byte $0F,$12,$22,$32 ; sp3 marine

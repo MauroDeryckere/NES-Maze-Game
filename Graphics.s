@@ -274,11 +274,14 @@ wait_vblank2:
     sta oam, x
     inx
 
-    lda #$02   ;tile pattern index
+    CLC
+    LDA #$D0   ;tile pattern index
+    ADC player_dir
+
     sta oam, x
     inx 
 
-    lda #%00000001 ;flip bits to set certain sprite attributes
+    lda #%00000000 ;flip bits to set certain sprite attributes
     sta oam, x
     inx
 
