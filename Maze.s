@@ -8,6 +8,8 @@
 .include "HardMode.s"
 .include "Score.s"
 
+.include "Queue.s"
+
 ;*****************************************************************
 ; Interupts | Vblank
 ;*****************************************************************
@@ -33,7 +35,7 @@ irq:
 
     JSR draw_background
     JSR draw_player_sprite
-    ;JSR display_score
+    ; JSR display_score
 
     ; transfer sprite OAM data using DMA
 	LDX #0
@@ -233,6 +235,8 @@ irq:
     
     ;run test code
     ;JSR test_frontier ;test code
+
+    JSR test_queue
 
     ;start generation immediately
     LDA #1

@@ -71,9 +71,9 @@ MAP_ROWS = 30
 FRONTIER_LISTQ1 = $0320
 FRONTIER_LISTQ2 = $041E
 FRONTIER_LISTQ3 = $051C
-FRONTIER_LISTQ4 = $061A
+FRONTIER_LISTQ4 = $9999 ; not in use anymore - TODO remove from macros
 
-; player direcctions
+; player directions
 LEFT = 0
 BOTTOM = 1 
 RIGHT = 2
@@ -209,6 +209,11 @@ score_high:             .res 1
 testvar:                .res 1
 
 Remainder:              .res 1
+
+; Queue ptrs
+queue_head:             .res 1
+queue_tail:             .res 1
+
 ;*****************************************************************
 
 .segment "OAM"

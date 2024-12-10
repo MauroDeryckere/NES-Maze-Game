@@ -36,4 +36,37 @@
     RTS
 
 .endproc
+
+.proc test_queue
+
+    JSR clear_queue
+
+    @l: 
+
+    LDA #1
+    JSR enqueue
+
+    LDA queue_tail 
+    CMP #$FE
+
+    BEQ @done
+
+    JMP @l
+
+    @done: 
+    JSR dequeue
+    ; LDA #2
+    ; JSR enqueue
+    ; LDA #2
+    ; JSR enqueue
+    ; LDA #2
+    ; JSR enqueue   
+    ; LDA #2
+    ; JSR enqueue
+    ; LDA #2
+    ; JSR enqueue
+
+    RTS
+
+.endproc
 ;*****************************************************************
