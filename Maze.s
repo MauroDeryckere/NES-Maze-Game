@@ -243,7 +243,7 @@ irq:
     STA display_steps
 
     ;set gamemode
-    LDA #0
+    LDA #1
     STA is_hard_mode
     
  ;   add_score #$FF
@@ -529,10 +529,16 @@ loop:
         JMP nextnextstep
     :
     ;wont reach this label in algorithm but useful for debugging 
+    
 
     nextnextstep: 
+        JSR random_number_generator
+        modulo RandomSeed, #02
+        ADC #04
+        STA temp
+        
         set_map_tile temp_row, temp_col
-        add_to_changed_tiles_buffer temp_row, temp_col, #1
+        add_to_changed_tiles_buffer temp_row, temp_col, temp
 
     ;calculate the new frontier cells for the chosen frontier cell and add them
         access_map_neighbor #LEFT_N, frontier_row, frontier_col
@@ -610,9 +616,15 @@ loop:
 
         JSR add_cell
     end: 
+
+    JSR random_number_generator
+    modulo RandomSeed, #02
+    ADC #04
+    STA temp
+
     ; ;remove the chosen frontier cell from the list
     set_map_tile frontier_row, frontier_col
-    add_to_changed_tiles_buffer frontier_row, frontier_col, #1
+    add_to_changed_tiles_buffer frontier_row, frontier_col, temp
     remove_from_Frontier frontier_page, frontier_offset
 
     ;INC execs

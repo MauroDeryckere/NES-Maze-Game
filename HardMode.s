@@ -3,8 +3,14 @@
 ;*****************************************************************
 .segment "CODE"
 .proc start_hard_mode
-    add_to_changed_tiles_buffer player_row, player_collumn, #1
-    add_to_changed_tiles_buffer end_row, end_col, #1
+    JSR random_number_generator
+    modulo RandomSeed, #02
+    ADC #04
+    STA x_val
+
+
+    add_to_changed_tiles_buffer player_row, player_collumn, x_val
+    add_to_changed_tiles_buffer end_row, end_col, x_val
     LDA #0
     STA should_clear_buffer
 .endproc
@@ -31,9 +37,15 @@
         STA frontier_row
         DEC frontier_row
 
+        ADC player_collumn
+        STA temp
+        modulo temp, #02
+        ADC #04
+        STA temp
+
         get_map_tile_state frontier_row, player_collumn
         BEQ a_wall
-        add_to_changed_tiles_buffer frontier_row, player_collumn, #1
+        add_to_changed_tiles_buffer frontier_row, player_collumn, temp
         JMP below
         a_wall: 
             add_to_changed_tiles_buffer frontier_row, player_collumn, #0
@@ -47,9 +59,15 @@
         STA frontier_row
         INC frontier_row
 
+        ADC player_collumn
+        STA temp
+        modulo temp, #02
+        ADC #04
+        STA temp
+
         get_map_tile_state frontier_row, player_collumn
         BEQ b_wall
-        add_to_changed_tiles_buffer frontier_row, player_collumn, #1
+        add_to_changed_tiles_buffer frontier_row, player_collumn, temp
         JMP left
         b_wall: 
             add_to_changed_tiles_buffer frontier_row, player_collumn, #0
@@ -64,9 +82,15 @@
         STA frontier_col
         DEC frontier_col
 
+        ADC player_row
+        STA temp
+        modulo temp, #02
+        ADC #04
+        STA temp
+
         get_map_tile_state player_row, frontier_col
         BEQ l_wall
-        add_to_changed_tiles_buffer player_row, frontier_col, #1
+        add_to_changed_tiles_buffer player_row, frontier_col, temp
         JMP right
         l_wall: 
             add_to_changed_tiles_buffer player_row, frontier_col, #0
@@ -81,9 +105,15 @@
         STA frontier_col
         INC frontier_col
 
+        ADC player_row
+        STA temp
+        modulo temp, #02
+        ADC #04
+        STA temp
+
         get_map_tile_state player_row, frontier_col
         BEQ r_wall
-        add_to_changed_tiles_buffer player_row, frontier_col, #1
+        add_to_changed_tiles_buffer player_row, frontier_col, temp
         JMP end
         r_wall: 
             add_to_changed_tiles_buffer player_row, frontier_col, #0

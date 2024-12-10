@@ -180,7 +180,7 @@ wait_vblank2:
     LDA #$00         ; Low byte of address
     STA $2006
 
-    LDA #03
+    LDA #07
     LDY #30
     rowloop:
         LDX #32

@@ -36,7 +36,7 @@
 .proc add_cell
     STX x_val
     STY y_val
-
+    
     add_to_Frontier y_val, x_val
     add_to_changed_tiles_buffer y_val, x_val, #3
 
