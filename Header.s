@@ -67,6 +67,10 @@ MAP_BUFFER_SIZE = 120
 MAP_COLUMNS = 32 ;32 bits
 MAP_ROWS = 30
 
+; VISITED CELLS BUFFER
+VISISTED_ADDRESS = $051C ; 120 byte buffer same as maze buffer but this stores if a cell is visited (1) or not (0)
+VISITED_BUFFER_SIZE = 120
+
 ; Frontier list ; maintain 2 pages to be sure but there are no cases that surpas 1 page at the moment
 FRONTIER_LISTQ1 = $0320
 FRONTIER_LISTQ2 = $041E
@@ -83,14 +87,12 @@ RIGHT_N = 1
 BOTTOM_N = 2
 LEFT_N = 3
 
-;changed tiles util
+;changed tiles buffer
 CHANGED_TILES_BUFFER_SIZE = 40
 
-;sets the delay for player movement (==  movement speed)
-PLAYER_MOVEMENT_DELAY = 5
-
+;SETUP
+PLAYER_MOVEMENT_DELAY = 5 ;sets the delay for player movement (==  movement speed)
 MAZE_GENERATION_SPEED = 1 ;how much is maze generation slowed down
-
 SCORE_DIGIT_OFFSET = 8
 ;*****************************************************************
 

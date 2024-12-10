@@ -224,6 +224,7 @@ irq:
 
     JSR clear_changed_tiles_buffer
     JSR clear_maze
+    JSR init_BFS
 
     ;set an initial randomseed value - must be non zero
     LDA #$10

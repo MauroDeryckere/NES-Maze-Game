@@ -54,6 +54,8 @@
 
     @done: 
     JSR dequeue
+    JSR dequeue
+    JSR dequeue
     ; LDA #2
     ; JSR enqueue
     ; LDA #2

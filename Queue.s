@@ -63,7 +63,7 @@ QUEUE_START = $061A ; start address for the queue
 
 ; Item to enqueue is taken from register A.
 .proc enqueue
-    TAX ;save input val in X reg
+    TAY ;save input val in Y reg
 
     ; check if queue is full
     LDA queue_tail
@@ -77,21 +77,11 @@ QUEUE_START = $061A ; start address for the queue
         CMP queue_head
         BEQ @queue_full ;next position == head means the queue is full
 
-        STA temp
+        STA temp ;temporarily store the new tal
 
-        LDA queue_tail
-        CLC
-        ADC #<QUEUE_START       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-        STA paddr             ; Store the low byte of the calculated address.
-
-        LDA #>QUEUE_START      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-        ADC #$00              ; Add carry if crossing a page boundary.
-        STA paddr+1  
-
-        ;Load the value from the pointer into X and Y
-        LDY #0
-        TXA
-        STA (paddr), Y     
+        TYA ;value to enqueue -> A reg
+        LDX queue_tail
+        STA QUEUE_START, X
 
         LDA temp
         STA queue_tail
@@ -103,25 +93,15 @@ QUEUE_START = $061A ; start address for the queue
 
 ; dequeued item is loaded into A register
 .proc dequeue 
-
     ;check if queue is empty
     LDA queue_head
     CMP queue_tail
     BEQ @queue_empty
 
     ; load val from front of queue
-    LDA queue_head
-    CLC
-    ADC #<QUEUE_START       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-    STA paddr             ; Store the low byte of the calculated address.
-
-    LDA #>QUEUE_START      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-    ADC #$00              ; Add carry if crossing a page boundary.
-    STA paddr+1  
-    
-    ; Load the value from the calculated address into A (dequeued item)
-    LDY #0
-    LDA (paddr), Y
+    LDX queue_head
+    LDA QUEUE_START, X
+    TAX
 
     ; update queue_head to point to next item
     LDA queue_head
@@ -133,6 +113,7 @@ QUEUE_START = $061A ; start address for the queue
 
     @skip_wrap:
         STA queue_head
+        TXA
         RTS
     @queue_empty: 
         ; for now do nothing
