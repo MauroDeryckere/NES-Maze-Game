@@ -8,7 +8,7 @@
 .include "HardMode.s"
 .include "Score.s"
 
-.include "Queue.s"
+.include "BFS.s"
 
 ;*****************************************************************
 ; Interupts | Vblank

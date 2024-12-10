@@ -41,6 +41,19 @@
 QUEUE_CAPACITY = $FF ; the maximum capacity of the queue - actual  available size is capacity - 1
 QUEUE_START = $061A ; start address for the queue 
 
+; stores is queue is empty or not in A register
+.proc is_empty
+    LDA queue_head 
+    CMP queue_tail
+    BEQ @empty
+    LDA #0
+    RTS
+
+    @empty:
+        LDA #1
+        RTS 
+.endproc
+
 .proc clear_queue
     LDA #0
     STA queue_head
