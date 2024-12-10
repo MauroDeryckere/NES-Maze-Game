@@ -335,7 +335,7 @@
 ;*****************************************************************
 ; Frontier list macros
 ;*****************************************************************
-;page 0 - 3 | offset 0-127
+;page 0 - 1 | offset 0-127
 ;loads the row in the X register, col in the Y register
 .macro access_Frontier page, offset
     LDA page
@@ -362,7 +362,7 @@
     LDA (paddr),Y    
     TAY                
 
-    JMP :++++
+    JMP end
 
     :
     CMP #1
@@ -388,58 +388,8 @@
     LDA (paddr),Y    
     TAY                
 
-    JMP :+++
-
-    :
-    CMP #2
-    BNE :+
-
-        ; Calculate the address of the item in the list
-    LDA offset
-    ASL
-
-    CLC 
-    ADC #<FRONTIER_LISTQ3       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-    STA paddr             ; Store the low byte of the calculated address.
-
-    LDA #>FRONTIER_LISTQ3      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-    ADC #$00              ; Add carry if crossing a page boundary.
-    STA paddr+1  
-
-    ;Load the value from the pointer into X and Y
-    LDY #1
-    LDA (paddr),Y
-    TAX         
-    DEY                    
-    LDA (paddr),Y    
-    TAY                   
-
-    JMP :++
-
-    :
-    CMP #3
-    BNE :+
-
-        ; Calculate the address of the item in the list
-    LDA offset
-    ASL
-
-    CLC 
-    ADC #<FRONTIER_LISTQ4       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-    STA paddr             ; Store the low byte of the calculated address.
-
-    LDA #>FRONTIER_LISTQ4      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-    ADC #$00              ; Add carry if crossing a page boundary.
-    STA paddr+1  
-
-    ;Load the value from the pointer into X and Y
-    LDY #1
-    LDA (paddr),Y
-    TAX         
-    DEY                    
-    LDA (paddr),Y    
-    TAY               
-    :
+    .local end
+    end: 
 
 .endmacro
 
@@ -479,7 +429,7 @@
         BNE :+
             LDX #0
             STX temp
-            JMP loop_p2
+            JMP return_not_found
         :
         
         access_Frontier #1, temp
@@ -492,52 +442,6 @@
         CPX Col
         BEQ :+
             JMP loop_p1
-        :
-
-        JMP return_found
-
-    .local loop_p2
-    loop_p2:        
-        LDX temp
-        CPX frontier_listQ3_size
-        BNE :+
-            LDX #0
-            STX temp
-            JMP loop_p3
-        :
-        
-        access_Frontier #2, temp
-        INC temp
-        
-        CPY Row
-        BEQ :+
-            JMP loop_p2
-        :
-        CPX Col
-        BEQ :+
-            JMP loop_p2
-        :
-
-        JMP return_found
-
-    .local loop_p3
-    loop_p3:        
-        LDX temp
-        CPX frontier_listQ4_size
-        BNE :+
-            JMP return_not_found 
-        :
-        
-        access_Frontier #3, temp
-        INC temp
-        
-        CPY Row
-        BEQ :+
-            JMP loop_p3
-        :
-        CPX Col
-        BEQ :+
-            JMP loop_p3
         :
 
         JMP return_found
@@ -556,7 +460,7 @@
     n: 
 .endmacro
 
-;page 0 - 3 | offset 0-127
+;page 0 - 1 | offset 0-127
 .macro remove_from_Frontier page, offset
     LDA page
     CMP #0
@@ -610,8 +514,7 @@
         STA (tempPadrToLast),Y
 
         DEC frontier_listQ1_size
-        JMP :++++     ;jump to end
-
+        JMP end    ;jump to end
     :
     CMP #1
     BNE :+      ;remove from page 1? (Q2)
@@ -664,115 +567,8 @@
         STA (tempPadrToLast),Y
 
         DEC frontier_listQ2_size
-        JMP :+++     ;jump to end
-
-    :
-    CMP #2
-    BNE :+      ;remove from page 2? (Q3)
-
-        ; Calculate the address of the last item in the list
-        LDA frontier_listQ3_size
-
-        TAX
-        DEX         ;decrease size
-        TXA
-
-        ASL
-
-        CLC 
-        ADC #<FRONTIER_LISTQ3       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-        STA tempPadrToLast             ; Store the low byte of the calculated address.
-
-        LDA #>FRONTIER_LISTQ3      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-        ADC #$00              ; Add carry if crossing a page boundary.
-        STA tempPadrToLast+1  
-
-        ; Calculate the address to be removed
-        LDA offset
-        ASL
-
-        CLC 
-        ADC #<FRONTIER_LISTQ3       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-        STA paddr             ; Store the low byte of the calculated address.
-
-        LDA #>FRONTIER_LISTQ3      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-        ADC #$00              ; Add carry if crossing a page boundary.
-        STA paddr+1  
-
-        ;write the last values to the location to be removed
-        LDY #0
-        LDA (tempPadrToLast),Y
-        STA (paddr),Y 
-
-        LDY #$1
-        LDA (tempPadrToLast),Y
-        STA (paddr),Y
-
-        ;clear the last values
-        LDA #0
-        LDY #0
-        STA (tempPadrToLast),Y 
-
-        LDA #0
-        LDY #$1
-        STA (tempPadrToLast),Y
-
-        DEC frontier_listQ3_size
-        JMP :++     ;jump to end
-
-    :
-    CMP #3
-    BNE :+      ;remove from page 3? (Q4)
-
-        ; Calculate the address of the last item in the list
-        LDA frontier_listQ4_size
-
-        TAX
-        DEX         ;decrease size
-        TXA
-
-        ASL
-
-        CLC 
-        ADC #<FRONTIER_LISTQ4       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-        STA tempPadrToLast             ; Store the low byte of the calculated address.
-
-        LDA #>FRONTIER_LISTQ4      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-        ADC #$00              ; Add carry if crossing a page boundary.
-        STA tempPadrToLast+1  
-
-        ; Calculate the address to be removed
-        LDA offset
-        ASL
-
-        CLC 
-        ADC #<FRONTIER_LISTQ4       ; Add the low byte of FRONTIER_LIST_ADDRESS.
-        STA paddr             ; Store the low byte of the calculated address.
-
-        LDA #>FRONTIER_LISTQ4      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-        ADC #$00              ; Add carry if crossing a page boundary.
-        STA paddr+1  
-
-        ;write the last values to the location to be removed
-        LDY #0
-        LDA (tempPadrToLast),Y
-        STA (paddr),Y 
-
-        LDY #$1
-        LDA (tempPadrToLast),Y
-        STA (paddr),Y
-
-        ;clear the last values
-        LDA #0
-        LDY #0
-        STA (tempPadrToLast),Y 
-
-        LDA #0
-        LDY #$1
-        STA (tempPadrToLast),Y
-
-        DEC frontier_listQ4_size
-    :
+    .local end
+    end: 
 .endmacro
 
 ;Defintion of row and col can be found in the map buffer section.
@@ -805,7 +601,7 @@
         STA (paddr),Y
 
         INC frontier_listQ1_size   
-        JMP :++++                   ;jump to end
+        JMP end                   ;jump to end
 
     :
     ;multiply current size of Q2 by 2, 2 bytes required per element in list
@@ -836,70 +632,9 @@
         STA (paddr),Y
 
         INC frontier_listQ2_size 
-        JMP :+++                   ;jump to end
 
-    :
-    ;multiply current size of Q3 by 2, 2 bytes required per element in list
-    LDA frontier_listQ3_size
-    ASL
-
-    CMP #%11111110      ;check if it should be added to Q3 or not
-    BEQ :+
-
-        ; Calculate the new address
-        CLC 
-        ADC #<FRONTIER_LISTQ3    ; Add the low byte of FRONTIER_LIST_ADDRESS with the current size of this segment.
-        STA paddr             ; Store the low byte of the calculated address.
-
-        LDA #>FRONTIER_LISTQ3      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-        ADC #$00              ; Add carry if crossing a page boundary.
-        STA paddr+1           ; Store the high byte of the calculated address.
-
-        ;=> address of next item in list is now stored in paddr
-
-        ; Store the values into the calculated address
-        LDA Row
-        LDY #0
-        STA (paddr),Y 
-
-        LDA Col
-        LDY #$1
-        STA (paddr),Y
-
-        INC frontier_listQ3_size   
-        JMP :++                   ;jump to end
-
-    :
-    ;multiply current size of Q4 by 2, 2 bytes required per element in list
-    LDA frontier_listQ4_size
-    ASL
-
-    CMP #%11111110      ;check if it should be added to Q4 or not
-    BEQ :+
-
-        ; Calculate the new address
-        CLC 
-        ADC #<FRONTIER_LISTQ4   ; Add the low byte of FRONTIER_LIST_ADDRESS with the current size of this segment.
-        STA paddr             ; Store the low byte of the calculated address.
-
-        LDA #>FRONTIER_LISTQ4      ; Load the high byte of FRONTIER_LIST_ADDRESS.
-        ADC #$00              ; Add carry if crossing a page boundary.
-        STA paddr+1           ; Store the high byte of the calculated address.
-
-        ;=> address of next item in list is now stored in paddr
-
-        ; Store the values into the calculated address
-        LDA Row
-        LDY #0
-        STA (paddr),Y 
-
-        LDA Col
-        LDY #$1
-        STA (paddr),Y
-
-        INC frontier_listQ4_size
-        JMP :+                   ;jump to end
-    :
+        .local end
+        end: 
 .endmacro
 ;*****************************************************************
 
@@ -932,19 +667,7 @@
     CMP #0
     BEQ :+
     INX
-
-    :
-    LDA frontier_listQ3_size
-    CMP #0
-    BEQ :+
-    INX
-
-    :
-    LDA frontier_listQ4_size
-    CMP #0
-    BEQ :+
-    INX
-
+    
     :
     ;store the pages that are used 
     STX frontier_pages_used
@@ -991,7 +714,7 @@
     page1: 
     LDA frontier_listQ2_size
     CMP #0
-    BEQ page2
+    BEQ endSwitch
         ;page has items in it, check if we should use this page
         TYA
         CMP a_val
@@ -1007,38 +730,6 @@
     ;increase checked pages
     INY
 
-    .local page2
-    page2: 
-    LDA frontier_listQ3_size
-    CMP #0
-    BEQ page3
-        ;page has items in it, check if we should use this page
-        TYA
-        CMP a_val
-        BNE incP3
-            ;clamp the offset
-            modulo RandomSeed, frontier_listQ3_size
-            STA b_val
-            LDA #2
-            STA a_val
-            JMP endSwitch
-    .local incP3
-    incP3:
-    ;increase checked pages
-    INY
-
-    .local page3
-    page3: 
-    LDA frontier_listQ4_size
-    CMP #0
-    BEQ endSwitch
-        ;page has items in it, check if we should use this page
-        modulo RandomSeed, frontier_listQ4_size
-        STA b_val
-        LDA #3
-        STA a_val
-        JMP endSwitch
-
     .local endSwitch
     endSwitch:
         access_Frontier a_val, b_val
@@ -1047,33 +738,33 @@
 
 
 .macro multiply10 value
-
-LDA value
-ROL ;x2
-TAX
-ROL ;x2
-ROL ;x2 = x8
-STA a_val
-TXA
-ADC a_val
-
+    LDA value
+    ROL ;x2
+    TAX
+    ROL ;x2
+    ROL ;x2 = x8
+    STA a_val
+    TXA
+    ADC a_val
 .endmacro
 
 .macro divide10 value
-    ;with help from chatGPT
-    
-    LDA value
-    LDY #0          ; Initialize Y (Quotient) to 0
-    SEC             ; Set carry for subtraction
-.local DivideLoop
-DivideLoop:
-    SBC #10         ; Subtract 10 from A
-    BCC Done        ; If result is negative, exit loop
-    INY             ; Increment Y (Quotient)
-    JMP DivideLoop  ; Repeat the loop
-.local Done
-Done:
-    STA Remainder   ; Store the remainder (A)
-    TYA     ; Store the quotient (Y)
+        ;with help from chatGPT
+        
+        LDA value
+        LDY #0          ; Initialize Y (Quotient) to 0
+        SEC             ; Set carry for subtraction
+
+    .local DivideLoop
+    DivideLoop:
+        SBC #10         ; Subtract 10 from A
+        BCC Done        ; If result is negative, exit loop
+        INY             ; Increment Y (Quotient)
+        JMP DivideLoop  ; Repeat the loop
+
+    .local Done
+    Done:
+        STA Remainder   ; Store the remainder (A)
+        TYA     ; Store the quotient (Y)
 
 .endmacro

@@ -67,11 +67,9 @@ MAP_BUFFER_SIZE = 120
 MAP_COLUMNS = 32 ;32 bits
 MAP_ROWS = 30
 
-; Frontier list
+; Frontier list ; maintain 2 pages to be sure but there are no cases that surpas 1 page at the moment
 FRONTIER_LISTQ1 = $0320
 FRONTIER_LISTQ2 = $041E
-FRONTIER_LISTQ3 = $051C
-FRONTIER_LISTQ4 = $9999 ; not in use anymore - TODO remove from macros
 
 ; player directions
 LEFT = 0
@@ -161,8 +159,6 @@ high_byte: 				.res 1
 ;frontier list specific
 frontier_listQ1_size:	.res 1 ; | Internal use for frontier list, do not overwrite
 frontier_listQ2_size:	.res 1 ; | Internal use for frontier list, do not overwrite
-frontier_listQ3_size:	.res 1 ; | Internal use for frontier list, do not overwrite
-frontier_listQ4_size:	.res 1 ; | Internal use for frontier list, do not overwrite
 frontier_pages_used:	.res 1 ; | Internal use for frontier list, do not overwrite
 
 ;temporary values used in macros, ... - have to check when you use these in other routines if they arent used anywhere internally
