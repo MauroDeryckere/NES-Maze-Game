@@ -247,7 +247,8 @@ irq:
     STA is_hard_mode
     
  ;   add_score #$FF
-    add_score #10
+    add_score #255
+    add_score #255
 
     RTS
 .endproc
@@ -536,7 +537,7 @@ loop:
         modulo RandomSeed, #02
         ADC #04
         STA temp
-        
+
         set_map_tile temp_row, temp_col
         add_to_changed_tiles_buffer temp_row, temp_col, temp
 

@@ -278,7 +278,7 @@ wait_vblank2:
     sta oam, x
     inx 
 
-    lda #%00000000 ;flip bits to set certain sprite attributes
+    lda #%00000001 ;flip bits to set certain sprite attributes
     sta oam, x
     inx
 
@@ -303,27 +303,118 @@ wait_vblank2:
 .proc display_score
     LDX #4
 
-    LDA #10
+    LDA #SCORE_DIGIT_OFFSET
+    ROL     ; x2
+    ROL     ; x2 = x4
     STA temp
-
-    LDA #10
-    SEC
-    ROL
-
-    STA score_high
-    JSR draw_digit
+    
+    LDA score_low
 
     CLC
+    CMP #$0A
+    BCC skip_modulo
+
+    modulo score_low, #$0A  ;skip modulo if smaller than 10
+
+    STA a_val               ;store remainder for later
+
+    skip_modulo:
+
+    JSR draw_digit
+    CLC
     LDA temp
-    ADC #10
-    STA temp   
+    SBC #SCORE_DIGIT_OFFSET
+    STA temp    
 
-    ; LDA score_low
+    LDA score_low
+    SEC
+    SBC a_val
+
+    divide10 score_low
+
+    JSR draw_digit
+    CLC
+    LDA temp
+    SBC #SCORE_DIGIT_OFFSET
+    STA temp
+
+    
+    
+    
+    LDA score_high
+
+    CLC
+    CMP #$0A
+    BCC skip_modulo2
+
+    modulo score_high, #$0A  ;skip modulo if smaller than 10
+
+    STA a_val               ;store remainder for later
+
+    skip_modulo2:
+
+    JSR draw_digit
+    CLC
+    LDA temp
+    SBC #SCORE_DIGIT_OFFSET
+    STA temp    
+
+    LDA score_high
+    SEC
+    SBC a_val
+
+    divide10 score_high
+
+    JSR draw_digit
+    CLC
+    LDA temp
+    SBC #SCORE_DIGIT_OFFSET
+    STA temp
+
     ; JSR draw_digit
-
     ; CLC
     ; LDA temp
-    ; ADC #10
+    ; ADC #SCORE_DIGIT_OFFSET     ;add 10 for x offset
+    ; STA temp   
+    
+    
+    ; divide10 score_high
+    ; CLC
+    ; CMP #$0A
+    ; BCC skip_modulo
+
+    ; modulo score_high, #$0A
+
+    ; skip_modulo:
+
+    ; JSR draw_digit
+    ; CLC
+    ; LDA temp
+    ; ADC #SCORE_DIGIT_OFFSET
+    ; STA temp    
+
+    ; divide10 score_low
+
+    ; JSR draw_digit
+    ; CLC
+    ; LDA temp
+    ; ADC #SCORE_DIGIT_OFFSET     ;add 10 for x offset
+    ; STA temp   
+    
+    
+    ; divide10 score_low
+    ; CLC
+    ; CMP #$0A
+    ; BCC skip_modulo2
+
+    ; modulo score_low, #$0A
+
+    ; skip_modulo2:
+
+    ; JSR draw_digit
+    ; CLC
+    ; LDA temp
+    ; ADC #SCORE_DIGIT_OFFSET
     ; STA temp    
     
     RTS
@@ -333,23 +424,22 @@ wait_vblank2:
 .proc draw_digit
     ;convert digit 0-9 to correct tile index
     CLC
-    ADC #$10
+    ADC #$10        ; get correct tile ID  
     TAY
 
-    LDA #10 ;Y coordinate
+    LDA #SCORE_DIGIT_OFFSET ;Y coordinate
     STA oam, x
     INX
 
     TYA
-    LDA temp
     STA oam, x
     INX 
 
-    LDA #%00000000 ;flip bits to set certain sprite attributes
+    LDA #%00000001 ;flip bits to set certain sprite attributes
     STA oam, x
     INX
 
-    LDA #20   ;X coordinate
+    LDA temp   ;X coordinate
     STA oam, x
     INX 
 

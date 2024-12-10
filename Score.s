@@ -7,13 +7,20 @@
     CLC 
     ADC amount
     STA score_low 
-    BCC no_carry     
-    LDA score_high
-    ADC #$00 
-    STA score_high
+    CMP #100
+    BCC skip
+        
+    ;modulo score_low, #100
+    
+    divide10 score_low
+    STA score_low
+    divide10 score_low
 
-    .local no_carry
-    no_carry:
+    STA score_high
+    LDA Remainder
+    STA score_low
+.local skip
+skip:
 
 .endmacro
 ;*****************************************************************

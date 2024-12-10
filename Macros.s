@@ -1044,3 +1044,36 @@
         access_Frontier a_val, b_val
 
 .endmacro
+
+
+.macro multiply10 value
+
+LDA value
+ROL ;x2
+TAX
+ROL ;x2
+ROL ;x2 = x8
+STA a_val
+TXA
+ADC a_val
+
+.endmacro
+
+.macro divide10 value
+    ;with help from chatGPT
+    
+    LDA value
+    LDY #0          ; Initialize Y (Quotient) to 0
+    SEC             ; Set carry for subtraction
+.local DivideLoop
+DivideLoop:
+    SBC #10         ; Subtract 10 from A
+    BCC Done        ; If result is negative, exit loop
+    INY             ; Increment Y (Quotient)
+    JMP DivideLoop  ; Repeat the loop
+.local Done
+Done:
+    STA Remainder   ; Store the remainder (A)
+    TYA     ; Store the quotient (Y)
+
+.endmacro

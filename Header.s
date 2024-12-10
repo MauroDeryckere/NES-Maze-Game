@@ -86,6 +86,8 @@ CHANGED_TILES_BUFFER_SIZE = 40
 PLAYER_MOVEMENT_DELAY = 5
 
 MAZE_GENERATION_SPEED = 1 ;how much is maze generation slowed down
+
+SCORE_DIGIT_OFFSET = 8
 ;*****************************************************************
 
 .segment "HEADER"
@@ -196,6 +198,8 @@ score_low:              .res 1
 score_high:             .res 1
 
 testvar:                .res 1
+
+Remainder:              .res 1
 ;*****************************************************************
 
 .segment "OAM"
@@ -214,7 +218,7 @@ default_palette:
 .byte $0F,$01,$11,$21 ; bg2 blue
 .byte $0F,$00,$10,$30 ; bg3 greyscale
 .byte $0F,$16,$21,$2C ; sp0 blue (changed)
-.byte $0F,$14,$24,$34 ; sp1 purple
+.byte $0F,$17,$27,$37 ; sp1 orange
 .byte $0F,$1B,$2B,$3B ; sp2 teal
 .byte $0F,$12,$22,$32 ; sp3 marine
 ;*****************************************************************
