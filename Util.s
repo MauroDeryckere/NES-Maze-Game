@@ -38,7 +38,7 @@
     STY y_val
 
     add_to_Frontier y_val, x_val
-    add_to_changed_tiles_buffer y_val, x_val, #2
+    add_to_changed_tiles_buffer y_val, x_val, #3
 
     RTS
 .endproc  

@@ -122,8 +122,6 @@ irq:
                     JSR update_visibility
                 :   
 
-                add_to_changed_tiles_buffer #0, #0, #1
-
                 LDA frame_counter ;sets last frame ct to the same as frame counter
                 LDA #1
                 STA checked_this_frame
