@@ -173,7 +173,6 @@ b_val: 					.res 1
 byte_loop_couter:   	.res 1 ; counter for the bits in map transfer
 
 paddr:              	.res 2 ; 16-bit address pointer
-tempPadrToLast: 		.res 2 ;last item in address for a given quarter, used for the remove from list macro
 
 temp_address:			.res 1
 
