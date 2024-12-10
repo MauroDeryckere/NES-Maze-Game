@@ -104,6 +104,7 @@
     ADC y_val
     STA temp_address
     
+    ; bitmask: 
     ;Clamp the 0-31 Column to 0-7 
     LDA Column
     : ;Loop
@@ -330,6 +331,87 @@
     return:
 
 .endmacro
+
+    ;*****************************************************************
+    ; Map buffer - visited list 
+    ; same macros as maze buffer but not in zero page. read maze buffer documentation for info
+    ;*****************************************************************
+    .macro calculate_offset_and_mask_visited Row, Column
+        ;Calculate the base address of the row (Row * 4)
+        LDA Row
+        ASL             ;== times 2
+        ASL             ;== times 2
+        CLC
+        STA x_val
+
+        ;Calculate the byte offset within the row (Column / 8)
+        LDA Column
+        LSR
+        LSR
+        LSR
+        STA y_val
+
+        ;Add the byte offset to the base row address
+        LDA x_val
+        CLC 
+        ADC y_val
+        STA temp_address ; == byte offset
+        
+        ; bitmask: 
+        ;Clamp the 0-31 Column to 0-7 
+        LDA Column
+        : ;Loop
+        CMP #$08       ; Compare the number with 8 (i.e., check if it's greater than 7)
+        BCC :+         ; If the number is less than or equal to 7, branch to Done
+        SEC            ; Set the Carry flag before subtraction (since we're subtracting)
+        SBC #$08       ; Subtract 8 from the number
+        JMP :-
+
+        : ;end clamp loop
+        STA x_val
+
+        LDA #%00000001
+        STA y_val
+
+        ;Calculate how many times we should shift
+        LDA #7
+        SEC
+        SBC x_val    
+        BEQ :++
+        TAX
+        
+        LDA y_val
+        :    
+        ASL
+        DEX
+        BNE :-
+
+        STA y_val
+        :
+    .endmacro
+
+    .macro set_visited Row, Col
+        calculate_offset_and_mask_visited Row, Col
+        
+        LDY temp_address
+        LDA VISISTED_ADDRESS, Y   
+        ORA y_val
+        STA VISISTED_ADDRESS, Y
+
+    .endmacro
+
+    .macro is_visited Row, Col
+        calculate_offset_and_mask_visited Row, Col
+        
+        LDY temp_address
+        LDA VISISTED_ADDRESS, Y   
+        AND y_val
+
+    .endmacro
+
+    ;*****************************************************************
+
+
 ;*****************************************************************
 
 ;*****************************************************************
