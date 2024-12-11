@@ -67,13 +67,25 @@ MAP_BUFFER_SIZE = 120
 MAP_COLUMNS = 32 ;32 bits
 MAP_ROWS = 30
 
-; VISITED CELLS BUFFER
-VISISTED_ADDRESS = $051C ; 120 byte buffer same as maze buffer but this stores if a cell is visited (1) or not (0)
-VISITED_BUFFER_SIZE = 120
-
-; Frontier list ; maintain 2 pages to be sure but there are no cases that surpas 1 page at the moment
+; FRONTIET LIST ; maintain 2 pages to be sure but there are no cases that surpas 1 page at the moment
 FRONTIER_LISTQ1 = $0320
 FRONTIER_LISTQ2 = $041E
+; next available address == $51C
+
+; VISITED CELLS BUFFER
+VISISTED_ADDRESS = $051C ; 120 byte buffer same as maze buffer but this stores if a cell is visited (1) or not (0)
+VISITED_BUFFER_SIZE = 120 
+; next available address == $594
+
+; DIRECTIONS BUFFER
+DIRECTIONS_ADDRESS = $0594
+DIRECTIONS_BUFFER_SIZE = 240
+; next available address == $684
+
+; Queue data structure constants
+QUEUE_START = $0684 ; start address for the queue 
+QUEUE_CAPACITY = $FF ; the maximum capacity of the queue - actual  available size is capacity - 1
+; next available address == $783
 
 ; player directions
 LEFT = 0

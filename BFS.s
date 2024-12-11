@@ -25,6 +25,15 @@
         DEX
         BNE @clear_cell
 
+
+    ;clear directions buffer
+    LDX #DIRECTIONS_BUFFER_SIZE
+    LDA #$FE
+
+    @clear_dir: 
+        STA DIRECTIONS_ADDRESS, x
+        DEX
+        BNE @clear_dir
     RTS
 .endproc
 
