@@ -78,12 +78,12 @@ VISITED_BUFFER_SIZE = 120
 ; next available address == $594
 
 ; DIRECTIONS BUFFER
-DIRECTIONS_ADDRESS = $0594
+DIRECTIONS_ADDRESS = $0595
 DIRECTIONS_BUFFER_SIZE = 240
-; next available address == $684
+; next available address == $685
 
 ; Queue data structure constants
-QUEUE_START = $0684 ; start address for the queue 
+QUEUE_START = $0686 ; start address for the queue 
 QUEUE_CAPACITY = $FF ; the maximum capacity of the queue - actual  available size is capacity - 1
 ; next available address == $783
 
@@ -217,8 +217,6 @@ player_collumn: 		.res 1
 score_low:              .res 1
 score_high:             .res 1
 
-testvar:                .res 1
-
 Remainder:              .res 1
 
 ; Queue ptrs
@@ -229,6 +227,12 @@ queue_tail:             .res 1
 move_count:             .res 1
 nodes_left_layer:       .res 1
 nodes_next_layer:       .res 1
+
+; Testing
+testvar:                .res 1
+testvar2:               .res 1
+testvar3:               .res 1
+
 ;*****************************************************************
 
 .segment "OAM"

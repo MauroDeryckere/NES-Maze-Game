@@ -410,7 +410,6 @@
         ASL             ;== times 2
         ASL             ;== times 4
         ASL             ;== times 8
-        CLC
         STA x_val
 
         ;Calculate the byte offset within the row (Column / 4)
@@ -432,52 +431,55 @@
 
         STA x_val
 
-        LDA #%00000011 ; 2 bit mask
+        LDA #%00000011
         STA y_val
 
         ;Calculate how many times we should shift
-        LDA x_val ; == 0-3
-        ASL ; == 0, 2, 4, 6
-        TAX ; Store in X (number of shifts)
+        LDA #3
+        SEC
+        SBC x_val    
         BEQ :++
-
-        : ; Shift the 2-bit mask to the correct position in the byte
+        TAX
+        
         LDA y_val
+        :    
+        ASL
         ASL
         DEX
+        CPX #0
         BNE :-
-        
-        STA y_val       ; y_val now holds the 2-bit mask for the tile
+
+        STA y_val
         :
     .endmacro
     
     .macro set_direction Row, Col, Direction
-        calculate_offset_and_mask_visited Row, Col
+        calculate_offset_and_mask_directions Row, Col
         ;amt of shifts sored in x val
         
-        LDA Direction
-        TAX
+        ; LDA Direction
+        ; TAX
 
-        LDA x_val
-        BEQ :++
-        ASL
-        TAX
-        ; shift direction to correct position in byte
-        :
+        ; LDA x_val
+        ; BEQ :++
+        ; ASL
+        ; TAX
+        ; ; shift direction to correct position in byte
+        ; :
 
-        LDA Direction
-        ASL
-        DEX
-        BNE :-
+        ; LDA Direction
+        ; LSR
+        ; DEX
+        ; BNE :-
         
-        TAX
-        :
+        ; TAX
+        ; :
 
         LDY temp_address
-        LDA VISISTED_ADDRESS, Y   
-        STX temp_address
-        ORA temp_address
-        STA VISISTED_ADDRESS, Y
+        LDA DIRECTIONS_ADDRESS, Y   
+        ORA y_val
+        STA DIRECTIONS_ADDRESS, Y
+        
 
     .endmacro
 

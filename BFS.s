@@ -29,7 +29,7 @@
 
     ;clear directions buffer
     LDX #0
-    LDA #$FE
+    LDA #$00
 
     @clear_dir: 
         STA DIRECTIONS_ADDRESS, x
@@ -37,7 +37,12 @@
         CPX #DIRECTIONS_BUFFER_SIZE
         BNE @clear_dir
 
-       set_direction #0, #0, #03
+
+       set_direction #0, #0, #01
+       set_direction #1, #0, #01
+       set_direction #1, #3, #01
+       set_direction #1, #4, #01
+    ; BRK
     RTS
 .endproc
 
