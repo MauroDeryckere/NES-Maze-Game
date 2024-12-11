@@ -67,7 +67,7 @@ MAP_BUFFER_SIZE = 120
 MAP_COLUMNS = 32 ;32 bits
 MAP_ROWS = 30
 
-; FRONTIET LIST ; maintain 2 pages to be sure but there are no cases that surpas 1 page at the moment
+; FRONTIER LIST ; maintain 2 pages to be sure but there are no cases that surpas 1 page at the moment
 FRONTIER_LISTQ1 = $0320
 FRONTIER_LISTQ2 = $041E
 ; next available address == $51C

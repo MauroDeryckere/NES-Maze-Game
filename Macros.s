@@ -107,14 +107,8 @@
     ; bitmask: 
     ;Clamp the 0-31 Column to 0-7 
     LDA Column
-    : ;Loop
-    CMP #$08       ; Compare the number with 8 (i.e., check if it's greater than 7)
-    BCC :+         ; If the number is less than or equal to 7, branch to Done
-    SEC            ; Set the Carry flag before subtraction (since we're subtracting)
-    SBC #$08       ; Subtract 8 from the number
-    JMP :-
+    AND #%00000111
 
-    : ;end clamp loop
     STA x_val
 
     LDA #%00000001
@@ -360,14 +354,8 @@
         ; bitmask: 
         ;Clamp the 0-31 Column to 0-7 
         LDA Column
-        : ;Loop
-        CMP #$08       ; Compare the number with 8 (i.e., check if it's greater than 7)
-        BCC :+         ; If the number is less than or equal to 7, branch to Done
-        SEC            ; Set the Carry flag before subtraction (since we're subtracting)
-        SBC #$08       ; Subtract 8 from the number
-        JMP :-
+        AND #%00000111
 
-        : ;end clamp loop
         STA x_val
 
         LDA #%00000001
@@ -411,6 +399,89 @@
 
     ;*****************************************************************
 
+    ;*****************************************************************
+    ; Map buffer - directions
+    ; same macros as maze buffer but not in zero page
+    ; additonally there are 2 bits per tile, direction 0-3
+    ;*****************************************************************
+    .macro calculate_offset_and_mask_directions Row, Column
+        ;Calculate the base address of the row (Row * 8)
+        LDA Row
+        ASL             ;== times 2
+        ASL             ;== times 4
+        ASL             ;== times 8
+        CLC
+        STA x_val
+
+        ;Calculate the byte offset within the row (Column / 4)
+        LDA Column
+        LSR
+        LSR
+        STA y_val
+
+        ;Add the byte offset to the base row address
+        LDA x_val
+        CLC 
+        ADC y_val
+        STA temp_address ; == byte offset
+        
+        ; bitmask: 
+        ;Clamp the 0-31 Column to 0-3 (since there are now 2 bits per tile and 4 tiles per byte)
+        LDA Column
+        AND #%00000011
+
+        STA x_val
+
+        LDA #%00000011 ; 2 bit mask
+        STA y_val
+
+        ;Calculate how many times we should shift
+        LDA x_val ; == 0-3
+        ASL ; == 0, 2, 4, 6
+        TAX ; Store in X (number of shifts)
+        BEQ :++
+
+        : ; Shift the 2-bit mask to the correct position in the byte
+        LDA y_val
+        ASL
+        DEX
+        BNE :-
+        
+        STA y_val       ; y_val now holds the 2-bit mask for the tile
+        :
+    .endmacro
+    
+    .macro set_direction Row, Col, Direction
+        calculate_offset_and_mask_visited Row, Col
+        ;amt of shifts sored in x val
+        
+        LDA Direction
+        TAX
+
+        LDA x_val
+        BEQ :++
+        ASL
+        TAX
+        ; shift direction to correct position in byte
+        :
+
+        LDA Direction
+        ASL
+        DEX
+        BNE :-
+        
+        TAX
+        :
+
+        LDY temp_address
+        LDA VISISTED_ADDRESS, Y   
+        STX temp_address
+        ORA temp_address
+        STA VISISTED_ADDRESS, Y
+
+    .endmacro
+
+    ;*****************************************************************
 
 ;*****************************************************************
 

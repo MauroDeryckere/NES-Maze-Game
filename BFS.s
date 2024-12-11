@@ -17,23 +17,27 @@
     JSR clear_queue
 
     ;Initialize the visited cells buffer in memory as 0 (unvisited)
-    LDX #VISITED_BUFFER_SIZE
+    LDX #0
     LDA #$00
 
     @clear_cell: 
         STA VISISTED_ADDRESS, x
-        DEX
+        INX
+        CPX #VISITED_BUFFER_SIZE
         BNE @clear_cell
 
 
     ;clear directions buffer
-    LDX #DIRECTIONS_BUFFER_SIZE
+    LDX #0
     LDA #$FE
 
     @clear_dir: 
         STA DIRECTIONS_ADDRESS, x
-        DEX
+        INX
+        CPX #DIRECTIONS_BUFFER_SIZE
         BNE @clear_dir
+
+       set_direction #0, #0, #03
     RTS
 .endproc
 
