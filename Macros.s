@@ -868,6 +868,7 @@
 
 .macro multiply10 value
     LDA value
+    CLC
     ROL ;x2
     TAX
     ROL ;x2
@@ -879,18 +880,29 @@
 
 .macro divide10 value
         ;with help from chatGPT
-        
-        LDA value
         LDY #0          ; Initialize Y (Quotient) to 0
-        SEC             ; Set carry for subtraction
 
+        LDA #9
+        CLC
+        CMP value       ; Check if smaller than 10
+        BCS SkipDivide
+
+        LDA value
+        SEC             ; Set carry for subtraction
     .local DivideLoop
     DivideLoop:
         SBC #10         ; Subtract 10 from A
-        BCC Done        ; If result is negative, exit loop
+        BCC FinishLoop        ; If result is negative, exit loop
         INY             ; Increment Y (Quotient)
         JMP DivideLoop  ; Repeat the loop
 
+    .local SkipDivide
+    SkipDivide:
+        LDA value
+        JMP Done
+    .local FinishLoop
+    FinishLoop:
+        ADC #10
     .local Done
     Done:
         STA Remainder   ; Store the remainder (A)
