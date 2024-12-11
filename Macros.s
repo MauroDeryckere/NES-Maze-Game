@@ -491,8 +491,40 @@
         STX temp_address
         ORA temp_address
         STA DIRECTIONS_ADDRESS, Y
-        
+    .endmacro
 
+    ; loads direction in A register
+    .macro get_direction Row, Col
+        calculate_offset_and_mask_directions Row, Col
+
+        LDY temp_address
+        LDA DIRECTIONS_ADDRESS, Y 
+        TAY
+
+        ; direction from E.g 11 xx xx xx -> xx xx xx 11
+        ; this ensure direction is in the 0-3 range when returning
+        LDA Col
+        AND #%00000011
+        STA x_val
+
+        LDA #3
+        SEC
+        SBC x_val
+        CMP #0
+        BEQ :++
+        TAX
+
+        TYA
+        :
+        LSR
+        LSR
+        DEX
+        CPX #0
+        BNE :-
+        TAY
+
+        :
+        TYA
     .endmacro
 
     ;*****************************************************************

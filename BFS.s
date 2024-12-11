@@ -41,7 +41,9 @@
        ;set_direction #0, #0, #01
        ;set_direction #1, #0, #01
    ; set_direction #1, #3, #01
-       set_direction #1, #0, #03
+       set_direction #1, #2, #02
+       get_direction #1, #2
+       STA testvar	
     ; BRK
     RTS
 .endproc
