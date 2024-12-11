@@ -98,7 +98,7 @@ irq:
         
         ;only when not generating 
         LDA has_generation_started
-        BNE :+++
+        BNE @WHILE_GENERATING
             ;poll input and similar
             JSR start
 
@@ -110,36 +110,49 @@ irq:
             LDA checked_this_frame
             CMP #1
             BEQ mainloop
+            
+                LDA #1
+                STA checked_this_frame
 
                 JSR poll_clear_buffer
 
                 JSR update_player_sprite
-                jsr left_hand_rule
+
+                LDA is_BFS_solve
+                CMP #1
+                BNE @LEFT_HAND_RULE
+
+                @BFS: 
+                    LDA is_solving
+                    CMP #1
+                    BEQ @skip_start_BFS
+                        JSR start_BFS
+
+                        LDA #1
+                        STA is_solving
+                    @skip_start_BFS: 
+                    
+                    LDA is_solving
+                    CMP #0
+                    BEQ @skip_BFS_step
+                        JSR step_BFS
+                    @skip_BFS_step: 
+
+
+                LDA is_BFS_solve
+                CMP #1
+                BEQ @skip_left_hand
+                
+                @LEFT_HAND_RULE: 
+                    JSR left_hand_rule
+
+                @skip_left_hand: 
 
                 LDA is_hard_mode
                 CMP #0
                 BEQ :+
                     JSR update_visibility
                 :   
-
-                LDA is_solving
-                CMP #1
-                BEQ :+
-                    JSR start_BFS
-
-                    LDA #0
-                    STA is_solving
-                :
-                
-                LDA is_solving
-                CMP #0
-                BEQ @n
-                    JSR step_BFS
-                @n: 
-
-                LDA frame_counter ;sets last frame ct to the same as frame counter
-                LDA #1
-                STA checked_this_frame
 
                 ;check if we reached the end
                 LDA player_row
@@ -152,8 +165,8 @@ irq:
                     STA has_generation_started
 
                 JMP mainloop
-        :
 
+        @WHILE_GENERATING: 
         ;only when generating
         LDA has_generation_started
         BEQ mainloop
@@ -259,7 +272,7 @@ irq:
     STA display_steps
 
     ;set gamemode
-    LDA #1
+    LDA #0
     STA is_hard_mode
     
  ;   add_score #$FF
@@ -271,10 +284,11 @@ irq:
     add_score #255
     add_score #44
 
-
-
     LDA #0
     STA is_solving
+    
+    LDA #1
+    STA is_BFS_solve
 
     RTS
 .endproc

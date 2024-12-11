@@ -162,7 +162,8 @@ has_generation_started: .res 1
 has_game_started:		.res 1
 display_steps:			.res 1 ;flag to toggle displaying maze generation step by step
 is_hard_mode:           .res 1 ;is the game running in hard mode or not
-is_solving:             .res 1
+is_solving:             .res 1 ;is BFS currently solving
+is_BFS_solve:           .res 1 ;which solve mode is running BFS or left hand
 
 ;maze
 maze_buffer:        	.res 120
@@ -241,7 +242,6 @@ testvar2:               .res 1
 testvar3:               .res 1
 
 ;SOLVING ALGORITHM VARIABLES
-
 temp_player_collumn:    .res 1
 temp_player_row:        .res 1
 solving_local_direction:.res 1
