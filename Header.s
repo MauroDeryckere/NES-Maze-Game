@@ -136,12 +136,13 @@ last_frame_ct: 			.res 1 ;for things we want to execute once per frame
 RandomSeed:				.res 1 ; Initial seed value | Used internally for random function, do not overwrite
 
 ;gameplay flags
+odd_frontiers: 			.res 1 ;was the maze generated with odd or even frontier rows
+checked_this_frame:     .res 1 ;has code been executed during this frame
+
 has_generation_started: .res 1 
 has_game_started:		.res 1
 display_steps:			.res 1 ;flag to toggle displaying maze generation step by step
-odd_frontiers: 			.res 1 ;was the maze generated with odd or even frontier rows
 is_hard_mode:           .res 1 ;is the game running in hard mode or not
-checked_this_frame:     .res 1 
 is_solving:             .res 1
 
 ;maze
