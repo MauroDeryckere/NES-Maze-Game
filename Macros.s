@@ -457,27 +457,39 @@
         calculate_offset_and_mask_directions Row, Col
         ;amt of shifts sored in x val
         
-        ; LDA Direction
-        ; TAX
+        LDA Col
+        AND #%00000011
+        STA x_val
 
-        ; LDA x_val
-        ; BEQ :++
-        ; ASL
-        ; TAX
-        ; ; shift direction to correct position in byte
-        ; :
+        LDA Direction
+        TAY
 
-        ; LDA Direction
-        ; LSR
-        ; DEX
-        ; BNE :-
+        LDA #3
+        SEC
+        SBC x_val
+        CMP #0
+        BEQ :++
+        TAX
+
+        ; shift direction to correct position in byte
+        LDA Direction
+        :
+        ASL
+        ASL
+        DEX
+        CPX #0
+        BNE :-
         
-        ; TAX
-        ; :
+        TAY
+        :
+
+        TYA
+        TAX
 
         LDY temp_address
         LDA DIRECTIONS_ADDRESS, Y   
-        ORA y_val
+        STX temp_address
+        ORA temp_address
         STA DIRECTIONS_ADDRESS, Y
         
 
