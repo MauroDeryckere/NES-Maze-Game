@@ -142,6 +142,7 @@ display_steps:			.res 1 ;flag to toggle displaying maze generation step by step
 odd_frontiers: 			.res 1 ;was the maze generated with odd or even frontier rows
 is_hard_mode:           .res 1 ;is the game running in hard mode or not
 checked_this_frame:     .res 1 
+is_solving:             .res 1
 
 ;maze
 maze_buffer:        	.res 120
@@ -211,6 +212,10 @@ Remainder:              .res 1
 queue_head:             .res 1
 queue_tail:             .res 1
 
+; BFS algorithm
+move_count:             .res 1
+nodes_left_layer:       .res 1
+nodes_next_layer:       .res 1
 ;*****************************************************************
 
 .segment "OAM"

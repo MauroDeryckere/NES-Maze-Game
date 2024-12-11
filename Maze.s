@@ -94,17 +94,10 @@ irq:
 
     mainloop:
         INC RandomSeed 
-
-        ; once per frame: 
-        LDA checked_this_frame
-        CMP #0
-        BEQ :+
-            JSR poll_clear_buffer
-        :
         
         ;only when not generating 
         LDA has_generation_started
-        BNE :++
+        BNE :+++
             ;poll input and similar
             JSR start
 
@@ -116,6 +109,9 @@ irq:
             LDA checked_this_frame
             CMP #1
             BEQ mainloop
+
+                JSR poll_clear_buffer
+
                 JSR update_player_sprite
 
                 LDA is_hard_mode
@@ -123,6 +119,21 @@ irq:
                 BEQ :+
                     JSR update_visibility
                 :   
+
+                LDA is_solving
+                CMP #1
+                BEQ :+
+                    JSR start_BFS
+
+                    LDA #1
+                    STA is_solving
+                :
+                
+                LDA is_solving
+                CMP #0
+                BEQ @n
+                    JSR step_BFS
+                @n: 
 
                 LDA frame_counter ;sets last frame ct to the same as frame counter
                 LDA #1
@@ -224,7 +235,6 @@ irq:
 
     JSR clear_changed_tiles_buffer
     JSR clear_maze
-    JSR init_BFS
 
     ;set an initial randomseed value - must be non zero
     LDA #$10
@@ -236,8 +246,7 @@ irq:
     
     ;run test code
     ;JSR test_frontier ;test code
-
-    JSR test_queue
+    ; JSR test_queue
 
     ;start generation immediately
     LDA #1
@@ -248,12 +257,15 @@ irq:
     STA display_steps
 
     ;set gamemode
-    LDA #1
+    LDA #0
     STA is_hard_mode
     
  ;   add_score #$FF
     add_score #255
     add_score #255
+
+    LDA #0
+    STA is_solving
 
     RTS
 .endproc

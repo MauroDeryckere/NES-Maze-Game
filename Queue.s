@@ -38,7 +38,7 @@
 
 
 ; Queue data structure constants
-QUEUE_CAPACITY = $FF ; the maximum capacity of the queue - actual  available size is capacity - 1
+QUEUE_CAPACITY = $FE ; the maximum capacity of the queue - actual  available size is capacity - 1
 QUEUE_START = $061A ; start address for the queue 
 
 ; stores is queue is empty or not in A register
@@ -88,7 +88,7 @@ QUEUE_START = $061A ; start address for the queue
 
     @queue_full: 
         ;do nothing when queue is full for now
-    RTS
+        RTS
 .endproc
 
 ; dequeued item is loaded into A register
@@ -97,11 +97,14 @@ QUEUE_START = $061A ; start address for the queue
     LDA queue_head
     CMP queue_tail
     BEQ @queue_empty
-
     ; load val from front of queue
     LDX queue_head
     LDA QUEUE_START, X
-    TAX
+    TAY
+
+    ;store clear value for debugging purposes
+    LDA #$FF
+    STA QUEUE_START, X
 
     ; update queue_head to point to next item
     LDA queue_head
@@ -113,7 +116,7 @@ QUEUE_START = $061A ; start address for the queue
 
     @skip_wrap:
         STA queue_head
-        TXA
+        TYA
         RTS
     @queue_empty: 
         ; for now do nothing

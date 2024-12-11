@@ -40,22 +40,23 @@
 
     JSR clear_queue
 
-    @l: 
+    ; @l: 
 
-    LDA #1
-    JSR enqueue
+    ; LDA #$FF
+    ; JSR enqueue
 
-    LDA queue_tail 
-    CMP #$FE
+    ; LDA queue_tail 
+    ; CMP #$FE
 
-    BEQ @done
+    ; BEQ @done
 
-    JMP @l
+    ; JMP @l
 
-    @done: 
-    JSR dequeue
-    JSR dequeue
-    JSR dequeue
+    ; @done: 
+    ; JSR dequeue
+    ; JSR dequeue
+    ; JSR dequeue
+    ; STA testvar
     ; LDA #2
     ; JSR enqueue
     ; LDA #2
@@ -66,6 +67,23 @@
     ; JSR enqueue
     ; LDA #2
     ; JSR enqueue
+
+
+    LDA #1
+    JSR enqueue
+    LDA #2
+    JSR enqueue
+    LDA #3
+    JSR enqueue
+
+
+    JSR dequeue
+    STA testvar
+    JSR dequeue
+    STA testvar
+
+    LDA #4
+    JSR enqueue
 
     RTS
 
