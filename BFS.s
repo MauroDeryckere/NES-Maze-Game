@@ -192,9 +192,11 @@
         RTS
 
     @end_reached: 
+        LDA #1
+        STA has_generation_started
         LDA #0
         STA is_solving
-
+        
         JSR start_BFS
         RTS
 .endproc
