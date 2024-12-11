@@ -37,10 +37,6 @@
 ; [ 70 ][ 43 ][ 50 ][ 60 ][ ?? ]  ; note: last slot remains [??] - reserve one to distinguish between empty and full
 
 
-; Queue data structure constants
-QUEUE_CAPACITY = $FE ; the maximum capacity of the queue - actual  available size is capacity - 1
-QUEUE_START = $061A ; start address for the queue 
-
 ; stores is queue is empty or not in A register
 .proc is_empty
     LDA queue_head 
