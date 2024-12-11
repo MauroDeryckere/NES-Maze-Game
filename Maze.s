@@ -35,7 +35,7 @@ irq:
 
     JSR draw_background
     JSR draw_player_sprite
-    ; JSR display_score
+    JSR display_score
 
     ; transfer sprite OAM data using DMA
 	LDX #0
@@ -125,7 +125,7 @@ irq:
                 BEQ :+
                     JSR start_BFS
 
-                    LDA #1
+                    LDA #0
                     STA is_solving
                 :
                 
@@ -257,12 +257,19 @@ irq:
     STA display_steps
 
     ;set gamemode
-    LDA #0
+    LDA #1
     STA is_hard_mode
     
  ;   add_score #$FF
+    ;add_score #0
+    ;add_score #10
+    ;add_score #16
+    ;add_score #99
+    ;add_score #102
     add_score #255
-    add_score #255
+    add_score #44
+
+
 
     LDA #0
     STA is_solving
