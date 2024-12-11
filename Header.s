@@ -99,6 +99,13 @@ RIGHT_N = 1
 BOTTOM_N = 2
 LEFT_N = 3
 
+; directions for leftHandRule
+TOP_D = 0
+RIGHT_D = 1
+BOTTOM_D = 2
+LEFT_D = 3
+
+
 ;changed tiles buffer
 CHANGED_TILES_BUFFER_SIZE = 40
 
@@ -232,6 +239,12 @@ nodes_next_layer:       .res 1
 testvar:                .res 1
 testvar2:               .res 1
 testvar3:               .res 1
+
+;SOLVING ALGORITHM VARIABLES
+
+temp_player_collumn:    .res 1
+temp_player_row:        .res 1
+solving_local_direction:.res 1
 
 ;*****************************************************************
 

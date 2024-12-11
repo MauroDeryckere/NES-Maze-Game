@@ -7,6 +7,7 @@
 
 .include "HardMode.s"
 .include "Score.s"
+.include "LeftHandRule.s"
 
 .include "BFS.s"
 
@@ -113,6 +114,7 @@ irq:
                 JSR poll_clear_buffer
 
                 JSR update_player_sprite
+                jsr left_hand_rule
 
                 LDA is_hard_mode
                 CMP #0
