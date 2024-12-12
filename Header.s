@@ -128,7 +128,8 @@ INES_SRAM = 0                                                       ; 1 = batter
 .byte $0, $0, $0, $0, $0, $0, $0, $0                                ; padding
 
 .segment "TILES"
-.incbin "Tiles.chr"
+; .incbin "Tiles.chr"
+.incbin "Tiles2.chr"    ;Tiles2 is another font, testing to see if it reads better
 
 .segment "VECTORS"
 .word nmi

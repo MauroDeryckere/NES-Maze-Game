@@ -272,22 +272,23 @@ irq:
     STA display_steps
 
     ;set gamemode
-    LDA #0
+    LDA #1
     STA is_hard_mode
     
  ;   add_score #$FF
-    ;add_score #0
+    add_score #0
     ;add_score #10
-    ;add_score #16
+    add_score #16
     ;add_score #99
     ;add_score #102
-    add_score #255
-    add_score #44
+    
+    ;add_score #255
+    ;add_score #44
 
     LDA #0
     STA is_solving
     
-    LDA #1
+    LDA #0
     STA is_BFS_solve
 
     RTS
