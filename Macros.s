@@ -336,12 +336,10 @@
         LSR
         LSR
         LSR
-        STA y_val
 
         ;Add the byte offset to the base row address
-        LDA x_val
         CLC 
-        ADC y_val
+        ADC x_val
         STA temp_address ; == byte offset
         
         ; bitmask: 
