@@ -446,8 +446,8 @@ loop:
     :
 
     ;useful for debugging but not necessary for algorithm    
-    LDA #%11111111
-    STA used_direction
+    ; LDA #%11111111
+    ; STA used_direction
 
     ;step one of the agorithm: pick a random frontier cell of the list
     get_random_frontier_tile ;returns col and row in x and y reg respectively | page and offset are maintained in a and b val

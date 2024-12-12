@@ -99,8 +99,8 @@
     TAY
 
     ;store clear value for debugging purposes
-    LDA #$FF
-    STA QUEUE_START, X
+    ; LDA #$FF
+    ; STA QUEUE_START, X
 
     ; update queue_head to point to next item
     LDA queue_head

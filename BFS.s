@@ -11,12 +11,12 @@
     ;set start values
     LDA #0
     STA move_count
-    STA nodes_next_layer
+    ; STA nodes_next_layer
 
     STA is_backtracking
 
-    LDA #1
-    STA nodes_left_layer
+    ; LDA #1
+    ; STA nodes_left_layer
 
 
     ;clear the queue
@@ -42,21 +42,6 @@
         INX
         CPX #DIRECTIONS_BUFFER_SIZE
         BNE @clear_dir
-
-    ; set_direction #0, #0, #2
-    ; set_direction #0, #1, #1
-    ; set_direction #0, #2, #2
-    ; set_direction #0, #3, #3
-    ; set_direction #0, #4, #2
-    ; set_direction #0, #5, #1
-
-    ; set_direction #1, #0, #2
-    ; set_direction #2, #5, #3
-    ; set_direction #10, #0, #1
-
-    ; get_direction #0, #1
-    ; STA testvar
-
     RTS
 .endproc
 
@@ -132,11 +117,9 @@
                     
                     ; in case its a valid tile
                     ; set direction for the neewly visited cell (enqueued) to the direction of dequeued cell
-                    ; INC frontier_row
                     set_tile_dir #BOTTOM_D
-                    ; DEC frontier_row
 
-                    INC nodes_next_layer
+                    ; INC nodes_next_layer
                 @inc_t: 
                 INC frontier_row
         @rightn: 
@@ -164,11 +147,9 @@
 
                     ; in case its a valid tile
                     ; set direction for the neewly visited cell (enqueued) to the direction of dequeued cell
-                    ; DEC frontier_col
                     set_tile_dir #LEFT_D
-                    ; INC frontier_col
 
-                    INC nodes_next_layer
+                    ; INC nodes_next_layer
 
                 @dec_r: 
                 DEC frontier_col
@@ -196,11 +177,9 @@
                     JSR visit_tile
                     ; in case its a valid tile
                     ; set direction for the neewly visited cell (enqueued) to the direction of dequeued cell
-                   ; DEC frontier_row
                     set_tile_dir #TOP_D
-                    ; INC frontier_row
 
-                    INC nodes_next_layer
+                    ; INC nodes_next_layer
 
                 @inc_b:
                 DEC frontier_row
@@ -229,28 +208,27 @@
                     JSR visit_tile
                     ; in case its a valid tile
                     ; set direction for the neewly visited cell (enqueued) to the direction of dequeued cell
-                   ; INC frontier_col
                     set_tile_dir #RIGHT_D
-                   ; DEC frontier_col
 
-                    INC nodes_next_layer
+                    ; INC nodes_next_layer
 
                 @inc_l: 
                 INC frontier_col
 
         @nnstep: 
-            DEC nodes_left_layer
-            LDA nodes_left_layer
-            CMP #0
-            BNE :+
-                LDA nodes_next_layer
-                STA nodes_left_layer
+            ; only necessary when using algorithm with possibility to have no solutions, out maze always has a solution
+            ; DEC nodes_left_layer
+            ; LDA nodes_left_layer
+            ; CMP #0
+            ; BNE :+
+            ;     LDA nodes_next_layer
+            ;     STA nodes_left_layer
 
-                LDA #0
-                STA nodes_next_layer
+            ;     LDA #0
+            ;     STA nodes_next_layer
 
                 INC move_count
-            :
+            ; :
 
             RTS
 
@@ -266,91 +244,78 @@
         STA is_backtracking
 
         add_to_changed_tiles_buffer end_row, end_col, #5
-
         get_direction end_row, end_col
-        STA testvar
+
+        LDA end_row
+        STA frontier_row
+        LDA end_col
+        STA frontier_col
+
         CMP #TOP_D
         BNE :+
-            LDA end_row
-            STA testvar2
-            LDA end_col
-            STA testvar3
-
-            DEC testvar2
+            DEC frontier_row
             JMP end_step_1
         :
         CMP #RIGHT_D
         BNE :+
-            LDA end_row
-            STA testvar2
-            LDA end_col
-            STA testvar3
-
-            INC testvar3
+            INC frontier_col
             JMP end_step_1
         :
         CMP #BOTTOM_D
         BNE :+
-            LDA end_row
-            STA testvar2
-            LDA end_col
-            STA testvar3
-
-            INC testvar2
+            INC frontier_row
             JMP end_step_1
         :
         ;left direction
-            LDA end_row
-            STA testvar2
-            LDA end_col
-            STA testvar3
-
-            DEC testvar3
+        DEC frontier_col
 
         end_step_1: 
-            add_to_changed_tiles_buffer testvar2, testvar3, #5
+            add_to_changed_tiles_buffer frontier_row, frontier_col, #5
             RTS
 
         skip_initial_step: 
             LDA player_row
-            CMP testvar2
+            CMP frontier_row
             BNE :+
                 
                 LDA player_collumn
-                CMP testvar3
+                CMP frontier_col
                 BNE :+
+
+                    ; path tracking done - TODO
+                    ; LDA #1
+                    ; STA has_generation_started
+                    ; LDA #0
+                    ; STA is_solving
+                    
+                    ; JSR start_BFS
+
                 RTS
             :
 
-            get_direction testvar2, testvar3
+            get_direction frontier_row, frontier_col
             CMP #TOP_D
             BNE :+
-                DEC testvar2
+                DEC frontier_row
                 JMP @end_step
             :
             CMP #RIGHT_D
             BNE :+
-                INC testvar3
+                INC frontier_col
                 JMP @end_step
             :
             CMP #BOTTOM_D
             BNE :+
-                INC testvar2
+                INC frontier_row
                 JMP @end_step
             :
             
             ;left direction
-            DEC testvar3
+            DEC frontier_col
 
         @end_step: 
-            add_to_changed_tiles_buffer testvar2, testvar3, #5
+            add_to_changed_tiles_buffer frontier_row, frontier_col, #5
             RTS
-        ; LDA #1
-        ; STA has_generation_started
-        ; LDA #0
-        ; STA is_solving
-        
-        ; JSR start_BFS
 .endproc
 
 .proc visit_tile

@@ -80,15 +80,13 @@
 ;util macro to calculate the mask and address for a given tile
 ;mask: the bitmask for the requested row and column
 ;e.g row 0, column 1 == 0100 0000
-;address: the address in the buffer for the requested row and column
+;offset: the offset in the buffer for the requested row and colum
 ;e.g row 2, column 1 == $00 + $4 == $04
-.macro calculate_tile_address_and_mask Row, Column
+.macro calculate_tile_offset_and_mask Row, Column
     ;Calculate the base address of the row (Row * 4)
     LDA Row
     ASL             ;== times 2
     ASL             ;== times 2
-    CLC
-    ADC #maze_buffer ; Add base address of the map buffer
     STA x_val
 
     ;Calculate the byte offset within the row (Column / 8)
@@ -96,12 +94,10 @@
     LSR
     LSR
     LSR
-    STA y_val
 
     ;Add the byte offset to the base row address
-    LDA x_val
-    CLC 
-    ADC y_val
+    CLC
+    ADC x_val
     STA temp_address
     
     ; bitmask: 
@@ -135,10 +131,10 @@
 ;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
 ;Column:  Column index (0 to 31, across 4 bytes per row);
 .macro get_map_tile_state Row, Column
-    calculate_tile_address_and_mask Row, Column
+    calculate_tile_offset_and_mask Row, Column
 
-    LDY #0
-    LDA (temp_address), Y   
+    LDY temp_address
+    LDA maze_buffer, Y   
     AND y_val
 .endmacro
 
@@ -146,12 +142,12 @@
 ;Row: Row index in the map buffer (0 to MAP_ROWS - 1)
 ;Column:  Column index (0 to 31, across 4 bytes per row);
 .macro set_map_tile Row, Column
-    calculate_tile_address_and_mask Row, Column
+    calculate_tile_offset_and_mask Row, Column
     
-    LDY #0
-    LDA (temp_address), Y   
+    LDY temp_address
+    LDA maze_buffer, Y   
     ORA y_val
-    STA (temp_address), Y
+    STA maze_buffer, Y
 .endmacro
 
 .macro bounds_check_neighbor Direction, Row, Col
@@ -274,9 +270,8 @@
 .macro access_map_neighbor Direction, Row, Column
     bounds_check_neighbor Direction, Row, Column
     ;Check if A is valid (1)
-    CMP #0
     BNE :+ ;else return   
-    JMP set_invalid
+        JMP set_invalid
     :
     ;calculate the neighbors row and col
     calculate_neighbor_position Direction, Row, Column ;returns row in y and col in x register
@@ -292,7 +287,6 @@
     PHA 
         
     get_map_tile_state b_val, a_val
-    CMP #0
     BNE passable ;if the neighbor is not a wall (wall == 0) it is passable 
     
         ;wall neighbor
@@ -335,7 +329,6 @@
         LDA Row
         ASL             ;== times 2
         ASL             ;== times 2
-        CLC
         STA x_val
 
         ;Calculate the byte offset within the row (Column / 8)
@@ -404,7 +397,8 @@
     ; same macros as maze buffer but not in zero page
     ; additonally there are 2 bits per tile, direction 0-3
     ;*****************************************************************
-    .macro calculate_offset_and_mask_directions Row, Column
+    ; stores offset in temp address
+    .macro calculate_offset_directions Row, Column
         ;Calculate the base address of the row (Row * 8)
         LDA Row
         ASL             ;== times 2
@@ -416,46 +410,15 @@
         LDA Column
         LSR
         LSR
-        STA y_val
 
         ;Add the byte offset to the base row address
-        LDA x_val
         CLC 
-        ADC y_val
+        ADC x_val
         STA temp_address ; == byte offset
-        
-        ; bitmask: 
-        ;Clamp the 0-31 Column to 0-3 (since there are now 2 bits per tile and 4 tiles per byte)
-        LDA Column
-        AND #%00000011
-
-        STA x_val
-
-        LDA #%00000011
-        STA y_val
-
-        ;Calculate how many times we should shift
-        LDA #3
-        SEC
-        SBC x_val    
-        BEQ :++
-        TAX
-        
-        LDA y_val
-        :    
-        ASL
-        ASL
-        DEX
-        CPX #0
-        BNE :-
-
-        STA y_val
-        :
     .endmacro
     
     .macro set_direction Row, Col, Direction
-        calculate_offset_and_mask_directions Row, Col
-        ;amt of shifts sored in x val
+        calculate_offset_directions Row, Col
         
         LDA Col
         AND #%00000011
@@ -467,7 +430,6 @@
         LDA #3
         SEC
         SBC x_val
-        CMP #0
         BEQ :++
         TAX
 
@@ -477,7 +439,6 @@
         ASL
         ASL
         DEX
-        CPX #0
         BNE :-
         
         TAY
@@ -495,22 +456,24 @@
 
     ; loads direction in A register
     .macro get_direction Row, Col
-        calculate_offset_and_mask_directions Row, Col
+        calculate_offset_directions Row, Col
 
         LDY temp_address
         LDA DIRECTIONS_ADDRESS, Y 
         TAY
 
-        ; direction from E.g 11 xx xx xx -> xx xx xx 11
+        ; direction from E.g 11 xx xx xx -> 00 00 00 11
         ; this ensure direction is in the 0-3 range when returning
+
+        ; clamp col
         LDA Col
         AND #%00000011
         STA x_val
 
+        ; how many times should we shift (3 - col)
         LDA #3
         SEC
         SBC x_val
-        CMP #0
         BEQ :++
         TAX
 
@@ -519,12 +482,12 @@
         LSR
         LSR
         DEX
-        CPX #0
         BNE :-
         TAY
 
         :
         TYA
+        ; final result could still contain other direction bits we only want bit 0 and 1
         AND #%00000011
     .endmacro
 

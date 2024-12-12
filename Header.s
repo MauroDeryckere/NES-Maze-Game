@@ -234,13 +234,11 @@ queue_tail:             .res 1
 
 ; BFS algorithm
 move_count:             .res 1
-nodes_left_layer:       .res 1
-nodes_next_layer:       .res 1
+; nodes_left_layer:       .res 1
+; nodes_next_layer:       .res 1
 
 ; Testing
 testvar:                .res 1
-testvar2:               .res 1
-testvar3:               .res 1
 
 ;SOLVING ALGORITHM VARIABLES
 temp_player_collumn:    .res 1
