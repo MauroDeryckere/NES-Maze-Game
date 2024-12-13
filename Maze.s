@@ -278,11 +278,14 @@ irq:
     
  ;   add_score #$FF
     ;add_score #0
-    add_score #10
-    ;add_score #16
-    add_score #90
-    add_score #100
-    add_score #120
+    ; add_score #10
+    ; ;add_score #16
+    ; add_score #90
+    ; add_score #100
+    ; add_score #120
+    add_score #80
+    add_score #20
+   ; add_score #200
     ;add_score #102
     ;add_score #255
     

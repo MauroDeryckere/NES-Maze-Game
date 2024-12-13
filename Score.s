@@ -2,27 +2,24 @@
 ; Score system
 ;*****************************************************************
 .macro add_score amount
-    LDA amount
-    STA added_low
 
+    LDA amount           ; Load the amount to be added
     JSR private_add_score
-
 .endmacro
 
 .segment "CODE"
 .proc private_add_score
-    LDA added_low           ; Load the amount to be added
-    CLC                  ; Clear the carry flag
-    ADC score_low        ; Add the amount to score_low
-    STA score_low        ; Store the result back into score_low
+    CLC 
+    ADC score_low
+    STA score_low
 
     LDA score_low
     CMP #100             ; Check if score_low is >= 100
-    BCC @no_carry         ; If less than 100, skip to no_carry
+    BCC @no_carry        ; If less than 100, skip to no_carry
 
     SBC #100             ; Subtract 100 from score_low
-    STA score_low        ; Update score_low with the result
-    INC score_high       ; Increment score_high
+    STA score_low        ; Update score_low with the new 10s and 1s
+    INC score_high       ; Increment score_high (100s and 1000s)
 @no_carry:
 
     ; LDA added_low
