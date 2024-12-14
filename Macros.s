@@ -29,9 +29,17 @@
     :
 .endmacro
 ;*****************************************************************
-; Vblank buffers
+
+; Vblank buffer contains the row and column of the tile on the background
+; Only tiles from the first 4 rows (0-3) and first 8 cols (0-7) can currently be set using this macro.
+; Internal info:
+; F: flag bit - not in use currently other than to check if it is an invalid or valid IDX in the buffer
+; T: tile bit
+; R: background row bit
+; C: background col bit
+; Row: FTTR RRRR
+; Col: TTTC CCCC
 ;*****************************************************************
-; most significant bits are set to 000 - 111 (tileID 0-7 of the row)
 .macro add_to_changed_tiles_buffer Row, Col, TileID
     LDY #0
     .local loop
@@ -49,20 +57,39 @@
 
     .local add_vals
     add_vals:
-        ;convert tileID (0000 0111) to te correct bits (1110 0000)
+        ;convert tileID to row
+        ;divide by 16 to get the row (16 tiles per row in sheet)
+        ; (0011 1111) -> (0000 0011)
         LDA TileID
-
+        LSR
+        LSR
+        LSR
+        LSR
+        
+        ;shift to the correct location
+        ; 0000 0011 -> 0110 0000
         ASL			
         ASL			
-        ASL			
-        ASL			
-        ASL			
+        ASL				
+        ASL	
+        ASL	
 
         ORA Row
-
         STA changed_tiles_buffer, y
         INY
-        LDA Col
+
+        ;convert tileID to Column
+        LDA TileID
+        AND #%00000111
+        ; shift to the correct location
+        ; 0000 0111 -> 1110 0000
+        ASL			
+        ASL			
+        ASL			
+        ASL	
+        ASL
+
+        ORA Col
         STA changed_tiles_buffer, y
 .endmacro
 ;*****************************************************************

@@ -212,18 +212,19 @@ wait_vblank2:
         BEQ done 
         STA low_byte
 
-        ;1110 0000 -> 0000 0111
+        ; clear the flag bit and row
+        AND #%01100000
+        ;0110 0000 -> 0000 0011
         ;extract the tileID  
         LSR
         LSR
         LSR
         LSR
         LSR
-
-        TAX ;Store the 3-bit TileID in X (0-7)        
+        TAX ;Store the 2-bit TileID in X (0-3)        
 
         LDA low_byte
-        AND #%00011111 ; Clear the tileID from the row
+        AND #%00011111 ; Clear the tileID and flag from the row
         STA low_byte
         
         CLC
@@ -246,12 +247,31 @@ wait_vblank2:
         ;col
         INY
         LDA changed_tiles_buffer, y
-        ;LDA #0
-        
-        ADC low_byte
+        AND #%00011111 ;clear tileID
+        CLC
+        ADC low_byte 
         STA $2006
 
-        STX PPU_VRAM_IO
+        ;extract the tileID  
+        LDA changed_tiles_buffer, y
+        AND #%11100000
+        ;1110 0000 -> 0000 0111
+        LSR
+        LSR
+        LSR
+        LSR
+        LSR
+        STA low_byte ;temporarily store result
+
+        ; need to do row * 16 + col
+        TXA 
+        ASL 
+        ASL 
+        ASL 
+        ASL
+        CLC
+        ADC low_byte ; col
+        STA PPU_VRAM_IO
 
         INY
         CPY #CHANGED_TILES_BUFFER_SIZE
