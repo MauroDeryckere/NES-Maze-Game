@@ -159,11 +159,20 @@ RandomSeed:				.res 1 ; Initial seed value | Used internally for random function
 odd_frontiers: 			.res 1 ;was the maze generated with odd or even frontier rows
 checked_this_frame:     .res 1 ;has code been executed during this frame
 
-has_generation_started: .res 1 
-has_game_started:		.res 1
+current_game_mode:      .res 1  ; 0: Generating
+                                ; 1: Playing game 
+                                ; 2: Running Solving algorithm
+                                ; 3: Nothing
+
+has_started:            .res 1  ; internal flag to show whether or not a mode has started, used to only execute the start function once 
+
+solve_mode:             .res 1  ; 0: BFS
+                                ; 1: Left hand rule 
+                                ; 2: Nothing
+
+;todo
 display_steps:			.res 1 ;flag to toggle displaying maze generation step by step
 is_hard_mode:           .res 1 ;is the game running in hard mode or not
-is_solving:             .res 1 ;is BFS currently solving
 is_backtracking:        .res 1 ; is BFS currently backtracking the path
 is_BFS_solve:           .res 1 ;which solve mode is running BFS or left hand
 
@@ -177,7 +186,9 @@ end_col:				.res 1
 should_clear_buffer: 	.res 1
 changed_tiles_buffer: 	.res 40 ;changed tiles this frame - used for graphics during vblank 
                                 ; layout: row, col, row, col; FF by default 
-                                ; first 3 bits of row are the tileID
+                                ; first bit of the row is a flag bit
+                                ; bit 2 and 3 of row == row in the spritesheet
+                                ; first 3 bits of col == col in spritesheet
 
 low_byte: 				.res 1
 high_byte: 				.res 1

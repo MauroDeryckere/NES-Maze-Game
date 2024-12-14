@@ -281,15 +281,7 @@
                 LDA player_collumn
                 CMP frontier_col
                 BNE :+
-
-                    ; path tracking done - TODO
-                    ; LDA #1
-                    ; STA has_generation_started
-                    ; LDA #0
-                    ; STA is_solving
-                    
-                    ; JSR start_BFS
-
+                    ; LOAD in A TODO
                 RTS
             :
 

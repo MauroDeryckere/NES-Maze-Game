@@ -290,8 +290,10 @@ wait_vblank2:
 ; populate oam buffer with player sprite
 .segment "CODE"
 .proc draw_player_sprite
-    LDA has_game_started
-    BEQ :+
+    ; only show sprite when in playing mode
+    LDA current_game_mode
+    CMP #1
+    BNE :+
 
     ldx #0 
 
@@ -314,14 +316,17 @@ wait_vblank2:
     lda player_x   ;X coordinate
     sta oam, x
     ;INX to go to the next sprite location 
-    
-    :
+
     rts
+
+    :
+    JSR hide_player_sprite
+    RTS
 
 .endproc
 
 ;simply hides the sprite off screen
-.proc clear_player_sprite
+.proc hide_player_sprite
     LDX #0          ; Start at the first byte of the OAM (sprite 0 Y-coordinate)
     LDA #$F0        ; Y-coordinate off-screen
     STA oam, x      ; Write to OAM

@@ -82,20 +82,12 @@
 
 .segment "CODE"
 .proc run_prims_maze
-    loop:
-    
-    LDA execs
-    CMP #3
-    BNE :+
-       RTS ;early return if debugging amt of execs is completed
-    :
     ;calculate pages used to see if all are empty - if so the maze is finished
     calculate_pages_used
     LDA frontier_pages_used
     BNE :+
-
-        LDA #0
-        STA has_generation_started
+        ;return with FF in A reg to show we are done with algorithm
+        LDA #$FF
 
         RTS ;early return if finished
     :
@@ -318,13 +310,13 @@
     ADC #04
     STA temp
 
-    ; ;remove the chosen frontier cell from the list
+    ;remove the chosen frontier cell from the list
     set_map_tile frontier_row, frontier_col
     add_to_changed_tiles_buffer frontier_row, frontier_col, temp
     remove_from_Frontier frontier_page, frontier_offset
 
-    ;INC execs
-    ;JMP loop
+    ;return with 0 in A reg to show we are not done with algorithm yet
+    LDA #0
 
     RTS
 .endproc
