@@ -322,10 +322,8 @@ irq:
     ;set gamemode
     LDA #0
     STA is_hard_mode
-        
-    ;add_score #255
-    
-    LDA #1
+            
+    LDA #0
     STA solve_mode
 
     RTS

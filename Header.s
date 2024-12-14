@@ -221,16 +221,15 @@ temp_row:				.res 1
 temp_col:				.res 1
 temp: 					.res 1
 
-;PLAYER SPRITE VARIABLES
+;PLAYER VARIABLES
 player_dir:             .res 1
 
 player_row: 			.res 1
 player_collumn: 		.res 1
 
+; Score
 score_low:              .res 1
 score_high:             .res 1
-
-Remainder:              .res 1
 
 ; Queue ptrs
 queue_head:             .res 1
