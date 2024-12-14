@@ -228,14 +228,8 @@ wait_vblank2:
 
         ; clear the flag bit and row
         AND #%01100000
-        ;0110 0000 -> 0000 0011
-        ;extract the tileID  
-        LSR
-        LSR
-        LSR
-        LSR
-        LSR
-        TAX ;Store the 2-bit TileID in X (0-3)        
+        TAX ;Store the 2-bit TileID in X (0-3) - not shifted yet  
+
 
         LDA low_byte
         AND #%00011111 ; Clear the tileID and flag from the row
@@ -262,7 +256,6 @@ wait_vblank2:
         INY
         LDA changed_tiles_buffer, y
         AND #%00011111 ;clear tileID
-        CLC
         ADC low_byte 
         STA $2006
 
@@ -277,14 +270,13 @@ wait_vblank2:
         LSR
         STA low_byte ;temporarily store result
 
+        ;extract the tileID  
         ; need to do row * 16 + col
+        ;0110 0000 -> 0000 0011
+        ; but the row is already stored in a significant enough bit so we can minimise amount of shifts
         TXA 
-        ASL 
-        ASL 
-        ASL 
-        ASL
-        CLC
-        ADC low_byte ; col
+        LSR
+        ADC low_byte
         STA PPU_VRAM_IO
 
         INY

@@ -320,7 +320,7 @@
 
 .proc visit_tile
     set_visited frontier_row, frontier_col
-    add_to_changed_tiles_buffer frontier_row, frontier_col, #$10
+    add_to_changed_tiles_buffer frontier_row, frontier_col, #3
     RTS
 .endproc
 
