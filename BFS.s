@@ -12,7 +12,6 @@
     LDA #0
     STA move_count
     ; STA nodes_next_layer
-    STA is_BFS_end_reached
     STA is_backtracking
 
     ; LDA #1
@@ -65,8 +64,8 @@
 .proc step_BFS
     ;algorithm ends when queue is empty
     LDA is_backtracking
-    CMP #1
-    BNE :+
+    CMP #0
+    BEQ :+
         JMP @end_reached
     :
 
@@ -282,10 +281,9 @@
                 LDA player_collumn
                 CMP frontier_col
                 BNE :+
-                    LDA #1
+                    LDA #$FF
                     STA is_backtracking 
-                    STA is_BFS_end_reached
-                RTS
+                    RTS
             :
 
             get_direction frontier_row, frontier_col

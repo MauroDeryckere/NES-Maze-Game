@@ -243,8 +243,8 @@ irq:
                     BNE @LFR_SOLVE
                     JSR step_BFS
 
-                    LDA is_BFS_end_reached
-                    CMP #1                    
+                    LDA is_backtracking
+                    CMP #$FF                 
                     BEQ @SOLVE_END_REACHED
 
                     JMP @END_SOLVE_MODES

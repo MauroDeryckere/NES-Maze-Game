@@ -173,8 +173,6 @@ solve_mode:             .res 1  ; 0: BFS
 is_hard_mode:           .res 1 ;is the game running in hard mode or not
 is_backtracking:        .res 1 ; is BFS currently backtracking the path (internal) - will be set to FF when end is reached
 
-is_BFS_end_reached:     .res 1
-
 ;maze
 maze_buffer:        	.res 120
 
