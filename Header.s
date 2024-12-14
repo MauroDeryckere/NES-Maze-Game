@@ -170,11 +170,8 @@ solve_mode:             .res 1  ; 0: BFS
                                 ; 1: Left hand rule 
                                 ; 2: Nothing
 
-;todo
-display_steps:			.res 1 ;flag to toggle displaying maze generation step by step
 is_hard_mode:           .res 1 ;is the game running in hard mode or not
-is_backtracking:        .res 1 ; is BFS currently backtracking the path
-is_BFS_solve:           .res 1 ;which solve mode is running BFS or left hand
+is_backtracking:        .res 1 ; is BFS currently backtracking the path (internal) - will be set to FF when end is reached
 
 ;maze
 maze_buffer:        	.res 120

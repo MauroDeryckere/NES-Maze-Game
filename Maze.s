@@ -164,7 +164,7 @@ irq:
             ; ONCE PER FRAME
             LDA checked_this_frame
             CMP #1
-            BEQ @END
+            BEQ mainloop
                 LDA #1
                 STA checked_this_frame ; set flag so that we only do this once per frame
                 
@@ -216,6 +216,8 @@ irq:
 
                 JSR poll_clear_buffer ; clear buffer if necessary
 
+                JSR update_player_sprite ; Left hand requires player updates
+
                 ; Have we started the solving algorithm yet? if not, execute the start function once
                 LDA has_started
                 CMP #0
@@ -237,151 +239,45 @@ irq:
 
                 ; execute one step of the algorithm
                 LDA solve_mode
-                CMP #0 ;BFS
-                BNE :+ 
+                @BFS_SOLVE: 
+                    CMP #0 ;BFS
+                    BNE @LFR_SOLVE
                     JSR step_BFS
-                :
-                CMP #1 ;left hand
-                BNE :+
-                    JSR left_hand_rule
-                :
-                
-                ; end reached check TODO
+                    
+                    LDA is_backtracking
+                    CMP #$FF
+                    BEQ @SOLVE_END_REACHED
 
-                JMP @END
+                    JMP @END_SOLVE_MODES
+                @LFR_SOLVE: 
+                    CMP #1 ;LFR
+                    BNE @END_SOLVE_MODES
+                    JSR left_hand_rule
+
+                    ; check if player reached end
+                    LDA player_row
+                    CMP end_row
+                        BNE @END_SOLVE_MODES
+                    LDA player_collumn 
+                    CMP end_col
+                        BNE @END_SOLVE_MODES
+
+                    JMP @SOLVE_END_REACHED
+                @END_SOLVE_MODES: 
+                    JMP @END
+                
+                @SOLVE_END_REACHED: 
+                    ; back to generating
+                    LDA #0 ;set the gamemode to generating
+                    STA current_game_mode
+                    STA has_started
+
+                    JSR reset_generation
+
+                    JMP @END
+
         @END: 
             JMP mainloop
-
-        ; ;only when not generating 
-        ; LDA has_generation_started
-        ; BNE @WHILE_GENERATING
-        ;     ;poll input and similar
-        ;     JSR start
-
-        ;     ;auto generation once maze is completed (useful for debugging)
-        ;     ; LDA #1
-        ;     ; STA has_generation_started
-
-        ;     ;once per frame
-        ;     LDA checked_this_frame
-        ;     CMP #1
-        ;     BEQ mainloop
-            
-        ;         LDA #1
-        ;         STA checked_this_frame
-
-        ;         JSR poll_clear_buffer
-
-        ;         JSR update_player_sprite
-
-        ;         LDA is_BFS_solve
-        ;         CMP #1
-        ;         BNE @LEFT_HAND_RULE
-
-        ;         @BFS: 
-        ;             LDA is_solving
-        ;             CMP #1
-        ;             BEQ @skip_start_BFS
-        ;                 JSR start_BFS
-
-        ;                 LDA #1
-        ;                 STA is_solving
-        ;             @skip_start_BFS: 
-                    
-        ;             LDA is_solving
-        ;             CMP #0
-        ;             BEQ @skip_BFS_step
-        ;                 JSR step_BFS
-        ;             @skip_BFS_step: 
-
-
-        ;         LDA is_BFS_solve
-        ;         CMP #1
-        ;         BEQ @skip_left_hand
-                
-        ;         @LEFT_HAND_RULE: 
-        ;             JSR left_hand_rule
-
-        ;         @skip_left_hand: 
-
-        ;         LDA is_hard_mode
-        ;         CMP #0
-        ;         BEQ :+
-        ;             JSR update_visibility
-        ;         :   
-
-        ;         ;check if we reached the end
-        ;         LDA player_row
-        ;         CMP end_row
-        ;         BNE mainloop
-        ;         LDA player_collumn 
-        ;         CMP end_col
-        ;         BNE mainloop
-        ;             add_score #10
-        ;             LDA #1
-        ;             STA has_generation_started
-
-        ;         JMP mainloop
-
-        ; @WHILE_GENERATING: 
-        ; ;only when generating
-        ; LDA has_generation_started
-        ; BEQ mainloop
-        ;     LDA #0
-        ;     STA has_game_started
-        ;     ;clear everything and display empty map at start of generation
-
-        ;     JSR clear_player_sprite
-
-        ;     JSR clear_maze
-        ;     JSR clear_changed_tiles_buffer
-        ;     JSR wait_frame
-        ;     JSR display_map
-
-        ;     JSR start_prims_maze
-
-        ; LDA display_steps
-        ; BEQ display_once
-
-        ;     step_by_step_generation_loop:
-        ;         JSR wait_frame ;wait until a vblank has happened
-
-        ;         modulo frame_counter, #MAZE_GENERATION_SPEED
-        ;         CMP #0
-        ;         BNE step_by_step_generation_loop
-
-        ;         JSR poll_clear_buffer
-        ;         JSR run_prims_maze
-                
-        ;         LDA has_generation_started
-        ;         BEQ stop
-        ;         JMP step_by_step_generation_loop
-
-        ;     display_once: 
-        ;         JSR run_prims_maze
-        ;         LDA has_generation_started
-        ;         BNE display_once
-        ;         JSR display_map
-        ;         JMP stop
-
-        ; stop:
-        ;     JSR calculate_prims_start_end
-        ;     JSR wait_frame
-
-        ;     JSR clear_changed_tiles_buffer
-        ;     LDA #0
-        ;     STA should_clear_buffer
-
-        ;     LDA is_hard_mode
-        ;     CMP #0
-        ;     BEQ :+
-        ;         JSR display_clear_map
-        ;         JSR start_hard_mode
-
-        ;     :
-
-        ;     LDA #1
-        ;     STA has_game_started
 .endproc
 ;*****************************************************************
 
@@ -424,18 +320,14 @@ irq:
 
     JSR reset_generation
 
-    ;display maze generation step-by-step
-    LDA #1
-    STA display_steps
-
     ;set gamemode
     LDA #0
     STA is_hard_mode
         
     ;add_score #255
     
-    LDA #1
-    STA is_BFS_solve
+    LDA #0
+    STA solve_mode
 
     RTS
 .endproc
@@ -497,7 +389,7 @@ loop:
 ; resets everything necessary so that the maze generation can start again
 .proc reset_generation
     JSR hide_player_sprite
-
+    JSR clear_changed_tiles_buffer
     JSR clear_maze
     JSR display_map
 

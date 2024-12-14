@@ -281,7 +281,9 @@
                 LDA player_collumn
                 CMP frontier_col
                 BNE :+
-                    ; LOAD in A TODO
+                    ; we reached the end load FF in backtracking
+                    LDA #$FF   
+                    STA is_backtracking
                 RTS
             :
 
