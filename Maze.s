@@ -216,8 +216,6 @@ irq:
 
                 JSR poll_clear_buffer ; clear buffer if necessary
 
-                JSR update_player_sprite ; Left hand requires player updates
-
                 ; Have we started the solving algorithm yet? if not, execute the start function once
                 LDA has_started
                 CMP #0
@@ -227,6 +225,7 @@ irq:
                     CMP #0 ;BFS
                     BNE :+ 
                         JSR start_BFS
+                        JMP :++
                     :
                     CMP #1 ;left hand
                     BNE :+
@@ -243,9 +242,9 @@ irq:
                     CMP #0 ;BFS
                     BNE @LFR_SOLVE
                     JSR step_BFS
-                    
-                    LDA is_backtracking
-                    CMP #$FF
+
+                    LDA is_BFS_end_reached
+                    CMP #1                    
                     BEQ @SOLVE_END_REACHED
 
                     JMP @END_SOLVE_MODES

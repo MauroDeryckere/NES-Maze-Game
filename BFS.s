@@ -12,7 +12,7 @@
     LDA #0
     STA move_count
     ; STA nodes_next_layer
-
+    STA is_BFS_end_reached
     STA is_backtracking
 
     ; LDA #1
@@ -210,6 +210,7 @@
                     ; set direction for the neewly visited cell (enqueued) to the direction of dequeued cell
                     set_tile_dir #RIGHT_D
 
+
                     ; INC nodes_next_layer
 
                 @inc_l: 
@@ -244,13 +245,13 @@
         STA is_backtracking
 
         add_to_changed_tiles_buffer end_row, end_col, #5
-        get_direction end_row, end_col
 
         LDA end_row
         STA frontier_row
         LDA end_col
         STA frontier_col
 
+        get_direction end_row, end_col
         CMP #TOP_D
         BNE :+
             DEC frontier_row
@@ -281,9 +282,9 @@
                 LDA player_collumn
                 CMP frontier_col
                 BNE :+
-                    ; we reached the end load FF in backtracking
-                    LDA #$FF   
-                    STA is_backtracking
+                    LDA #1
+                    STA is_backtracking 
+                    STA is_BFS_end_reached
                 RTS
             :
 
