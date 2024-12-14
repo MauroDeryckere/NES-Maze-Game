@@ -247,7 +247,6 @@ testvar:                .res 1
 ;SOLVING ALGORITHM VARIABLES
 temp_player_collumn:    .res 1
 temp_player_row:        .res 1
-solving_local_direction:.res 1
 
 added_high:             .res 1
 added_low:              .res 1 ;these 2 are to make sure add score works correctly

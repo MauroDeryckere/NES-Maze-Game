@@ -14,11 +14,11 @@
     ;----------------------------------------------------------
     ;MAKE SURE LOCAL DIRECTION IS WITHIN RANGE 0-3
     ;----------------------------------------------------------
-    lda solving_local_direction
+    lda player_dir
     cmp #$FF        ; Check if A went below 0 (will become $FF due to underflow)
     bne SkipWrap    ; If not $FF, skip wrapping
     lda #$03        ; Wrap around to 3 if A is $FF
-    sta solving_local_direction
+    sta player_dir
 
     SkipWrap:
     ;solver_local_direction now contains a value between 0-3
@@ -26,7 +26,7 @@
     ;---------------------------------------------------------
     ;LOAD LOCAL DIRECTION OF TILE
     ;---------------------------------------------------------
-    sta solving_local_direction ; direction is TOP
+    sta player_dir ; direction is TOP
     cmp #TOP_D
     beq DIRECTION_IS_TOP
     cmp #BOTTOM_D
@@ -88,7 +88,7 @@
                     ;---------------------------------
                     ;RIGHT NOT POSSIBLE, SO WE ROTATE
                     ;---------------------------------
-                    dec solving_local_direction
+                    dec player_dir
                     rts
 
                 RIGHT_TOP_PASSABLE:
@@ -101,7 +101,7 @@
 
                     INC player_collumn        ; Increment player_collumn (move right)
                     LDA #RIGHT_D              ; Update the local direction to RIGHT
-                    STA solving_local_direction
+                    STA player_dir
                     RTS                        ; Return from subroutine
 
                 SkipMoveRight:
@@ -120,7 +120,7 @@
 
                 DEC player_row            ; Decrement player_row (move forward)
                 LDA #TOP_D                 ; Update the local direction to TOP
-                STA solving_local_direction
+                STA player_dir
                 RTS                        ; Return from subroutine
 
                 SkipMoveForwardRow:
@@ -137,7 +137,7 @@
 
             DEC player_collumn        ; Decrement player_collumn (move left)
             LDA #LEFT_D                ; Update the local direction to LEFT
-            STA solving_local_direction
+            STA player_dir
             RTS                        ; Return from subroutine
 
         SkipMoveLeft:
@@ -187,7 +187,7 @@
                     ;RIGHT NOT POSSIBLE, SO WE ROTATE
                     ;---------------------------------
                     right_not_possible: 
-                    dec solving_local_direction
+                    dec player_dir
                     rts
 
                 RIGHT_BOTTOM_PASSABLE:
@@ -200,7 +200,7 @@
 
                     DEC player_collumn        ; Decrement player_collumn (move left)
                     LDA #LEFT_D                ; Update the local direction to LEFT
-                    STA solving_local_direction
+                    STA player_dir
                     RTS                        ; Return from subroutine
 
                 SkipMoveLeft1:
@@ -218,7 +218,7 @@
 
             INC player_row            ; Increment player_row (move down)
             LDA #BOTTOM_D             ; Update the local direction to BOTTOM
-            STA solving_local_direction
+            STA player_dir
             RTS                        ; Return from subroutine
 
             SkipMoveDown:
@@ -236,7 +236,7 @@
 
             INC player_collumn        ; Increment player_collumn (move right)
             LDA #RIGHT_D              ; Update the local direction to RIGHT
-            STA solving_local_direction
+            STA player_dir
             RTS                        ; Return from subroutine
 
             SkipMoveRight1:
@@ -282,7 +282,7 @@
                     ;RIGHT NOT POSSIBLE, SO WE ROTATE
                     ;---------------------------------
                     right_not_possible3:
-                    dec solving_local_direction
+                    dec player_dir
                     rts
 
                 RIGHT_RIGHT_PASSABLE:
@@ -295,7 +295,7 @@
 
                     INC player_row            
                     LDA #BOTTOM_D             
-                    STA solving_local_direction
+                    STA player_dir
                     RTS                        
 
                 SkipMoveDown2:
@@ -313,7 +313,7 @@
 
                 INC player_collumn        ; Increment player_collumn (move right)
                 LDA #RIGHT_D              ; Update the local direction to RIGHT
-                STA solving_local_direction
+                STA player_dir
                 RTS                        ; Return from subroutine
 
             SkipMoveRight2:
@@ -331,7 +331,7 @@
 
             DEC player_row            ; Decrement player_row (move forward)
             LDA #TOP_D                 ; Update the local direction to TOP
-            STA solving_local_direction
+            STA player_dir
             RTS                        ; Return from subroutine
 
         SkipMoveForwardRow2:
@@ -377,7 +377,7 @@
                     ;RIGHT NOT POSSIBLE, SO WE ROTATE
                     ;---------------------------------
                     right_not_possible2:
-                    dec solving_local_direction
+                    dec player_dir
                     rts
 
                 RIGHT_LEFT_PASSABLE:
@@ -390,7 +390,7 @@
 
                     DEC player_row            ; Decrement player_row (move forward)
                     LDA #TOP_D                 ; Update the local direction to TOP
-                    STA solving_local_direction
+                    STA player_dir
                     RTS                        ; Return from subroutine
 
                     SkipMoveForwardRow3:
@@ -406,7 +406,7 @@
 
                 DEC player_collumn        ; Decrement player_collumn (move left)
                 LDA #LEFT_D                ; Update the local direction to LEFT
-                STA solving_local_direction
+                STA player_dir
                 RTS                        ; Return from subroutine
 
         SkipMoveLeft2:
@@ -424,7 +424,7 @@
 
             INC player_row            
             LDA #BOTTOM_D             
-            STA solving_local_direction
+            STA player_dir
             RTS                        ;
 
             SkipMoveDown3:
