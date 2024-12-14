@@ -57,21 +57,26 @@
 
     .local add_vals
     add_vals:
+        LDA TileID
+
         ;convert tileID to row
         ;divide by 16 to get the row (16 tiles per row in sheet)
         ; (0011 1111) -> (0000 0011)
-        LDA TileID
-        LSR
-        LSR
-        LSR
-        LSR
+        ; LSR
+        ; LSR
+        ; LSR
+        ; LSR
         
-        ;shift to the correct location
-        ; 0000 0011 -> 0110 0000
-        ASL			
-        ASL			
-        ASL				
-        ASL	
+        ; ;shift to the correct location
+        ; ; 0000 0011 -> 0110 0000
+        ; ASL			
+        ; ASL			
+        ; ASL				
+        ; ASL	
+        ; ASL	
+
+        ;but the optimised version allows us to just mask and shift once
+        AND #%11111000
         ASL	
 
         ORA Row

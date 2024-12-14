@@ -11,6 +11,20 @@
     RTS
 .endproc
 
+.segment "CODE"
+.proc clear_changed_tiles_buffer
+    LDY #0
+
+    loop: 
+    LDA #$FF
+    STA changed_tiles_buffer, Y
+
+    INY
+    CPY #CHANGED_TILES_BUFFER_SIZE
+    BNE loop
+
+    RTS
+.endproc
 
 .proc wait_frame
 	INC nmi_ready
