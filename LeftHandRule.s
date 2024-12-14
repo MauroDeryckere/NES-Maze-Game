@@ -2,24 +2,9 @@
 ;MAZE SOLVER
 ;****************************************************************
 .proc left_hand_rule
-
     ;---------------------------------------------------------------------------------------------------------------------------
     ;WHEN SOLVING, UPDATE PLAYER MOVEMENT OUTSIDE OF INPUT FROM PLAYER (WE SHOULD DISABLE THE PLAYER_UPDATE IN THIS MODE)
     ;---------------------------------------------------------------------------------------------------------------------------
-    lda player_row
-    sta player_row
-    asl            ; Multiply by 2 
-    asl            ; Multiply by 4 
-    asl            ; Multiply by 8 
-    sta player_y  ;set y position
-
-    lda player_collumn
-    sta player_collumn
-    asl
-    asl
-    asl 
-    sta player_x ;set x position
-
 
     ;----------------------------------------------------------
     ;DRAW CELL

@@ -298,7 +298,10 @@ wait_vblank2:
     ldx #0 
 
     ;SPRITE 0
-    lda player_y ;Y coordinate
+    lda player_row ;Y coordinate
+    ASL
+    ASL
+    ASL
     sta oam, x
     inx
 
@@ -313,7 +316,10 @@ wait_vblank2:
     sta oam, x
     inx
 
-    lda player_x   ;X coordinate
+    lda player_collumn   ;X coordinate
+    ASL
+    ASL
+    ASL
     sta oam, x
     ;INX to go to the next sprite location 
 

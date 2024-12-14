@@ -325,7 +325,7 @@ irq:
         
     ;add_score #255
     
-    LDA #0
+    LDA #1
     STA solve_mode
 
     RTS

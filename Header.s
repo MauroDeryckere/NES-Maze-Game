@@ -217,8 +217,6 @@ frontier_col:			.res 1
 
 used_direction:			.res 1
 
-execs: 					.res 1
-
 temp_row:				.res 1
 temp_col:				.res 1
 temp: 					.res 1
@@ -226,9 +224,6 @@ temp: 					.res 1
 ;PLAYER SPRITE VARIABLES
 player_dir:             .res 1
 
-
-player_x: 				.res 1
-player_y: 				.res 1
 player_row: 			.res 1
 player_collumn: 		.res 1
 

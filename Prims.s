@@ -348,15 +348,6 @@
     LDA temp
     STA player_collumn
 
-    LDA #0
-    STA player_y
-    LDA player_collumn
-    CLC
-    ASL
-    ASL
-    ASL
-    STA player_x
-
     JMP col_check
 
     ;even rows means black border at bottom, find a tile in row 30 with a white tile above to set as start pos
@@ -376,20 +367,6 @@
         STA player_row
         LDA temp
         STA player_collumn
-
-        LDA player_row
-        CLC
-        ASL
-        ASL
-        ASL
-        STA player_y
-        LDA player_collumn
-        CLC
-        ASL
-        ASL
-        ASL
-        STA player_x
-
 
     col_check: 
         LDA odd_frontiers

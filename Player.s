@@ -33,10 +33,7 @@
         ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
 
         BEQ HitDown
-            LDA player_y
-            CLC 
-            ADC #8 ; set position
-            STA player_y
+            ;otherwise keep now changed value
             JMP NOT_GAMEPAD_DOWN
 
         HitDown: 
@@ -67,11 +64,8 @@
         ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
 
         BEQ HitUp
-        LDA player_y
-        SEC 
-        SBC #8 ; set position
-        sta player_y
-        JMP NOT_GAMEPAD_UP
+            ;otherwise keep now changed value
+            JMP NOT_GAMEPAD_UP
 
         HitUp: 
             ;sprite collided with wall
@@ -102,10 +96,7 @@
         ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
 
         BEQ HitLeft
-            LDA player_x
-            SEC 
-            SBC #8 ; set position
-            STA player_x
+            ;otherwise keep now changed value
             JMP NOT_GAMEPAD_LEFT
 
 
@@ -138,10 +129,7 @@
         ; a register now holds if the sprite is in a non passable area (0) or passable area (non zero)
 
         BEQ HitRight
-            LDA player_x
-            CLC 
-            ADC #8 ; set position
-            STA player_x
+            ;otherwise keep now changed value
             JMP NOT_GAMEPAD_RIGHT
 
         HitRight: 
