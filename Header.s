@@ -182,10 +182,13 @@ input_game_mode:        .res 1  ; game mode the game was started with
 
 
 current_game_mode:      .res 1  ; internal mode that's currently running
-                                ; 0: Generating
-                                ; 1: Playing game 
-                                ; 2: Running Solving algorithm
-                                ; 3: Nothing
+                                ; 0: Start Screen
+                                ; 1: Generating
+                                ; 2: Playing game 
+                                ; 3: Running Solving algorithm
+                                ; 4: Nothing (paused)
+
+gamemode_store_for_paused:  .res 1 ; stores previous curr_game_mode when pausing 
 
 has_started:            .res 1  ; internal flag to show whether or not a mode has started, used to only execute the start function once 
 is_backtracking:        .res 1 ; is BFS currently backtracking the path (internal) - will be set to FF when end is reached
@@ -267,9 +270,6 @@ temp_player_row:        .res 1
 added_high:             .res 1
 added_low:              .res 1 ;these 2 are to make sure add score works correctly
 
-is_past_start_screen:       .res 1
-
-gamemode_store_for_paused:  .res 1
 ;*****************************************************************
 
 .segment "OAM"

@@ -39,18 +39,16 @@ irq:
     LDA #0
     STA checked_this_frame
 
-    LDA is_past_start_screen
+    LDA current_game_mode
     CMP #0
     BEQ draw_start_screen
 
     JSR draw_background
     JSR draw_player_sprite
     JSR display_score
-
     JMP skip_start_screen
     
 draw_start_screen:
-
     JSR display_Start_screen
     JSR draw_player_sprite
     JSR draw_title_settings
@@ -122,9 +120,6 @@ skip_start_screen:
     JSR ppu_off
     JSR clear_nametable
 
-    LDA #0
-    STA is_past_start_screen
-
     JSR ppu_update
 
     JSR clear_changed_tiles_buffer
@@ -141,8 +136,8 @@ skip_start_screen:
     LDA #2
     STA player_dir
 
-    ;start generation immediately
-    LDA #3
+    ;start with startscreen
+    LDA #0
     STA current_game_mode
     STA has_started
 
@@ -156,7 +151,6 @@ skip_start_screen:
     LDA #%00000001
     ;EOR #HARD_MODE_MASK
     ;EOR #GAME_MODE_MASK
-
     STA input_game_mode
 
     LDA #1 
@@ -182,7 +176,7 @@ skip_start_screen:
         ;------------;
         ;   PAUSE    ;
         ;------------;
-        CMP #3
+        CMP #4
         BNE @GENERATING
             JSR input_logic
             JMP @END
@@ -190,7 +184,7 @@ skip_start_screen:
         ; GENERATING ;
         ;------------;
         @GENERATING: 
-            CMP #0
+            CMP #1
             BNE @PLAYING
 
             JSR input_logic
@@ -234,11 +228,11 @@ skip_start_screen:
                     AND #GAME_MODE_MASK
                     CMP #GAME_MODE_MASK
                     BEQ :+
-                        LDA #1 
+                        LDA #2
                         STA current_game_mode
                         JMP @END
                     :
-                    LDA #2
+                    LDA #3
                     STA current_game_mode
                 :
 
@@ -248,7 +242,7 @@ skip_start_screen:
         ; PLAYING ;
         ;---------;
         @PLAYING: 
-            CMP #1
+            CMP #2
             BNE @SOLVING
             
             JSR input_logic ; poll input as often as possible
@@ -294,7 +288,7 @@ skip_start_screen:
                     LDA #0
                     STA has_started
 
-                    LDA #0 ;set the gamemode to generating
+                    LDA #1 ;set the gamemode to generating
                     STA current_game_mode
                     JSR reset_generation
 
@@ -304,7 +298,7 @@ skip_start_screen:
         ; SOLVING ;
         ;---------;
         @SOLVING: 
-            CMP #2
+            CMP #3
             BNE @END
 
             JSR input_logic
@@ -386,7 +380,7 @@ skip_start_screen:
                 
                 @SOLVE_END_REACHED: 
                     ; back to generating
-                    LDA #0 ;set the gamemode to generating
+                    LDA #1 ;set the gamemode to generating
                     STA current_game_mode
                     STA has_started
 
@@ -469,21 +463,16 @@ skip_start_screen:
 
     exit_title_loop:
         LDA #1
-        STA is_past_start_screen
+        STA current_game_mode ; back to generating
 
         LDA #0                      
-        STA current_game_mode
         STA has_started
         JSR reset_generation
+        RTS
 .endproc
 
 
 .proc draw_title_settings
-    LDA is_past_start_screen
-    CMP #1
-    BEQ EXIT
-
-
     LDA input_game_mode
     AND #GAME_MODE_MASK
     BNE AUTO_FALSE
@@ -591,6 +580,7 @@ loop:
     JSR hide_player_sprite
     JSR clear_changed_tiles_buffer
     JSR clear_maze
+    JSR wait_frame
     JSR display_map
     
     RTS
