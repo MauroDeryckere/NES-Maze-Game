@@ -5,13 +5,13 @@
 .proc start_prims_maze
     ; step 0 of the maze generation, set a random cell as passage and calculate its frontier cells
     JSR random_number_generator
-    modulo RandomSeed, #29
+    modulo random_seed, #29
     ;LDA #29
     STA a_val
     STA frontier_row
     ;STA temp
     JSR random_number_generator
-    modulo RandomSeed, #31
+    modulo random_seed, #31
     ;LDA #31
     STA b_val
     STA frontier_col
@@ -151,7 +151,7 @@
     ;pick a random direction based on the temp counter
     :
     JSR random_number_generator
-    modulo RandomSeed, temp ;stores val in A reg
+    modulo random_seed, temp ;stores val in A reg
     
     ;the total amt of pulls from stack is stored in X    
     LDX temp
@@ -221,7 +221,7 @@
 
     nextnextstep: 
         JSR random_number_generator
-        modulo RandomSeed, #02
+        modulo random_seed, #02
         ADC #04
         STA temp
 
@@ -306,7 +306,7 @@
     end: 
 
     JSR random_number_generator
-    modulo RandomSeed, #02
+    modulo random_seed, #02
     ADC #04
     STA temp
 
@@ -335,7 +335,7 @@
     ;uneven row means black border at top
     rowloop_ue:
     JSR random_number_generator
-    modulo RandomSeed, #31
+    modulo random_seed, #31
     STA temp
 
     get_map_tile_state #1, temp
@@ -354,7 +354,7 @@
     even_rows:
         rowloop_e:
         JSR random_number_generator
-        modulo RandomSeed, #31
+        modulo random_seed, #31
         STA temp
 
         get_map_tile_state #28, temp
@@ -382,7 +382,7 @@
 
         colloop_ue:
         JSR random_number_generator
-        modulo RandomSeed, #29
+        modulo random_seed, #29
         STA temp
 
         get_map_tile_state temp, #1
@@ -401,7 +401,7 @@
     even_cols:
         colloop_e:
         JSR random_number_generator
-        modulo RandomSeed, #29
+        modulo random_seed, #29
         STA temp
 
         get_map_tile_state temp, #30

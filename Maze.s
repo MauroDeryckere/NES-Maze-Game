@@ -92,10 +92,10 @@ irq:
 ;*****************************************************************
 
 ;*****************************************************************
-; Init
+; init
 ;*****************************************************************
 .segment "CODE"
-.proc Init
+.proc init
     LDX #0
     palette_loop:
         LDA default_palette, x  ;load palettes
@@ -113,17 +113,11 @@ irq:
 
     ;set an initial randomseed value - must be non zero
     LDA #$10
-    STA RandomSeed
+    STA random_seed
 
     LDA #$FF
     STA player_row
     STA player_collumn
-    
-
-    
-    ;run test code
-    ;JSR test_frontier ;test code
-    ; JSR test_queue
 
     ;start generation immediately
     LDA #0
@@ -139,6 +133,10 @@ irq:
     LDA #0
     STA solve_mode
 
+    ;run test code
+    ;JSR test_frontier ;test code
+    ;JSR test_queue
+
     RTS
 .endproc
 ;*****************************************************************
@@ -148,10 +146,10 @@ irq:
 ;*****************************************************************
 .segment "CODE"
 .proc main
-    JSR Init
+    JSR init
 
     mainloop:
-        INC RandomSeed  ; Chnage the random seed as many times as possible per frame
+        INC random_seed  ; Chnage the random seed as many times as possible per frame
         
         LDA current_game_mode
         ;------------;
@@ -391,7 +389,6 @@ loop:
 ;*****************************************************************
 ; Gameplay
 ;*****************************************************************
-
 ; resets everything necessary so that the maze generation can start again
 .proc reset_generation
     JSR hide_player_sprite
@@ -412,5 +409,4 @@ loop:
     :
     RTS
 .endproc 
-
 ;*****************************************************************

@@ -105,7 +105,6 @@ RIGHT_D = 1
 BOTTOM_D = 2
 LEFT_D = 3
 
-
 ;changed tiles buffer
 CHANGED_TILES_BUFFER_SIZE = 40
 
@@ -153,7 +152,7 @@ frame_counter: 			.res 1
 last_frame_ct: 			.res 1 ;for things we want to execute once per frame
 
 ;random
-RandomSeed:				.res 1 ; Initial seed value | Used internally for random function, do not overwrite
+random_seed:			.res 1 ; Initial seed value | Used internally for random function, do not overwrite
 
 ;gameplay flags
 odd_frontiers: 			.res 1 ;was the maze generated with odd or even frontier rows

@@ -4,7 +4,7 @@
 .segment "CODE"
 .proc start_hard_mode
     JSR random_number_generator
-    modulo RandomSeed, #02
+    modulo random_seed, #02
     ADC #04
     STA x_val
 

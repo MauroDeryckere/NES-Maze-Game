@@ -836,7 +836,7 @@
     JSR random_number_generator
 
     ;clamp page
-    modulo RandomSeed, frontier_pages_used
+    modulo random_seed, frontier_pages_used
     STA a_val
 
     ;random number for offset
@@ -855,7 +855,7 @@
         CMP a_val
         BNE incP1
             ;clamp the offset
-            modulo RandomSeed, frontier_listQ1_size
+            modulo random_seed, frontier_listQ1_size
             STA b_val
             LDA #0
             STA a_val
@@ -875,7 +875,7 @@
         CMP a_val
         BNE incP2
             ;clamp the offset
-            modulo RandomSeed, frontier_listQ2_size
+            modulo random_seed, frontier_listQ2_size
             STA b_val
             LDA #1
             STA a_val

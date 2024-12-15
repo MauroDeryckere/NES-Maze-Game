@@ -35,14 +35,14 @@
 .segment "CODE"
 .proc random_number_generator
     RNG:
-        LDA RandomSeed  ; Load the current seed
+        LDA random_seed  ; Load the current seed
         set_Carry_to_highest_bit_A ;to make sure the rotation happens properly (makes odd numbers possible)
         ROL             ; Shift left
         BCC NoXor       ; Branch if no carry
         EOR #$B4        ; XOR with a feedback value (tweak as needed)
 
     NoXor:
-        STA RandomSeed  ; Store the new seed
+        STA random_seed  ; Store the new seed
         RTS             ; Return
 
 .endproc
