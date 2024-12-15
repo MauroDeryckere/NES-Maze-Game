@@ -125,17 +125,17 @@ irq:
     STA has_started
 
     JSR reset_generation
-
-    ;set gamemode
-    LDA #1
-    STA is_hard_mode
             
-    LDA #0
-    STA solve_mode
-
     ;run test code
     ;JSR test_frontier ;test code
     ;JSR test_queue
+
+    ; 000G HSSS
+    LDA #%00000001
+    ORA #HARD_MODE_MASK
+   ; ORA #GAME_MODE_MASK
+
+    STA input_game_mode
 
     RTS
 .endproc
@@ -186,18 +186,24 @@ irq:
 
                 ; Has the maze finished generating?
                 CMP #0
-                BEQ :+
+                BEQ :++
                     JSR calculate_prims_start_end
 
                     ; reset some flags for the next game mode so that they could be reused
                     LDA #0
                     STA has_started
 
-                    LDA #1 ;set the gamemode to playing
+                    ; Select correct gamemode after generating  
+                    LDA input_game_mode
+                    AND #GAME_MODE_MASK
+                    CMP #GAME_MODE_MASK
+                    BEQ :+
+                        LDA #1 
+                        STA current_game_mode
+                        JMP @END
+                    :
+                    LDA #2
                     STA current_game_mode
-
-                    ; LDA #2 ;set the gamemode to solving
-                    ; STA current_game_mode
                 :
 
                 JMP @END
@@ -232,7 +238,8 @@ irq:
                 JSR update_player_sprite
                 
                 ; are we in hard mode?
-                LDA is_hard_mode
+                LDA input_game_mode
+                AND #HARD_MODE_MASK
                 CMP #0
                 BEQ :+
                     JSR update_visibility
@@ -278,7 +285,8 @@ irq:
                 CMP #0
                 BNE :+++ 
                     ;which solve mode do we have to start?
-                    LDA solve_mode
+                    LDA input_game_mode
+                    AND #SOLVE_MODE_MASK
                     CMP #0 ;BFS
                     BNE :+ 
                         JSR start_BFS
@@ -294,7 +302,8 @@ irq:
                 :
 
                 ; execute one step of the algorithm
-                LDA solve_mode
+                LDA input_game_mode
+                AND #SOLVE_MODE_MASK
                 @BFS_SOLVE: 
                     CMP #0 ;BFS
                     BNE @LFR_SOLVE
@@ -347,8 +356,6 @@ irq:
     AND #PAD_A
     BEQ A_NOT_PRESSED
 
-        ; LDA #1
-        ; STA current_game_mode
 
         JMP :+
     A_NOT_PRESSED:
@@ -395,13 +402,14 @@ loop:
     JSR clear_changed_tiles_buffer
     JSR clear_maze
     JSR display_map
-
+    
     RTS
 .endproc
 
 .proc start_game
     
-    LDA is_hard_mode
+    LDA input_game_mode
+    AND #HARD_MODE_MASK
     CMP #0
     BEQ :+
         JSR display_clear_map

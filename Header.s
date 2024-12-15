@@ -112,6 +112,13 @@ CHANGED_TILES_BUFFER_SIZE = 40
 PLAYER_MOVEMENT_DELAY = 5 ;sets the delay for player movement (==  movement speed)
 MAZE_GENERATION_SPEED = 1 ;how much is maze generation slowed down
 SCORE_DIGIT_OFFSET = 8
+
+; Gamemode masks
+; 000G HSSS
+GAME_MODE_MASK  = %00010000 ; playing or solving
+HARD_MODE_MASK  = %00001000 ; hardmode or not 
+SOLVE_MODE_MASK = %00000111 ; which solving algorithm
+
 ;*****************************************************************
 
 .segment "HEADER"
@@ -158,18 +165,24 @@ random_seed:			.res 1 ; Initial seed value | Used internally for random function
 odd_frontiers: 			.res 1 ;was the maze generated with odd or even frontier rows
 checked_this_frame:     .res 1 ;has code been executed during this frame
 
-current_game_mode:      .res 1  ; 0: Generating
+input_game_mode:        .res 1  ; game mode the game was started with
+                                ; 000G HSSS
+                                ; G: gamemode - 0 playing, 1 solving
+                                ; H: is in hard mode / not
+                                ; SSS: which solve mode are we in
+                                    ; 0: BFS
+                                    ; 1: Left hand rule 
+                                    ; 2: Nothing
+                                ; 000: unused, can be used later on
+
+
+current_game_mode:      .res 1  ; internal mode that's currently running
+                                ; 0: Generating
                                 ; 1: Playing game 
                                 ; 2: Running Solving algorithm
                                 ; 3: Nothing
 
 has_started:            .res 1  ; internal flag to show whether or not a mode has started, used to only execute the start function once 
-
-solve_mode:             .res 1  ; 0: BFS
-                                ; 1: Left hand rule 
-                                ; 2: Nothing
-
-is_hard_mode:           .res 1 ;is the game running in hard mode or not
 is_backtracking:        .res 1 ; is BFS currently backtracking the path (internal) - will be set to FF when end is reached
 
 ;maze
