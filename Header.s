@@ -119,8 +119,9 @@ GAME_MODE_MASK  = %00010000 ; playing or solving
 HARD_MODE_MASK  = %00001000 ; hardmode or not 
 SOLVE_MODE_MASK = %00000111 ; which solving algorithm
 
-BFS_MODE_MASK   = %00000000
-LHR_MODE_MASK   = %00000001
+CLEAR_SOLVING_MODE_MASK     = %11111000
+BFS_MODE_MASK               = %00000000
+LHR_MODE_MASK               = %00000001
 
 ;*****************************************************************
 
@@ -156,7 +157,7 @@ ppu_ctl1:		    	.res 1 ; PPU Control Register 2 Value
 
 ;input
 gamepad:		    	.res 1 ; stores the current gamepad values
-gamepad_prev:		    	.res 1 ; stores the previous gamepad values
+gamepad_prev:		    .res 1 ; stores the previous gamepad values
 
 frame_counter: 			.res 1
 last_frame_ct: 			.res 1 ;for things we want to execute once per frame
@@ -255,18 +256,20 @@ score_high:             .res 1
 queue_head:             .res 1
 queue_tail:             .res 1
 
+; Testing
+testvar:                .res 1
+
+;SOLVING ALGORITHM VARIABLES
+; LHR algoritm
+temp_player_collumn:    .res 1
+temp_player_row:        .res 1
+
 ; BFS algorithm
 move_count:             .res 1
 ; nodes_left_layer:       .res 1
 ; nodes_next_layer:       .res 1
 
-; Testing
-testvar:                .res 1
-
-;SOLVING ALGORITHM VARIABLES
-temp_player_collumn:    .res 1
-temp_player_row:        .res 1
-
+ ;Score
 added_high:             .res 1
 added_low:              .res 1 ;these 2 are to make sure add score works correctly
 

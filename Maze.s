@@ -297,7 +297,6 @@ skip_start_screen:
                     LDA #1 ;set the gamemode to generating
                     STA current_game_mode
                     JSR reset_generation
-
                 JMP @END
 
         ;---------;
@@ -305,14 +304,17 @@ skip_start_screen:
         ;---------;
         @SOLVING: 
             CMP #3
-            BNE @END
-
+            BEQ :+
+                JMP @END
+            :
             JSR input_logic
 
             ; ONCE PER FRAME
             LDA checked_this_frame
             CMP #1
-            BEQ @END
+            BNE :+
+                JMP @END
+            :
                 LDA #1
                 STA checked_this_frame ; set flag so that we only do this once per frame
 
@@ -321,8 +323,22 @@ skip_start_screen:
                 ; Have we started the solving algorithm yet? if not, execute the start function once
                 LDA has_started
                 CMP #0
-                BNE :+++ 
-                    ;which solve mode do we have to start?
+                BNE :++++ 
+                    ;select the solving mode based on hard mode or not
+                    LDA input_game_mode
+                    AND #CLEAR_SOLVING_MODE_MASK
+                    STA input_game_mode
+
+                    LDA input_game_mode
+                    AND #HARD_MODE_MASK
+                    CMP #0
+                    BEQ :+
+                        LDA input_game_mode
+                        ORA #LHR_MODE_MASK
+                        STA input_game_mode
+                    :
+
+                    ;which solve mode do we have to start in?
                     LDA input_game_mode
                     AND #SOLVE_MODE_MASK
                     CMP #0 ;BFS
@@ -388,6 +404,7 @@ skip_start_screen:
                     ; back to generating
                     LDA #1 ;set the gamemode to generating
                     STA current_game_mode
+                    LDA #0
                     STA has_started
 
                     JSR reset_generation
