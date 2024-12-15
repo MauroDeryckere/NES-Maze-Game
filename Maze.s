@@ -130,10 +130,11 @@ irq:
     ;JSR test_frontier ;test code
     ;JSR test_queue
 
-    ; 000G HSSS
-    LDA #%00000001
-    ORA #HARD_MODE_MASK
-    ORA #GAME_MODE_MASK
+    ;     000GHSSS
+    LDA #%00001000
+    EOR #HARD_MODE_MASK
+    EOR #GAME_MODE_MASK
+    ;EOR #SOLVE_MODE_MASK
 
     STA input_game_mode
 
