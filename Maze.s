@@ -53,6 +53,7 @@ draw_start_screen:
 
     JSR display_Start_screen
     JSR draw_player_sprite
+    JSR draw_title_settings
 
 skip_start_screen:
 
@@ -152,9 +153,9 @@ skip_start_screen:
     ;JSR test_queue
 
     ;     000GHSSS
-    LDA #%00000000
-    EOR #HARD_MODE_MASK
-    EOR #GAME_MODE_MASK
+    LDA #%00011000
+    ;EOR #HARD_MODE_MASK
+    ;EOR #GAME_MODE_MASK
 
     STA input_game_mode
 
@@ -419,6 +420,30 @@ titleloop:
         :
 
     NOT_GAMEPAD_UP: 
+    lda gamepad     
+    and #PAD_R
+    beq NOT_GAMEPAD_RIGHT
+
+    lda gamepad_prev            
+    and #PAD_R  
+    bne NOT_GAMEPAD_RIGHT
+        LDA player_row
+        CMP #15
+        BNE NOT_AUTO
+            LDA input_game_mode
+            EOR #%00010000
+            STA input_game_mode
+            JMP NOT_GAMEPAD_RIGHT
+        NOT_AUTO:
+        LDA player_row
+        CMP #16
+        BNE NOT_HARD
+            LDA input_game_mode
+            EOR #%00001000
+            STA input_game_mode
+            JMP NOT_GAMEPAD_RIGHT
+        NOT_HARD:
+    NOT_GAMEPAD_RIGHT: 
 
 
     LDA #2
@@ -444,7 +469,34 @@ exit_title_loop:
 .endproc
 
 
+.proc draw_title_settings
 
+    LDA input_game_mode
+    AND #GAME_MODE_MASK
+    BNE AUTO_FALSE
+        vram_set_address (NAME_TABLE_0_ADDRESS + 15 * 32 + 20)
+        LDA #$6A
+        STA PPU_VRAM_IO
+        JMP HARD_CHECK
+    AUTO_FALSE:
+        vram_set_address (NAME_TABLE_0_ADDRESS + 15 * 32 + 20)
+        LDA #$6B
+        STA PPU_VRAM_IO
+    HARD_CHECK:
+    LDA input_game_mode
+    AND #HARD_MODE_MASK
+    BNE HARD_FALSE
+        vram_set_address (NAME_TABLE_0_ADDRESS + 16 * 32 + 20)
+        LDA #$6A
+        STA PPU_VRAM_IO
+        JMP EXIT
+    HARD_FALSE:
+        vram_set_address (NAME_TABLE_0_ADDRESS + 16 * 32 + 20)
+        LDA #$6B
+        STA PPU_VRAM_IO
+    EXIT:
+    RTS
+.endproc
 
 ;*****************************************************************
 ; Start
@@ -589,8 +641,8 @@ top_border:
 play_text:
 .byte $81, $48, "p", "l", "a", "y", $48, $48, $85, 0
 auto_text:
-.byte $81, $48, "a", "u", "t", "o", $48, $7B, $85, 0
+.byte $81, $48, "a", "u", "t", "o", $48, $7A, $85, 0
 hard_text:
-.byte $81, $48, "h", "a", "r", "d", $48, $7B, $85, 0
+.byte $81, $48, "h", "a", "r", "d", $48, $7A, $85, 0
 bottom_border:
 .byte $84, $87, $87, $87, $87, $87, $87, $87, $88, 0
