@@ -290,10 +290,10 @@ wait_vblank2:
 ; populate oam buffer with player sprite
 .segment "CODE"
 .proc draw_player_sprite
-    ; only show sprite when in playing mode
+    ; only show sprite when in playing or solving mode
     LDA current_game_mode
-    CMP #1
-    BNE :+
+    CMP #0
+    BEQ :+
 
     ldx #0 
 

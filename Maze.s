@@ -133,7 +133,7 @@ irq:
     ; 000G HSSS
     LDA #%00000001
     ORA #HARD_MODE_MASK
-   ; ORA #GAME_MODE_MASK
+    ORA #GAME_MODE_MASK
 
     STA input_game_mode
 
@@ -246,21 +246,21 @@ irq:
                 :
 
                 ; Has the player reached the end?
-                LDA player_row
-                CMP end_row
-                BNE @END
-                LDA player_collumn
-                CMP end_col
-                BNE @END
+                    LDA player_row
+                    CMP end_row
+                    BNE @PLAYING
+                    LDA player_collumn
+                    CMP end_col
+                    BNE @PLAYING
 
                 ; ONLY EXECUTED WHEN END IS REACHED
                 ; reset some flags for the next game mode so that they could be reused
-                LDA #0
-                STA has_started
+                    LDA #0
+                    STA has_started
 
-                LDA #0 ;set the gamemode to generating
-                STA current_game_mode
-                JSR reset_generation
+                    LDA #0 ;set the gamemode to generating
+                    STA current_game_mode
+                    JSR reset_generation
 
                 JMP @END
 
@@ -294,6 +294,12 @@ irq:
                     :
                     CMP #1 ;left hand
                     BNE :+
+                        ; are we in hard mode?
+                        LDA input_game_mode
+                        AND #HARD_MODE_MASK
+                        CMP #0
+                        BEQ :+
+                            JSR display_clear_map
                         ;start left hand
                     :
 
@@ -318,6 +324,14 @@ irq:
                     CMP #1 ;LFR
                     BNE @END_SOLVE_MODES
                     JSR left_hand_rule
+
+                    ; are we in hard mode?
+                    LDA input_game_mode
+                    AND #HARD_MODE_MASK
+                    CMP #0
+                    BEQ :+
+                        JSR update_visibility
+                    :
 
                     ; check if player reached end
                     LDA player_row

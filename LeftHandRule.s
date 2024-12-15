@@ -9,8 +9,14 @@
     ;----------------------------------------------------------
     ;DRAW CELL
     ;----------------------------------------------------------
-    add_to_changed_tiles_buffer player_row, player_collumn, #2 
-
+    LDA input_game_mode
+    AND #HARD_MODE_MASK
+    CMP #0
+    BEQ :+
+        JMP _skip
+    :
+        add_to_changed_tiles_buffer player_row, player_collumn, #2 
+    _skip: 
     ;----------------------------------------------------------
     ;MAKE SURE LOCAL DIRECTION IS WITHIN RANGE 0-3
     ;----------------------------------------------------------
