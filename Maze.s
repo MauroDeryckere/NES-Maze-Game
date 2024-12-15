@@ -525,14 +525,14 @@ skip_start_screen:
         and #PAD_START              
         bne NOT_GAMEPAD_START
             LDA current_game_mode
-            CMP #3
+            CMP #4
             BNE is_not_paused
                 LDA gamemode_store_for_paused
                 STA current_game_mode
                 JMP EXIT            
             is_not_paused:
                 STA gamemode_store_for_paused
-                LDA #3
+                LDA #4
                 STA current_game_mode
 
     NOT_GAMEPAD_START:

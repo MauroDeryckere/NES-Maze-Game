@@ -290,10 +290,12 @@ wait_vblank2:
 ; populate oam buffer with player sprite
 .segment "CODE"
 .proc draw_player_sprite
-    ; only show sprite when not in generating mode
+    ; only show sprite when not in generating mode or paused mode
     LDA current_game_mode
     CMP #1
     BEQ :+
+    CMP #4
+    BEQ :++
 
     ldx #0 
 
@@ -327,6 +329,7 @@ wait_vblank2:
 
     :
     JSR hide_player_sprite
+    :
     RTS
 
 .endproc
