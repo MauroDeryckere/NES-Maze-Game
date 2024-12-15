@@ -33,6 +33,7 @@
 
 
     ;clear directions buffer
+    ; not necessary, could maintain 'garbage' here
     LDX #0
     LDA #$00
 
@@ -56,6 +57,7 @@
     JSR enqueue
 
     ; add start row and col to the visited buffer
+    LDX #4
     JSR visit_tile
 
     RTS
@@ -112,6 +114,8 @@
                     JSR enqueue
                     LDA frontier_col
                     JSR enqueue
+
+                    LDX #BOTTOM_D
                     JSR visit_tile
                     
                     ; in case its a valid tile
@@ -142,6 +146,8 @@
                     JSR enqueue
                     LDA frontier_col
                     JSR enqueue
+
+                    LDX #LEFT_D
                     JSR visit_tile
 
                     ; in case its a valid tile
@@ -173,6 +179,8 @@
                     JSR enqueue
                     LDA frontier_col
                     JSR enqueue
+
+                    LDX #TOP_D
                     JSR visit_tile
                     ; in case its a valid tile
                     ; set direction for the neewly visited cell (enqueued) to the direction of dequeued cell
@@ -204,6 +212,8 @@
                     JSR enqueue
                     LDA frontier_col
                     JSR enqueue
+
+                    LDX #RIGHT_D
                     JSR visit_tile
                     ; in case its a valid tile
                     ; set direction for the neewly visited cell (enqueued) to the direction of dequeued cell
@@ -312,8 +322,23 @@
 .endproc
 
 .proc visit_tile
+    STX temp_row
     set_visited frontier_row, frontier_col
-    add_to_changed_tiles_buffer frontier_row, frontier_col, #3
+    LDA display_BFS_directions
+    CMP #1
+    BNE :+
+        LDX temp_row
+        CPX #4 ; means theres no direction
+        BEQ :+
+            LDA temp_row
+            CLC
+            ADC #32
+            STA temp_row
+            add_to_changed_tiles_buffer frontier_row, frontier_col, temp_row
+
+        RTS
+    :
+        add_to_changed_tiles_buffer frontier_row, frontier_col, #3
     RTS
 .endproc
 

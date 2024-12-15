@@ -138,6 +138,9 @@ irq:
 
     STA input_game_mode
 
+    LDA #1 
+    STA display_BFS_directions
+
     RTS
 .endproc
 ;*****************************************************************
