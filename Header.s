@@ -267,7 +267,9 @@ temp_player_row:        .res 1
 added_high:             .res 1
 added_low:              .res 1 ;these 2 are to make sure add score works correctly
 
-is_past_start_screen:     .res 1
+is_past_start_screen:       .res 1
+
+gamemode_store_for_paused:  .res 1
 ;*****************************************************************
 
 .segment "OAM"

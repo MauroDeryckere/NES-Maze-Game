@@ -153,7 +153,7 @@ skip_start_screen:
     ;JSR test_queue
 
     ;     000GHSSS
-    LDA #%00011000
+    LDA #%00000001
     ;EOR #HARD_MODE_MASK
     ;EOR #GAME_MODE_MASK
 
@@ -180,11 +180,20 @@ skip_start_screen:
         
         LDA current_game_mode
         ;------------;
+        ;   PAUSE    ;
+        ;------------;
+        CMP #3
+        BNE @GENERATING
+            JSR input_logic
+            JMP @END
+        ;------------;
         ; GENERATING ;
         ;------------;
         @GENERATING: 
             CMP #0
             BNE @PLAYING
+
+            JSR input_logic
 
             ; ONCE PER FRAME
             LDA checked_this_frame
@@ -298,6 +307,8 @@ skip_start_screen:
             CMP #2
             BNE @END
 
+            JSR input_logic
+
             ; ONCE PER FRAME
             LDA checked_this_frame
             CMP #1
@@ -390,81 +401,81 @@ skip_start_screen:
 
 .proc title_screen
 
-titleloop:
-	jsr gamepad_poll
-    lda gamepad     
-    and #PAD_D
-    beq NOT_GAMEPAD_DOWN 
+    titleloop:
+        jsr gamepad_poll
+        lda gamepad     
+        and #PAD_D
+        beq NOT_GAMEPAD_DOWN 
 
-    lda gamepad_prev            
-    and #PAD_D                  
-    bne NOT_GAMEPAD_DOWN
-        LDA player_row
-        CMP #16
-        BEQ :+
-            INC player_row
-        :
+        lda gamepad_prev            
+        and #PAD_D                  
+        bne NOT_GAMEPAD_DOWN
+            LDA player_row
+            CMP #16
+            BEQ :+
+                INC player_row
+            :
 
-    NOT_GAMEPAD_DOWN: 
-    lda gamepad     
-    and #PAD_U
-    beq NOT_GAMEPAD_UP
+        NOT_GAMEPAD_DOWN: 
+        lda gamepad     
+        and #PAD_U
+        beq NOT_GAMEPAD_UP
 
-    lda gamepad_prev            
-    and #PAD_U           
-    bne NOT_GAMEPAD_UP
-        LDA player_row
-        CMP #14
-        BEQ :+
-            DEC player_row
-        :
+        lda gamepad_prev            
+        and #PAD_U           
+        bne NOT_GAMEPAD_UP
+            LDA player_row
+            CMP #14
+            BEQ :+
+                DEC player_row
+            :
 
-    NOT_GAMEPAD_UP: 
-    lda gamepad     
-    and #PAD_R
-    beq NOT_GAMEPAD_RIGHT
+        NOT_GAMEPAD_UP: 
+        lda gamepad     
+        and #PAD_R
+        beq NOT_GAMEPAD_RIGHT
 
-    lda gamepad_prev            
-    and #PAD_R  
-    bne NOT_GAMEPAD_RIGHT
-        LDA player_row
-        CMP #15
-        BNE NOT_AUTO
-            LDA input_game_mode
-            EOR #%00010000
-            STA input_game_mode
-            JMP NOT_GAMEPAD_RIGHT
-        NOT_AUTO:
-        LDA player_row
-        CMP #16
-        BNE NOT_HARD
-            LDA input_game_mode
-            EOR #%00001000
-            STA input_game_mode
-            JMP NOT_GAMEPAD_RIGHT
-        NOT_HARD:
-    NOT_GAMEPAD_RIGHT: 
+        lda gamepad_prev            
+        and #PAD_R  
+        bne NOT_GAMEPAD_RIGHT
+            LDA player_row
+            CMP #15
+            BNE NOT_AUTO
+                LDA input_game_mode
+                EOR #%00010000
+                STA input_game_mode
+                JMP NOT_GAMEPAD_RIGHT
+            NOT_AUTO:
+            LDA player_row
+            CMP #16
+            BNE NOT_HARD
+                LDA input_game_mode
+                EOR #%00001000
+                STA input_game_mode
+                JMP NOT_GAMEPAD_RIGHT
+            NOT_HARD:
+        NOT_GAMEPAD_RIGHT: 
 
 
-    LDA #2
-    STA player_dir
+        LDA #2
+        STA player_dir
 
-    lda gamepad
-    sta gamepad_prev
+        lda gamepad
+        sta gamepad_prev
 
-	and #PAD_A
-	bne exit_title_loop
+        and #PAD_A
+        bne exit_title_loop
 
-    JMP titleloop
+        JMP titleloop
 
-exit_title_loop:
-    LDA #1
-    STA is_past_start_screen
+    exit_title_loop:
+        LDA #1
+        STA is_past_start_screen
 
-    LDA #0                      ;temp
-    STA current_game_mode
-    STA has_started
-    JSR reset_generation
+        LDA #0                      
+        STA current_game_mode
+        STA has_started
+        JSR reset_generation
 
 .endproc
 
@@ -509,10 +520,35 @@ exit_title_loop:
     BEQ A_NOT_PRESSED
 
 
-        JMP :+
+        JMP START_CHECK
     A_NOT_PRESSED:
 
-    :
+    START_CHECK:
+        jsr gamepad_poll
+        lda gamepad     
+        and #PAD_START
+        beq NOT_GAMEPAD_START
+
+        lda gamepad_prev            
+        and #PAD_START              
+        bne NOT_GAMEPAD_START
+            LDA current_game_mode
+            CMP #3
+            BNE is_not_paused
+                LDA gamemode_store_for_paused
+                STA current_game_mode
+                JMP EXIT            
+            is_not_paused:
+                STA gamemode_store_for_paused
+                LDA #3
+                STA current_game_mode
+
+    NOT_GAMEPAD_START:
+    EXIT:
+
+    lda gamepad
+    sta gamepad_prev
+
     RTS
 .endproc
 ;*****************************************************************
