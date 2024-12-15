@@ -503,6 +503,9 @@ wait_vblank2:
 
 ;*****************************************************************
 
+;*****************************************************************
+; startscreen
+;*****************************************************************
 
 .proc draw_title_settings
     LDA input_game_mode
@@ -532,82 +535,6 @@ wait_vblank2:
     RTS
 .endproc
 
-;*****************************************************************
-; Start
-;       Gets called multiple times per frame
-;*****************************************************************
-.proc input_logic
-    JSR gamepad_poll
-    LDA gamepad
-    AND #PAD_A
-    BEQ A_NOT_PRESSED
-
-
-        JMP START_CHECK
-    A_NOT_PRESSED:
-
-    START_CHECK:
-        jsr gamepad_poll
-        lda gamepad     
-        and #PAD_START
-        beq NOT_GAMEPAD_START
-
-        lda gamepad_prev            
-        and #PAD_START              
-        bne NOT_GAMEPAD_START
-            LDA current_game_mode
-            CMP #4
-            BNE is_not_paused
-                LDA gamemode_store_for_paused
-                STA current_game_mode
-                JMP EXIT            
-            is_not_paused:
-                STA gamemode_store_for_paused
-                LDA #4
-                STA current_game_mode
-
-    NOT_GAMEPAD_START:
-    EXIT:
-
-    lda gamepad
-    sta gamepad_prev
-
-    RTS
-.endproc
-;*****************************************************************
-
-;*****************************************************************
-; Input
-;*****************************************************************
-.segment "CODE"
-.proc gamepad_poll
-	; strobe the gamepad to latch current button state
-	LDA #1
-	STA JOYPAD1
-	LDA #0
-	STA JOYPAD1
-	; read 8 bytes from the interface at $4016
-	LDX #8
-loop:
-    PHA
-    LDA JOYPAD1
-    ; combine low two bits and store in carry bit
-	AND #%00000011
-	CMP #%00000001
-	PLA
-	; rotate carry into gamepad variable
-	ROR
-	DEX
-	BNE loop
-	STA gamepad
-	RTS
-.endproc
-;*****************************************************************
-
-
-;*****************************************************************
-;Start Screen code
-;*****************************************************************
 .segment "CODE"
 .proc display_Start_screen
     LDA temp_player_collumn
