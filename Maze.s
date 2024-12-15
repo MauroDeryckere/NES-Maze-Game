@@ -411,7 +411,7 @@ skip_start_screen:
         and #PAD_D                  
         bne NOT_GAMEPAD_DOWN
             LDA player_row
-            CMP #16
+            CMP #20
             BEQ :+
                 INC player_row
             :
@@ -425,7 +425,7 @@ skip_start_screen:
         and #PAD_U           
         bne NOT_GAMEPAD_UP
             LDA player_row
-            CMP #14
+            CMP #18
             BEQ :+
                 DEC player_row
             :
@@ -439,7 +439,7 @@ skip_start_screen:
         and #PAD_R  
         bne NOT_GAMEPAD_RIGHT
             LDA player_row
-            CMP #15
+            CMP #19
             BNE NOT_AUTO
                 LDA input_game_mode
                 EOR #%00010000
@@ -447,7 +447,7 @@ skip_start_screen:
                 JMP NOT_GAMEPAD_RIGHT
             NOT_AUTO:
             LDA player_row
-            CMP #16
+            CMP #20
             BNE NOT_HARD
                 LDA input_game_mode
                 EOR #%00001000
