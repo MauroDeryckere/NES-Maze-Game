@@ -119,6 +119,9 @@ GAME_MODE_MASK  = %00010000 ; playing or solving
 HARD_MODE_MASK  = %00001000 ; hardmode or not 
 SOLVE_MODE_MASK = %00000111 ; which solving algorithm
 
+BFS_MODE_MASK   = %00000000
+LHR_MODE_MASK   = %00000001
+
 ;*****************************************************************
 
 .segment "HEADER"
