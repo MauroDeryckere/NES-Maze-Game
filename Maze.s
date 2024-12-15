@@ -426,11 +426,10 @@ skip_start_screen:
     BEQ A_NOT_PRESSED
 
 
-        JMP START_CHECK
+    JMP START_CHECK
     A_NOT_PRESSED:
 
     START_CHECK:
-        jsr gamepad_poll
         lda gamepad     
         and #PAD_START
         beq NOT_GAMEPAD_START
@@ -450,6 +449,7 @@ skip_start_screen:
                 STA current_game_mode
 
     NOT_GAMEPAD_START:
+
     EXIT:
 
     lda gamepad
@@ -457,11 +457,7 @@ skip_start_screen:
 
     RTS
 .endproc
-;*****************************************************************
 
-;*****************************************************************
-; Input
-;*****************************************************************
 .segment "CODE"
 .proc gamepad_poll
 	; strobe the gamepad to latch current button state
@@ -490,49 +486,55 @@ loop:
 ;*****************************************************************
 .proc title_screen
     titleloop:
-        jsr gamepad_poll
-        lda gamepad     
-        and #PAD_D
-        beq NOT_GAMEPAD_DOWN 
 
-        lda gamepad_prev            
-        and #PAD_D                  
-        bne NOT_GAMEPAD_DOWN
-            LDA player_row
-            CMP #20
-            BEQ :+
-                INC player_row
-            :
+        ; UP/DOWN MOVEMENT OF SELECTION
+        @UP_DOWN_MOVEMENT: 
+            jsr gamepad_poll
+            lda gamepad     
+            and #PAD_D
+            beq NOT_GAMEPAD_DOWN 
 
-        NOT_GAMEPAD_DOWN: 
-        lda gamepad     
-        and #PAD_U
-        beq NOT_GAMEPAD_UP
+            lda gamepad_prev            
+            and #PAD_D                  
+            bne NOT_GAMEPAD_DOWN
+                LDA player_row
+                CMP #20
+                BEQ :+
+                    INC player_row
+                :
 
-        lda gamepad_prev            
-        and #PAD_U           
-        bne NOT_GAMEPAD_UP
-            LDA player_row
-            CMP #18
-            BEQ :+
-                DEC player_row
-            :
+            NOT_GAMEPAD_DOWN: 
+            lda gamepad     
+            and #PAD_U
+            beq NOT_GAMEPAD_UP
+
+            lda gamepad_prev            
+            and #PAD_U           
+            bne NOT_GAMEPAD_UP
+                LDA player_row
+                CMP #18
+                BEQ :+
+                    DEC player_row
+                :
+        ;---------------------
+
+
 
         NOT_GAMEPAD_UP: 
         lda gamepad     
-        and #PAD_R
-        beq NOT_GAMEPAD_RIGHT
+        and #PAD_SELECT
+        beq NOT_GAMEPAD_SELECT
 
         lda gamepad_prev            
-        and #PAD_R  
-        bne NOT_GAMEPAD_RIGHT
+        and #PAD_SELECT  
+        bne NOT_GAMEPAD_SELECT
             LDA player_row
             CMP #19
             BNE NOT_AUTO
                 LDA input_game_mode
                 EOR #%00010000
                 STA input_game_mode
-                JMP NOT_GAMEPAD_RIGHT
+                JMP NOT_GAMEPAD_SELECT
             NOT_AUTO:
             LDA player_row
             CMP #20
@@ -540,9 +542,9 @@ loop:
                 LDA input_game_mode
                 EOR #%00001000
                 STA input_game_mode
-                JMP NOT_GAMEPAD_RIGHT
+                JMP NOT_GAMEPAD_SELECT
             NOT_HARD:
-        NOT_GAMEPAD_RIGHT: 
+        NOT_GAMEPAD_SELECT: 
 
 
         LDA #2
