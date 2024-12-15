@@ -128,9 +128,10 @@ skip_start_screen:
     LDA #$10
     STA random_seed
 
+    ;player row and col on the startscreen
     LDA #14
     STA player_row
-    LDA #14
+    LDA #13
     STA player_collumn
 
     LDA #2
@@ -476,24 +477,24 @@ skip_start_screen:
     LDA input_game_mode
     AND #GAME_MODE_MASK
     BNE AUTO_FALSE
-        vram_set_address (NAME_TABLE_0_ADDRESS + 15 * 32 + 20)
+        vram_set_address (NAME_TABLE_0_ADDRESS + 15 * 32 + 19)
         LDA #$6A
         STA PPU_VRAM_IO
         JMP HARD_CHECK
     AUTO_FALSE:
-        vram_set_address (NAME_TABLE_0_ADDRESS + 15 * 32 + 20)
+        vram_set_address (NAME_TABLE_0_ADDRESS + 15 * 32 + 19)
         LDA #$6B
         STA PPU_VRAM_IO
     HARD_CHECK:
     LDA input_game_mode
     AND #HARD_MODE_MASK
     BNE HARD_FALSE
-        vram_set_address (NAME_TABLE_0_ADDRESS + 16 * 32 + 20)
+        vram_set_address (NAME_TABLE_0_ADDRESS + 16 * 32 + 19)
         LDA #$6A
         STA PPU_VRAM_IO
         JMP EXIT
     HARD_FALSE:
-        vram_set_address (NAME_TABLE_0_ADDRESS + 16 * 32 + 20)
+        vram_set_address (NAME_TABLE_0_ADDRESS + 16 * 32 + 19)
         LDA #$6B
         STA PPU_VRAM_IO
     EXIT:
@@ -605,27 +606,27 @@ loop:
 .segment "CODE"
 .proc display_Start_screen
 	; Write top border
-	vram_set_address (NAME_TABLE_0_ADDRESS + 13 * 32 + 13)
+	vram_set_address (NAME_TABLE_0_ADDRESS + 13 * 32 + 11)
 	assign_16i paddr, top_border
 	jsr write_text
 
 	; Write play button
-	vram_set_address (NAME_TABLE_0_ADDRESS + 14 * 32 + 13)
+	vram_set_address (NAME_TABLE_0_ADDRESS + 14 * 32 + 11)
 	assign_16i paddr, play_text
 	jsr write_text
 
 	; Write auto button
-	vram_set_address (NAME_TABLE_0_ADDRESS + 15 * 32 + 13)
+	vram_set_address (NAME_TABLE_0_ADDRESS + 15 * 32 + 11)
 	assign_16i paddr, auto_text
 	jsr write_text
 
 	; Write hard button
-	vram_set_address (NAME_TABLE_0_ADDRESS + 16 * 32 + 13)
+	vram_set_address (NAME_TABLE_0_ADDRESS + 16 * 32 + 11)
 	assign_16i paddr, hard_text
 	jsr write_text
 
 	; Write bottom border
-	vram_set_address (NAME_TABLE_0_ADDRESS + 17 * 32 + 13)
+	vram_set_address (NAME_TABLE_0_ADDRESS + 17 * 32 + 11)
 	assign_16i paddr, bottom_border
 	jsr write_text
 
@@ -665,12 +666,12 @@ exit:
 .endproc
 
 top_border:
-.byte $83, $82, $82, $82, $82, $82, $82, $82, $86, 0
+.byte $83, $82, $82, $82, $82, $82, $82, $82, $82, $86, 0
 play_text:
-.byte $81, $48, "p", "l", "a", "y", $48, $48, $85, 0
+.byte $81, $48, $48, "p", "l", "a", "y", $48, $48, $85, 0
 auto_text:
-.byte $81, $48, "a", "u", "t", "o", $48, $7A, $85, 0
+.byte $81, $48, $48, "a", "u", "t", "o", $48, $7A, $85, 0
 hard_text:
-.byte $81, $48, "h", "a", "r", "d", $48, $7A, $85, 0
+.byte $81, $48, $48, "h", "a", "r", "d", $48, $7A, $85, 0
 bottom_border:
-.byte $84, $87, $87, $87, $87, $87, $87, $87, $88, 0
+.byte $84, $87, $87, $87, $87, $87, $87, $87, $87, $88, 0
