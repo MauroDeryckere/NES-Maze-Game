@@ -294,13 +294,14 @@ irq:
                     :
                     CMP #1 ;left hand
                     BNE :+
+                        ;start left hand
                         ; are we in hard mode?
                         LDA input_game_mode
                         AND #HARD_MODE_MASK
                         CMP #0
                         BEQ :+
                             JSR display_clear_map
-                        ;start left hand
+                            JSR start_hard_mode
                     :
 
                     LDA #1
