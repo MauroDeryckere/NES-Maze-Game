@@ -428,13 +428,16 @@ titleloop:
     sta gamepad_prev
 
 	and #PAD_A
-	beq exit_title_loop
+	bne exit_title_loop
 
     JMP titleloop
 
 exit_title_loop:
     LDA #1
     STA is_past_start_screen
+
+    LDA #0                      ;temp
+    STA current_game_mode
 
 .endproc
 
