@@ -92,6 +92,58 @@ irq:
 ;*****************************************************************
 
 ;*****************************************************************
+; Init
+;*****************************************************************
+.segment "CODE"
+.proc Init
+    LDX #0
+    palette_loop:
+        LDA default_palette, x  ;load palettes
+        STA palette, x
+        INX
+        CPX #32
+        BCC palette_loop
+
+    ;clear stuff
+    JSR ppu_off
+    JSR clear_nametable
+    JSR ppu_update
+
+    JSR clear_changed_tiles_buffer
+
+    ;set an initial randomseed value - must be non zero
+    LDA #$10
+    STA RandomSeed
+
+    LDA #$FF
+    STA player_row
+    STA player_collumn
+    
+
+    
+    ;run test code
+    ;JSR test_frontier ;test code
+    ; JSR test_queue
+
+    ;start generation immediately
+    LDA #0
+    STA current_game_mode
+    STA has_started
+
+    JSR reset_generation
+
+    ;set gamemode
+    LDA #1
+    STA is_hard_mode
+            
+    LDA #0
+    STA solve_mode
+
+    RTS
+.endproc
+;*****************************************************************
+
+;*****************************************************************
 ; Main Gameloop
 ;*****************************************************************
 .segment "CODE"
@@ -143,11 +195,11 @@ irq:
                     LDA #0
                     STA has_started
 
-                    ; LDA #1 ;set the gamemode to playing
-                    ; STA current_game_mode
-
-                    LDA #2 ;set the gamemode to solving
+                    LDA #1 ;set the gamemode to playing
                     STA current_game_mode
+
+                    ; LDA #2 ;set the gamemode to solving
+                    ; STA current_game_mode
                 :
 
                 JMP @END
@@ -174,12 +226,19 @@ irq:
                 LDA has_started
                 CMP #0
                 BNE :+ 
-                    ; start function if necessary to setup gameplay
+                    JSR start_game
                     LDA #1
                     STA has_started ;set started to 1 so that we start drawing the sprite
                 :
 
                 JSR update_player_sprite
+                
+                ; are we in hard mode?
+                LDA is_hard_mode
+                CMP #0
+                BEQ :+
+                    JSR update_visibility
+                :
 
                 ; Has the player reached the end?
                 LDA player_row
@@ -281,56 +340,6 @@ irq:
 ;*****************************************************************
 
 ;*****************************************************************
-; Init
-;*****************************************************************
-.segment "CODE"
-.proc Init
-    LDX #0
-    palette_loop:
-        LDA default_palette, x  ;load palettes
-        STA palette, x
-        INX
-        CPX #32
-        BCC palette_loop
-
-    ;clear stuff
-    JSR ppu_off
-    JSR clear_nametable
-    JSR ppu_update
-
-    JSR clear_changed_tiles_buffer
-
-    ;set an initial randomseed value - must be non zero
-    LDA #$10
-    STA RandomSeed
-
-    LDA #$FF
-    STA player_row
-    STA player_collumn
-    
-    ;run test code
-    ;JSR test_frontier ;test code
-    ; JSR test_queue
-
-    ;start generation immediately
-    LDA #0
-    STA current_game_mode
-    STA has_started
-
-    JSR reset_generation
-
-    ;set gamemode
-    LDA #0
-    STA is_hard_mode
-            
-    LDA #0
-    STA solve_mode
-
-    RTS
-.endproc
-;*****************************************************************
-
-;*****************************************************************
 ; Start
 ;       Gets called multiple times per frame
 ;*****************************************************************
@@ -392,5 +401,16 @@ loop:
 
     RTS
 .endproc
+
+.proc start_game
+    
+    LDA is_hard_mode
+    CMP #0
+    BEQ :+
+        JSR display_clear_map
+        JSR start_hard_mode
+    :
+    RTS
+.endproc 
 
 ;*****************************************************************

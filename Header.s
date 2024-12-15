@@ -250,6 +250,7 @@ temp_player_row:        .res 1
 added_high:             .res 1
 added_low:              .res 1 ;these 2 are to make sure add score works correctly
 
+
 ;*****************************************************************
 
 .segment "OAM"

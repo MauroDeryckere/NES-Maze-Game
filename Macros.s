@@ -904,7 +904,7 @@
     ADC a_val
 .endmacro
 
-;remainder in X, quotiennt in A
+;remainder currently not stored but can be stored if necessaery (check comment - done label) quotient in A
 .macro divide10 value
         ;with help from chatGPT
         LDY #0          ; Initialize Y (Quotient) to 0
@@ -932,7 +932,7 @@
         ADC #10
     .local Done
     Done:
-        TAX   ; Store the remainder (A)
+        ;TAX   ; Store the remainder (A)
         TYA     ; Store the quotient (Y)
 
 .endmacro
