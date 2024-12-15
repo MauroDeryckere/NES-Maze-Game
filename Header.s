@@ -99,7 +99,7 @@ RIGHT_N = 1
 BOTTOM_N = 2
 LEFT_N = 3
 
-; directions for leftHandRule
+; directions for solving
 TOP_D = 0
 RIGHT_D = 1
 BOTTOM_D = 2
@@ -167,6 +167,8 @@ random_seed:			.res 1 ; Initial seed value | Used internally for random function
 ;gameplay flags
 odd_frontiers: 			.res 1 ;was the maze generated with odd or even frontier rows
 checked_this_frame:     .res 1 ;has code been executed during this frame
+
+display_BFS_directions: .res 1 ;display directions instead of just 'red cells' for BFS field
 
 input_game_mode:        .res 1  ; game mode the game was started with
                                 ; 000G HSSS
