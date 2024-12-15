@@ -438,6 +438,8 @@ exit_title_loop:
 
     LDA #0                      ;temp
     STA current_game_mode
+    STA has_started
+    JSR reset_generation
 
 .endproc
 
