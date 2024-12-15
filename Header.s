@@ -137,8 +137,7 @@ INES_SRAM = 0                                                       ; 1 = batter
 .byte $0, $0, $0, $0, $0, $0, $0, $0                                ; padding
 
 .segment "TILES"
-; .incbin "Tiles.chr"
-.incbin "Tiles2.chr"    ;Tiles2 is another font, testing to see if it reads better
+.incbin "Tiles3.chr"    ;Tiles2 is another font, testing to see if it reads better
 
 .segment "VECTORS"
 .word nmi
@@ -157,6 +156,7 @@ ppu_ctl1:		    	.res 1 ; PPU Control Register 2 Value
 
 ;input
 gamepad:		    	.res 1 ; stores the current gamepad values
+gamepad_prev:		    	.res 1 ; stores the previous gamepad values
 
 frame_counter: 			.res 1
 last_frame_ct: 			.res 1 ;for things we want to execute once per frame
@@ -265,7 +265,7 @@ temp_player_row:        .res 1
 added_high:             .res 1
 added_low:              .res 1 ;these 2 are to make sure add score works correctly
 
-
+is_past_start_screen:     .res 1
 ;*****************************************************************
 
 .segment "OAM"

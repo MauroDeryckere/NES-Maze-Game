@@ -39,9 +39,22 @@ irq:
     LDA #0
     STA checked_this_frame
 
+    LDA is_past_start_screen
+    CMP #0
+    BEQ draw_start_screen
+
     JSR draw_background
     JSR draw_player_sprite
     JSR display_score
+
+    JMP skip_start_screen
+    
+draw_start_screen:
+
+    JSR display_Start_screen
+    JSR draw_player_sprite
+
+skip_start_screen:
 
     ; transfer sprite OAM data using DMA
 	LDX #0
@@ -107,6 +120,10 @@ irq:
     ;clear stuff
     JSR ppu_off
     JSR clear_nametable
+
+    LDA #0
+    STA is_past_start_screen
+
     JSR ppu_update
 
     JSR clear_changed_tiles_buffer
@@ -115,12 +132,16 @@ irq:
     LDA #$10
     STA random_seed
 
-    LDA #$FF
+    LDA #14
     STA player_row
+    LDA #14
     STA player_collumn
 
+    LDA #2
+    STA player_dir
+
     ;start generation immediately
-    LDA #0
+    LDA #3
     STA current_game_mode
     STA has_started
 
@@ -131,10 +152,9 @@ irq:
     ;JSR test_queue
 
     ;     000GHSSS
-    LDA #%00001000
+    LDA #%00000000
     EOR #HARD_MODE_MASK
     EOR #GAME_MODE_MASK
-    ;EOR #SOLVE_MODE_MASK
 
     STA input_game_mode
 
@@ -148,6 +168,8 @@ irq:
 .segment "CODE"
 .proc main
     JSR init
+
+    JSR title_screen
 
     mainloop:
         INC random_seed  ; Chnage the random seed as many times as possible per frame
@@ -362,6 +384,60 @@ irq:
 .endproc
 ;*****************************************************************
 
+.proc title_screen
+
+titleloop:
+	jsr gamepad_poll
+    lda gamepad     
+    and #PAD_D
+    beq NOT_GAMEPAD_DOWN 
+
+    lda gamepad_prev            
+    and #PAD_D                  
+    bne NOT_GAMEPAD_DOWN
+        LDA player_row
+        CMP #16
+        BEQ :+
+            INC player_row
+        :
+
+    NOT_GAMEPAD_DOWN: 
+    lda gamepad     
+    and #PAD_U
+    beq NOT_GAMEPAD_UP
+
+    lda gamepad_prev            
+    and #PAD_U           
+    bne NOT_GAMEPAD_UP
+        LDA player_row
+        CMP #14
+        BEQ :+
+            DEC player_row
+        :
+
+    NOT_GAMEPAD_UP: 
+
+
+    LDA #2
+    STA player_dir
+
+    lda gamepad
+    sta gamepad_prev
+
+	and #PAD_A
+	beq exit_title_loop
+
+    JMP titleloop
+
+exit_title_loop:
+    LDA #1
+    STA is_past_start_screen
+
+.endproc
+
+
+
+
 ;*****************************************************************
 ; Start
 ;       Gets called multiple times per frame
@@ -434,3 +510,79 @@ loop:
     RTS
 .endproc 
 ;*****************************************************************
+
+;*****************************************************************
+;Start Screen code
+;*****************************************************************
+.segment "CODE"
+.proc display_Start_screen
+	; Write top border
+	vram_set_address (NAME_TABLE_0_ADDRESS + 13 * 32 + 13)
+	assign_16i paddr, top_border
+	jsr write_text
+
+	; Write play button
+	vram_set_address (NAME_TABLE_0_ADDRESS + 14 * 32 + 13)
+	assign_16i paddr, play_text
+	jsr write_text
+
+	; Write auto button
+	vram_set_address (NAME_TABLE_0_ADDRESS + 15 * 32 + 13)
+	assign_16i paddr, auto_text
+	jsr write_text
+
+	; Write hard button
+	vram_set_address (NAME_TABLE_0_ADDRESS + 16 * 32 + 13)
+	assign_16i paddr, hard_text
+	jsr write_text
+
+	; Write bottom border
+	vram_set_address (NAME_TABLE_0_ADDRESS + 17 * 32 + 13)
+	assign_16i paddr, bottom_border
+	jsr write_text
+
+	; ; Write our press play text
+	; vram_set_address (NAME_TABLE_0_ADDRESS + 20 * 32 + 6)
+	; assign_16i paddr, press_play_text
+	; jsr write_text
+
+	; ; Set the title text to use the 2nd palette entries
+	; vram_set_address (ATTRIBUTE_TABLE_0_ADDRESS + 8)
+	; assign_16i paddr, title_attributes
+;     ldy #0
+; loop:
+; 	lda (paddr),y
+; 	sta PPU_VRAM_IO
+; 	iny
+; 	cpy #8
+; 	bne loop
+
+	;jsr ppu_update ; Wait until the screen has been drawn
+
+	rts
+.endproc
+
+.segment "CODE"
+.proc write_text
+	ldy #0
+loop:
+	lda (paddr),y ; get the byte at the current source address
+	beq exit ; exit when we encounter a zero in the text
+    SBC #$11
+	sta PPU_VRAM_IO ; write the byte to video memory
+	iny
+	jmp loop
+exit:
+	rts
+.endproc
+
+top_border:
+.byte $83, $82, $82, $82, $82, $82, $82, $82, $86, 0
+play_text:
+.byte $81, $48, "p", "l", "a", "y", $48, $48, $85, 0
+auto_text:
+.byte $81, $48, "a", "u", "t", "o", $48, $7B, $85, 0
+hard_text:
+.byte $81, $48, "h", "a", "r", "d", $48, $7B, $85, 0
+bottom_border:
+.byte $84, $87, $87, $87, $87, $87, $87, $87, $88, 0
