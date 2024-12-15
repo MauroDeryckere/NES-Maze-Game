@@ -49,10 +49,15 @@ irq:
     JMP skip_start_screen
     
 draw_start_screen:
-    JSR display_Start_screen
-    JSR draw_player_sprite
-    JSR draw_title_settings
-
+    LDA has_started
+    CMP #1
+    BEQ :+
+        INC temp_player_collumn ; tep var to maintain how many times weve executed
+        JSR display_Start_screen
+        JSR draw_title
+    :   
+        JSR draw_player_sprite
+        JSR draw_title_settings
 skip_start_screen:
 
     ; transfer sprite OAM data using DMA
@@ -141,8 +146,8 @@ skip_start_screen:
     LDA #0
     STA current_game_mode
     STA has_started
-
-    JSR reset_generation
+    STA temp_player_collumn
+    STA temp_player_row
             
     ;run test code
     ;JSR test_frontier ;test code
@@ -459,7 +464,7 @@ skip_start_screen:
 
         and #PAD_A
         bne exit_title_loop
-
+    
         JMP titleloop
 
     exit_title_loop:
@@ -605,6 +610,9 @@ loop:
 ;*****************************************************************
 .segment "CODE"
 .proc display_Start_screen
+    LDA temp_player_collumn
+    CMP #2
+    BEQ @half_way
 	; Write top border
 	vram_set_address (NAME_TABLE_0_ADDRESS + 13 * 32 + 11)
 	assign_16i paddr, top_border
@@ -615,6 +623,9 @@ loop:
 	assign_16i paddr, play_text
 	jsr write_text
 
+    RTS
+
+    @half_way: 
 	; Write auto button
 	vram_set_address (NAME_TABLE_0_ADDRESS + 15 * 32 + 11)
 	assign_16i paddr, auto_text
@@ -630,24 +641,8 @@ loop:
 	assign_16i paddr, bottom_border
 	jsr write_text
 
-	; ; Write our press play text
-	; vram_set_address (NAME_TABLE_0_ADDRESS + 20 * 32 + 6)
-	; assign_16i paddr, press_play_text
-	; jsr write_text
-
-	; ; Set the title text to use the 2nd palette entries
-	; vram_set_address (ATTRIBUTE_TABLE_0_ADDRESS + 8)
-	; assign_16i paddr, title_attributes
-;     ldy #0
-; loop:
-; 	lda (paddr),y
-; 	sta PPU_VRAM_IO
-; 	iny
-; 	cpy #8
-; 	bne loop
-
-	;jsr ppu_update ; Wait until the screen has been drawn
-
+    LDA #1
+    STA has_started
 	rts
 .endproc
 
@@ -657,12 +652,62 @@ loop:
 loop:
 	lda (paddr),y ; get the byte at the current source address
 	beq exit ; exit when we encounter a zero in the text
+    SEC
     SBC #$11
 	sta PPU_VRAM_IO ; write the byte to video memory
 	iny
 	jmp loop
 exit:
 	rts
+.endproc
+
+.proc draw_title
+    LDA temp_player_collumn
+    CMP #2
+    BEQ @halfway
+
+    vram_set_address (NAME_TABLE_0_ADDRESS + 1 * 32 + 1)
+	assign_16i paddr, titlebox_line_1
+	JSR write_text
+    vram_set_address (NAME_TABLE_0_ADDRESS + 2 * 32 + 1)
+	assign_16i paddr, titlebox_line_2
+	JSR write_text
+
+
+    vram_set_address (NAME_TABLE_0_ADDRESS + 3 * 32 + 1)
+	assign_16i paddr, title_line_1
+	JSR write_text
+    vram_set_address (NAME_TABLE_0_ADDRESS + 4 * 32 + 1)
+	assign_16i paddr, title_line_2
+	JSR write_text
+    vram_set_address (NAME_TABLE_0_ADDRESS + 5 * 32 + 1)
+	assign_16i paddr, title_line_3
+	JSR write_text
+
+    RTS
+    @halfway: 
+
+    vram_set_address (NAME_TABLE_0_ADDRESS + 6 * 32 + 1)
+	assign_16i paddr, title_line_4
+	JSR write_text
+    vram_set_address (NAME_TABLE_0_ADDRESS + 7 * 32 + 1)
+	assign_16i paddr, title_line_5
+	JSR write_text
+    vram_set_address (NAME_TABLE_0_ADDRESS + 8 * 32 + 1)
+	assign_16i paddr, title_line_6
+	JSR write_text
+
+    vram_set_address (NAME_TABLE_0_ADDRESS + 9 * 32 + 1)
+	assign_16i paddr, titlebox_line_3
+	JSR write_text
+    vram_set_address (NAME_TABLE_0_ADDRESS + 10 * 32 + 1)
+	assign_16i paddr, titlebox_line_4
+	JSR write_text
+
+    LDA #1
+    STA has_started
+
+    RTS
 .endproc
 
 top_border:
@@ -675,3 +720,26 @@ hard_text:
 .byte $81, $48, $48, "h", "a", "r", "d", $48, $7A, $85, 0
 bottom_border:
 .byte $84, $87, $87, $87, $87, $87, $87, $87, $87, $88, 0
+
+titlebox_line_1:
+.byte $11,$15,  $11, $11, $17, $17, $17,  $11,$11,    $17, $17, $15, $15, $11,    $11,$11,    $15, $11, $11, $15, $15,    $11,$11,    $15, $11, $15, $11, $11,  $11,$11, 0
+titlebox_line_2:
+.byte $11,$15,  $15, $15, $15, $17, $17,  $15,$15,    $15, $17, $17, $15, $15,    $11,$11,    $15, $15, $15, $15, $15,    $15,$15,    $15, $16, $16, $15, $15,  $15,$11, 0
+
+title_line_1: 
+.byte $15,$15,  $14, $14, $15, $14, $14,  $15,$15,    $15, $14, $14, $14, $15,    $11,$15,    $14, $14, $14, $14, $14,    $15,$15,    $14, $14, $14, $14, $14,  $15,$11, 0
+title_line_2: 
+.byte $17,$15,  $14, $14, $14, $14, $14,  $17,$17,    $14, $14, $15, $14, $14,    $11,$15,    $14, $15, $15, $14, $14,    $17,$17,    $14, $14, $15, $15, $14,  $15,$15, 0
+title_line_3: 
+.byte $17,$15,  $14, $15, $14, $15, $14,  $15,$17,    $14, $15, $15, $15, $14,    $17,$15,    $16, $15, $14, $14, $15,    $15,$17,    $16, $14, $14, $15, $17,  $15,$15, 0
+title_line_4: 
+.byte $15,$17,  $14, $15, $15, $15, $14,  $15,$15,    $14, $14, $14, $14, $14,    $16,$16,    $16, $14, $14, $15, $15,    $15,$15,    $15, $14, $14, $17, $17,  $17,$15, 0
+title_line_5: 
+.byte $15,$15,  $14, $15, $15, $15, $14,  $15,$15,    $14, $15, $15, $16, $14,    $16,$16,    $14, $14, $15, $15, $14,    $15,$15,    $15, $14, $15, $15, $14,  $15,$11, 0
+title_line_6: 
+.byte $11,$16,  $14, $16, $15, $15, $14,  $15,$15,    $14, $15, $15, $15, $14,    $15,$16,    $14, $14, $14, $14, $14,    $15,$15,    $14, $14, $14, $14, $14,  $15,$11, 0
+
+titlebox_line_3:
+.byte $11,$16,  $16, $16, $11, $11, $15,  $15,$15,    $15, $15, $15, $15, $15,    $15,$15,    $15, $15, $15, $15, $15,    $15,$15,    $15, $17, $17, $17, $17,  $17,$11, 0
+titlebox_line_4:
+.byte $11,$11,  $11, $11, $11, $11, $11,  $15,$15,    $15, $15, $15, $15, $15,    $15,$15,    $15, $15, $11, $11, $11,    $11,$15,    $15, $15, $17, $17, $11,  $11,$11, 0

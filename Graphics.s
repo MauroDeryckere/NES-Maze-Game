@@ -293,9 +293,9 @@ wait_vblank2:
     ; only show sprite when not in generating mode or paused mode
     LDA current_game_mode
     CMP #1
-    BEQ :+
-    CMP #4
     BEQ :++
+    CMP #4
+    BEQ :+++
 
     ldx #0 
 
@@ -317,12 +317,24 @@ wait_vblank2:
     lda #%00000000 ;flip bits to set certain sprite attributes
     sta oam, x
     inx
+    
+    LDA player_collumn   ;X coordinate
+    ASL
+    ASL
+    ASL
+    TAY
 
-    lda player_collumn   ;X coordinate
-    ASL
-    ASL
-    ASL
-    sta oam, x
+    LDA current_game_mode
+    CMP #0
+    BNE :+
+        TYA
+        SEC
+        SBC #4
+        CLC
+        TAY
+    :
+    TYA
+    STA oam, x
     ;INX to go to the next sprite location 
 
     RTS
