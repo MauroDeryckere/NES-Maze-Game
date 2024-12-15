@@ -400,7 +400,6 @@ skip_start_screen:
 ;*****************************************************************
 
 .proc title_screen
-
     titleloop:
         jsr gamepad_poll
         lda gamepad     
@@ -476,11 +475,14 @@ skip_start_screen:
         STA current_game_mode
         STA has_started
         JSR reset_generation
-
 .endproc
 
 
 .proc draw_title_settings
+    LDA is_past_start_screen
+    CMP #1
+    BEQ EXIT
+
 
     LDA input_game_mode
     AND #GAME_MODE_MASK
