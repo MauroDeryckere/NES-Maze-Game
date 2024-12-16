@@ -112,11 +112,11 @@ FAMISTUDIO_USE_FDS_AUTOMOD  = 1
 
 ; ; Must be enabled if your project uses more than 63 unique DPCM mappings (a mapping is DPCM sample
 ; ; assigned to a note, with a specific pitch/loop, etc.). Implied when using FAMISTUDIO_USE_DPCM_BANKSWITCHING.
- FAMISTUDIO_USE_DPCM_EXTENDED_RANGE = 1
+ ; FAMISTUDIO_USE_DPCM_EXTENDED_RANGE = 1
 
 ; Allows having up to 256 instrument at the cost of slightly higher CPU usage when switching instrument.
 ; When this is off, the limit is 64 for regular instruments and 32 for expansion instrumnets.
-; FAMISTUDIO_USE_INSTRUMENT_EXTENDED_RANGE = 1
+FAMISTUDIO_USE_INSTRUMENT_EXTENDED_RANGE = 1
 
 ; FAMISTUDIO_CFG_EQUALIZER = 1 ; allows relative volme control of sound channel
 ; FAMISTUDIO_USE_VOLUME_TRACK = 1 ;for when the effects/music control the volume 
