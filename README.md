@@ -10,10 +10,9 @@ In game: <br>
   &nbsp;&nbsp;&nbsp;&nbsp;Start: Pause game <br>
   &nbsp;&nbsp;&nbsp;&nbsp;DPAD: Move UP/RIGHT/DOWN/LEFT <br> <br>
 
+Reach the end of the maze to finish the level.
+
   ## Participants
   &nbsp;&nbsp;&nbsp;&nbsp; Mauro Deryckere <br>
   &nbsp;&nbsp;&nbsp;&nbsp; Seppe Mestdagh <br>
   &nbsp;&nbsp;&nbsp;&nbsp; Aaron Van Sichem De Combe<br>
-  
-
-Reach the end of the maze to finish the level.
