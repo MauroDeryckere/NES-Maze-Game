@@ -549,30 +549,7 @@
     ;col
     LDA FRONTIER_LISTQ1, X
     TAX
-
-    JMP end
-
     :
-    CMP #1
-    BNE :+
-
-    ; Calculate the address of the item in the list
-    LDA offset
-    ASL
-
-    TAX
-
-    ;row
-    LDA FRONTIER_LISTQ2, X
-    TAY
-    INX
-
-    ;col
-    LDA FRONTIER_LISTQ2, X
-    TAX        
-
-    .local end
-    end: 
 
 .endmacro
 
@@ -588,7 +565,7 @@
         BNE :+
             LDX #0
             STX temp
-            JMP loop_p1
+            JMP return_not_found
         :
         
         access_Frontier #0, temp
@@ -601,30 +578,6 @@
         CPX Col
         BEQ :+
             JMP loop_p0
-        :
-
-        JMP return_found
-
-    .local loop_p1
-    loop_p1:        
-        LDX temp
-        CPX frontier_listQ2_size
-        BNE :+
-            LDX #0
-            STX temp
-            JMP return_not_found
-        :
-        
-        access_Frontier #1, temp
-        INC temp
-        
-        CPY Row
-        BEQ :+
-            JMP loop_p1
-        :
-        CPX Col
-        BEQ :+
-            JMP loop_p1
         :
 
         JMP return_found
@@ -697,60 +650,7 @@
 
 
         DEC frontier_listQ1_size
-        JMP end    ;jump to end
     :
-    CMP #1
-    BNE :+      ;remove from page 1? (Q2)
-        ; Calculate the address of the last item in the list
-        LDA frontier_listQ2_size
-
-        TAX
-        DEX ;decrease size by 1 before multiplying (otherwise we will go out of bounds since size 1 == index 0 )
-        TXA
-
-        ASL
-        TAX ;calculated address offset for last item in X
-
-        LDA FRONTIER_LISTQ2, X ; store last items in temp values
-        STA a_val
-    
-        INX
-        LDA FRONTIER_LISTQ2, X ; store last items in temp values
-        STA b_val
-
-        ; Calculate the address to be removed
-        LDA offset
-        ASL
-        TAX
-
-        LDA a_val
-        STA FRONTIER_LISTQ2, X
-        INX 
-        LDA b_val
-        STA FRONTIER_LISTQ2, X
-
-
-        ; ; in case you want to replace the garbage at end with FF for debugging (clear values)
-        ; LDA frontier_listQ2_size
-
-        ; TAX
-        ; DEX ;decrease size by 1 before multiplying (otherwise we will go out of bounds since size 1 == index 0 )
-        ; TXA
-
-        ; ASL
-        ; TAX ;calculated address offset for last item in X
-
-        ; LDA #$FF
-        ; STA FRONTIER_LISTQ2, X 
-        ; INX
-        ; LDA #$FF
-        ; STA FRONTIER_LISTQ2, X
-
-
-        DEC frontier_listQ2_size
-        JMP end    ;jump to end
-    .local end
-    end: 
 .endmacro
 
 ;Defintion of row and col can be found in the map buffer section.
@@ -770,26 +670,7 @@
         STA FRONTIER_LISTQ1, X
 
         INC frontier_listQ1_size   
-        JMP end                   ;jump to end
     :
-    ;multiply current size of Q2 by 2, 2 bytes required per element in list
-    LDA frontier_listQ2_size
-    ASL
-
-    CMP #%11111110      ;check if it should be added to Q2 or not
-    BEQ :+
-
-        TAX
-        LDA Row
-        STA FRONTIER_LISTQ2, X
-        INX
-        LDA Col
-        STA FRONTIER_LISTQ2, X
-
-        INC frontier_listQ2_size   
-
-        .local end
-        end: 
 .endmacro
 ;*****************************************************************
 
@@ -807,88 +688,18 @@
 
 .endmacro
 
-;calculates how many frontier list pages are used and stores it in the variable in zero page.
-.macro calculate_pages_used
-    ;calculate how many pages are currently in use
-    LDX #0
-
-    LDA frontier_listQ1_size
-    CMP #0
-    BEQ :+
-    INX
-    
-    :
-    LDA frontier_listQ2_size
-    CMP #0
-    BEQ :+
-    INX
-    
-    :
-    ;store the pages that are used 
-    STX frontier_pages_used
-.endmacro
-
 ;stores a random frontier page in a_val and a random offset from that page into b_val, then calls access_frontier on that tile
 .macro get_random_frontier_tile
-    calculate_pages_used ;macro calculating how many pages are used, in the final project it is possible to just call this once per frame after any adding / removing to 'optimize' slightly
-
-    ;random number for page
-    JSR random_number_generator
-
-    ;clamp page
-    modulo random_seed, frontier_pages_used
-    STA a_val
-
     ;random number for offset
     JSR random_number_generator
 
-    ;pages checked stored in y
-    LDY #0
+    ;clamp the offset
+    modulo random_seed, frontier_listQ1_size
+    STA b_val
+    LDA #0
+    STA a_val
 
-    ;pick the page with a size larger > 0 corresponding to a_val
-    ;page 0: 
-    LDA frontier_listQ1_size
-    CMP #0
-    BEQ page1
-        ;page has items in it, check if we should use this page
-        TYA
-        CMP a_val
-        BNE incP1
-            ;clamp the offset
-            modulo random_seed, frontier_listQ1_size
-            STA b_val
-            LDA #0
-            STA a_val
-            JMP endSwitch
-    .local incP1
-    incP1:
-    ;increase checked pages
-    INY
-
-    .local page1
-    page1: 
-    LDA frontier_listQ2_size
-    CMP #0
-    BEQ endSwitch
-        ;page has items in it, check if we should use this page
-        TYA
-        CMP a_val
-        BNE incP2
-            ;clamp the offset
-            modulo random_seed, frontier_listQ2_size
-            STA b_val
-            LDA #1
-            STA a_val
-            JMP endSwitch
-    .local incP2
-    incP2:
-    ;increase checked pages
-    INY
-
-    .local endSwitch
-    endSwitch:
-        access_Frontier a_val, b_val
-
+    access_Frontier a_val, b_val
 .endmacro
 
 

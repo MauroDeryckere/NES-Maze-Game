@@ -69,7 +69,6 @@ MAP_ROWS = 30
 
 ; FRONTIER LIST ; maintain 2 pages to be sure but there are no cases that surpas 1 page at the moment
 FRONTIER_LISTQ1 = $0320
-FRONTIER_LISTQ2 = $041E ; Q1 not in use! fix later todo
 ; next available address == $041E
 
 ; VISITED CELLS BUFFER
@@ -213,8 +212,6 @@ high_byte: 				.res 1
 
 ;frontier list specific
 frontier_listQ1_size:	.res 1 ; | Internal use for frontier list, do not overwrite
-frontier_listQ2_size:	.res 1 ; | Internal use for frontier list, do not overwrite
-frontier_pages_used:	.res 1 ; | Internal use for frontier list, do not overwrite
 
 ;temporary values used in macros, ... - have to check when you use these in other routines if they arent used anywhere internally
 x_val:					.res 1 ;x and y value stored in zero page for fast accesss when it's necessary to store these

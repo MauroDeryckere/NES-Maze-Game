@@ -82,13 +82,10 @@
 
 .segment "CODE"
 .proc run_prims_maze
-    ;calculate pages used to see if all are empty - if so the maze is finished
-    calculate_pages_used
-    LDA frontier_pages_used
+    LDA frontier_listQ1_size ; if empty end algorithm
     BNE :+
         ;return with FF in A reg to show we are done with algorithm
         LDA #$FF
-
         RTS ;early return if finished
     :
 
