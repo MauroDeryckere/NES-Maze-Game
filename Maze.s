@@ -21,6 +21,7 @@
 ;*****************************************************************
 .include "famistudio_ca65.s"
 .include "SoundEffects.s"
+.include "GameMusic.s"
 
 ;*****************************************************************
 ; Interupts | Vblank
@@ -183,10 +184,6 @@ skip_start_screen:
     ldy #.hibyte(sounds)
     jsr famistudio_sfx_init
 
-    lda #FAMISTUDIO_SFX_CH0
-    sta sfx_channel
-    lda #0
-    jsr play_sound_effect
 
 
     RTS
@@ -235,6 +232,12 @@ skip_start_screen:
                 LDA has_started
                 CMP #0
                 BNE :+
+
+                    ;PLAY MAZE GENERATION SOUND ONCE WHEN GENERATING
+                    lda #FAMISTUDIO_SFX_CH0
+                    sta sfx_channel
+                    lda #0
+                    jsr play_sound_effect
 
                     JSR start_prims_maze
                     LDA #1
@@ -464,6 +467,9 @@ skip_start_screen:
         lda gamepad_prev            
         and #PAD_START              
         bne NOT_GAMEPAD_START
+
+
+
             LDA current_game_mode
             CMP #4
             BNE is_not_paused
@@ -553,9 +559,33 @@ loop:
             beq NOT_GAMEPAD_SELECT
 
             ; select pressed
+
+
+        CheckAndPlaySound:
+            LDA sound_played   ; Check if sound has already been played
+            BEQ PlaySoundOnce  ; If not, play the sound
+
+            jmp Resume         ; continue if already played
+
+        PlaySoundOnce:
+            ; PLAY START SOUND
+            LDA #FAMISTUDIO_SFX_CH1
+            STA sfx_channel
+            LDA #2
+            JSR play_sound_effect
+
+            ; Set the flag to indicate the sound was played
+            LDA #$01
+            STA sound_played
+
+        Resume:
+
             lda gamepad_prev            
             and #PAD_SELECT  
             bne NOT_GAMEPAD_SELECT
+            lda #0
+            sta sound_played ;reset sound_played flag
+
                 LDA player_row
                 CMP #18
                 BNE NOT_PLAY
@@ -588,11 +618,28 @@ loop:
 
         ; Pressing start starts the game
         and #PAD_START
+
         bne exit_title_loop
-    
+
+
         JMP titleloop
 
     exit_title_loop:
+
+        ;PLAY START SOUND
+        lda #FAMISTUDIO_SFX_CH1
+        sta sfx_channel
+        lda #2
+        jsr play_sound_effect
+
+    Delay2Seconds:
+        LDX #50         ; Set delay counter to 50 frames (1 sec)
+    DelayLoop:
+        JSR wait_frame  ; Wait for a frame (assuming you have a WaitFrame routine)
+        DEX             ; Decrease frame counter
+        BNE DelayLoop   ; Loop until counter reaches 0
+
+
         LDA #1
         STA current_game_mode ; back to generating
 
