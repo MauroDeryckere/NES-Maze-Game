@@ -528,13 +528,9 @@
 ;*****************************************************************
 ; Frontier list macros
 ;*****************************************************************
-;page 0 - 1 | offset 0-127
+; offset 0-127
 ;loads the row in the X register, col in the Y register
-.macro access_Frontier page, offset
-    LDA page
-    CMP #0
-    BNE :+
-
+.macro access_Frontier offset
     ; Calculate the address of the item in the list
     LDA offset
     ASL
@@ -549,7 +545,6 @@
     ;col
     LDA FRONTIER_LISTQ1, X
     TAX
-    :
 
 .endmacro
 
@@ -568,7 +563,7 @@
             JMP return_not_found
         :
         
-        access_Frontier #0, temp
+        access_Frontier temp
         INC temp
         
         CPY Row
@@ -596,61 +591,56 @@
     n: 
 .endmacro
 
-; page 0 - 1 | offset 0-127
+; offset 0-127
 ; basically uses the "swap and pop" technique of a vector in C++
-.macro remove_from_Frontier page, offset
-    LDA page
-    CMP #0
-    BNE :+      ;remove from page 0? (Q1)
+.macro remove_from_Frontier offset
+    ; Calculate the address of the last item in the list
+    LDA frontier_listQ1_size
 
-        ; Calculate the address of the last item in the list
-        LDA frontier_listQ1_size
+    TAX
+    DEX ;decrease size by 1 before multiplying (otherwise we will go out of bounds since size 1 == index 0 )
+    TXA
 
-        TAX
-        DEX ;decrease size by 1 before multiplying (otherwise we will go out of bounds since size 1 == index 0 )
-        TXA
+    ASL
+    TAX ;calculated address offset for last item in X
 
-        ASL
-        TAX ;calculated address offset for last item in X
+    LDA FRONTIER_LISTQ1, X ; store last items in temp values
+    STA a_val
 
-        LDA FRONTIER_LISTQ1, X ; store last items in temp values
-        STA a_val
-    
-        INX
-        LDA FRONTIER_LISTQ1, X ; store last items in temp values
-        STA b_val
+    INX
+    LDA FRONTIER_LISTQ1, X ; store last items in temp values
+    STA b_val
 
-        ; Calculate the address to be removed
-        LDA offset
-        ASL
-        TAX
+    ; Calculate the address to be removed
+    LDA offset
+    ASL
+    TAX
 
-        LDA a_val
-        STA FRONTIER_LISTQ1, X
-        INX 
-        LDA b_val
-        STA FRONTIER_LISTQ1, X
+    LDA a_val
+    STA FRONTIER_LISTQ1, X
+    INX 
+    LDA b_val
+    STA FRONTIER_LISTQ1, X
 
 
-        ; ; in case you want to replace the garbage at end with FF for debugging (clear values)
-        ; LDA frontier_listQ1_size
+    ; ; in case you want to replace the garbage at end with FF for debugging (clear values)
+    ; LDA frontier_listQ1_size
 
-        ; TAX
-        ; DEX ;decrease size by 1 before multiplying (otherwise we will go out of bounds since size 1 == index 0 )
-        ; TXA
+    ; TAX
+    ; DEX ;decrease size by 1 before multiplying (otherwise we will go out of bounds since size 1 == index 0 )
+    ; TXA
 
-        ; ASL
-        ; TAX ;calculated address offset for last item in X
+    ; ASL
+    ; TAX ;calculated address offset for last item in X
 
-        ; LDA #$FF
-        ; STA FRONTIER_LISTQ1, X 
-        ; INX
-        ; LDA #$FF
-        ; STA FRONTIER_LISTQ1, X
+    ; LDA #$FF
+    ; STA FRONTIER_LISTQ1, X 
+    ; INX
+    ; LDA #$FF
+    ; STA FRONTIER_LISTQ1, X
 
 
-        DEC frontier_listQ1_size
-    :
+    DEC frontier_listQ1_size
 .endmacro
 
 ;Defintion of row and col can be found in the map buffer section.
@@ -674,7 +664,6 @@
 .endmacro
 ;*****************************************************************
 
-
 ; result = value % modulus
 ; => result is stored in the A register
 .macro modulo value, modulus
@@ -688,7 +677,7 @@
 
 .endmacro
 
-;stores a random frontier page in a_val and a random offset from that page into b_val, then calls access_frontier on that tile
+;stores a random offset into b_val, then calls access_frontier on that tile
 .macro get_random_frontier_tile
     ;random number for offset
     JSR random_number_generator
@@ -696,10 +685,8 @@
     ;clamp the offset
     modulo random_seed, frontier_listQ1_size
     STA b_val
-    LDA #0
-    STA a_val
 
-    access_Frontier a_val, b_val
+    access_Frontier b_val
 .endmacro
 
 
