@@ -203,7 +203,7 @@ skip_start_screen:
     JSR title_screen
 
     mainloop:
-        ;INC random_seed  ; Chnage the random seed as many times as possible per frame
+        INC random_seed  ; Chnage the random seed as many times as possible per frame
         
         LDA current_game_mode
         ;------------;
