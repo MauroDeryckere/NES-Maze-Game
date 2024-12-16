@@ -8,7 +8,6 @@
 sounds:
 	.word @pal
 	.word @pal
-
 @pal:
 	.word @sfx_pal_mazegeneration
 	.word @sfx_pal_scoreincrease
@@ -39,7 +38,7 @@ sounds:
 	.byte $81,$68,$82,$00,$80,$3f,$84,$9d,$85,$00,$83,$3f,$89,$f0,$05,$81
 	.byte $4e,$84,$75,$06,$80,$30,$00
 @sfx_pal_select:
-	.byte $84,$75,$85,$00,$83,$3f,$87,$3a,$88,$00,$86,$8f,$8a,$09,$89,$3f
-	.byte $05,$83,$30,$87,$4e,$89,$f0,$05,$00
+	.byte $84,$45,$85,$00,$83,$3f,$87,$8b,$88,$00,$86,$8f,$8a,$09,$89,$3f
+	.byte $05,$83,$30,$87,$5d,$89,$f0,$05,$00
 
 .export sounds

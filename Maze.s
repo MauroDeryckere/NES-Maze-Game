@@ -17,11 +17,12 @@
 .include "BFS.s"
 
 ;*****************************************************************
-; Include Sound Engine and Sound Effects Data
+; Include Sound Engine, Sound Effects and Music Data
 ;*****************************************************************
 .include "famistudio_ca65.s"
 .include "SoundEffects.s"
 .include "GameMusic.s"
+.include "PlayMusic.s"
 
 ;*****************************************************************
 ; Interupts | Vblank
@@ -172,17 +173,24 @@ skip_start_screen:
     LDA #1 
     STA display_BFS_directions
 
+
 ;-----------------------------------------
-;INITIALIZE SOUND
+;INITIALIZE MUSIC
 ;-----------------------------------------
     lda #1 
-    ldx #0 
-    ldy #0
+    ldx #.lobyte(music_data_duck_tales)
+    ldy #.hibyte(music_data_duck_tales)
     jsr famistudio_init
 
+;-----------------------------------------
+;INITIALIZE SOUNDEFFECTS
+;-----------------------------------------
+ 
     ldx #.lobyte(sounds)
     ldy #.hibyte(sounds)
     jsr famistudio_sfx_init
+
+
 
 
 
@@ -518,7 +526,15 @@ loop:
 
 ;*****************************************************************
 .proc title_screen
+
+    ;------------------------
+    ;PLAY TITLE SCREEN MUSIC
+    ;------------------------
+    lda #0
+    jsr play_music
+
     titleloop:
+
 
         ; UP/DOWN MOVEMENT OF SELECTION
         @UP_DOWN_MOVEMENT: 
@@ -632,6 +648,12 @@ loop:
         lda #2
         jsr play_sound_effect
 
+        ;------------------------
+        ;STOP TITLE SCREEN MUSIC
+        ;------------------------
+        lda #0
+        jsr stop_music
+
     Delay2Seconds:
         LDX #50         ; Set delay counter to 50 frames (1 sec)
     DelayLoop:
@@ -675,26 +697,5 @@ loop:
     RTS
 .endproc 
 
-;----------------------------------
-;ROUTINE TO PLAY SOUNDEFFECT
-;----------------------------------
-.proc play_sound_effect
-
-    sta temp_sound
-    tya 
-    pha
-    txa 
-    pha 
-
-    lda temp_sound
-    ldx sfx_channel
-    jsr famistudio_sfx_play
-
-    pla 
-    tax 
-    pla 
-    tay 
-    rts
-.endproc
 
 ;*****************************************************************
