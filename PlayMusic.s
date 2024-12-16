@@ -105,3 +105,15 @@
     not_backtracking: 
     rts
 .endproc
+
+.proc tiny_delay_for_music
+
+    Delay2Seconds:
+        LDX #50         ; Set delay counter to 50 frames (1 sec)
+    DelayLoop:
+        JSR wait_frame  ; Wait for a frame (assuming you have a WaitFrame routine)
+        DEX             ; Decrease frame counter
+        BNE DelayLoop   ; Loop until counter reaches 0
+        rts
+
+.endproc

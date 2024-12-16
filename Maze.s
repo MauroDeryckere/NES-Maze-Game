@@ -347,6 +347,19 @@ skip_start_screen:
                     LDA #0
                     STA has_started
 
+                    add_score #100
+
+                    ;------------------------
+                    ;PLAY SOUND EFFECT AND STOP PREVIOUS
+                    ;------------------------
+                    lda #2
+                    jsr stop_music
+                    
+                    lda #1
+                    jsr play_sound_effect
+
+                    jsr tiny_delay_for_music
+
                     LDA #1 ;set the gamemode to generating
                     STA current_game_mode
                     JSR reset_generation
@@ -467,7 +480,7 @@ skip_start_screen:
 
                     lda #0
                     sta sound_played2
-                    
+
                     ; back to generating
                     LDA #1 ;set the gamemode to generating
                     STA current_game_mode
@@ -684,12 +697,7 @@ loop:
         lda #0
         jsr stop_music
 
-    Delay2Seconds:
-        LDX #50         ; Set delay counter to 50 frames (1 sec)
-    DelayLoop:
-        JSR wait_frame  ; Wait for a frame (assuming you have a WaitFrame routine)
-        DEX             ; Decrease frame counter
-        BNE DelayLoop   ; Loop until counter reaches 0
+        jsr tiny_delay_for_music
 
 
         LDA #1
