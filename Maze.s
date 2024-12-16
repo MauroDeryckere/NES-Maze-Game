@@ -518,34 +518,40 @@ loop:
                 :
         ;---------------------
 
+        ; SELECTION
+        @SELECTION: 
+            NOT_GAMEPAD_UP: 
+            lda gamepad     
+            and #PAD_SELECT
+            beq NOT_GAMEPAD_SELECT
 
-
-        NOT_GAMEPAD_UP: 
-        lda gamepad     
-        and #PAD_SELECT
-        beq NOT_GAMEPAD_SELECT
-
-        lda gamepad_prev            
-        and #PAD_SELECT  
-        bne NOT_GAMEPAD_SELECT
-            LDA player_row
-            CMP #19
-            BNE NOT_AUTO
-                LDA input_game_mode
-                EOR #%00010000
-                STA input_game_mode
-                JMP NOT_GAMEPAD_SELECT
-            NOT_AUTO:
-            LDA player_row
-            CMP #20
-            BNE NOT_HARD
-                LDA input_game_mode
-                EOR #%00001000
-                STA input_game_mode
-                JMP NOT_GAMEPAD_SELECT
-            NOT_HARD:
+            ; select pressed
+            lda gamepad_prev            
+            and #PAD_SELECT  
+            bne NOT_GAMEPAD_SELECT
+                LDA player_row
+                CMP #18
+                BNE NOT_PLAY
+                    JMP exit_title_loop
+                NOT_PLAY: 
+                LDA player_row
+                CMP #19
+                BNE NOT_AUTO
+                    LDA input_game_mode
+                    EOR #%00010000
+                    STA input_game_mode
+                    JMP NOT_GAMEPAD_SELECT
+                NOT_AUTO:
+                LDA player_row
+                CMP #20
+                BNE NOT_HARD
+                    LDA input_game_mode
+                    EOR #%00001000
+                    STA input_game_mode
+                    JMP NOT_GAMEPAD_SELECT
+                NOT_HARD:
+        ;---------------------------
         NOT_GAMEPAD_SELECT: 
-
 
         LDA #2
         STA player_dir
@@ -553,7 +559,8 @@ loop:
         lda gamepad
         sta gamepad_prev
 
-        and #PAD_A
+        ; Pressing start starts the game
+        and #PAD_START
         bne exit_title_loop
     
         JMP titleloop
