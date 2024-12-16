@@ -13,7 +13,7 @@ In game: <br>
   ## Participants
   &nbsp;&nbsp;&nbsp;&nbsp; Mauro Deryckere <br>
   &nbsp;&nbsp;&nbsp;&nbsp; Seppe Mestdagh <br>
-  &nbsp;&nbsp;&nbsp;&nbsp; Aaron Van Sichem De Combe C<br>
+  &nbsp;&nbsp;&nbsp;&nbsp; Aaron Van Sichem De Combe<br>
   
 
 Reach the end of the maze to finish the level.
