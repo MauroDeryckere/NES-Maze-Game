@@ -310,7 +310,7 @@
     ;remove the chosen frontier cell from the list
     set_map_tile frontier_row, frontier_col
     add_to_changed_tiles_buffer frontier_row, frontier_col, temp
-    remove_from_Frontier frontier_page, frontier_offset
+    remove_from_Frontier frontier_offset
 
     ;return with 0 in A reg to show we are not done with algorithm yet
     LDA #0
