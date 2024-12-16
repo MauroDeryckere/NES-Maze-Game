@@ -274,6 +274,8 @@ added_low:              .res 1 ;these 2 are to make sure add score works correct
 temp_sound:             .res 1
 sfx_channel:            .res 1
 sound_played:           .res 1
+sound_played2:          .res 1
+music_flag:             .res 1
 ;*****************************************************************
 
 .segment "OAM"

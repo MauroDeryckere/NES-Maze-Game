@@ -208,6 +208,7 @@ skip_start_screen:
 
     JSR title_screen
 
+
     mainloop:
         INC random_seed  ; Chnage the random seed as many times as possible per frame
         
@@ -241,6 +242,12 @@ skip_start_screen:
                 LDA has_started
                 CMP #0
                 BNE :+
+
+                    ;------------------------
+                    ;PAUSE TITLE SCREEN MUSIC
+                    ;------------------------
+                    lda #1
+                    jsr pause_music
 
                     ;PLAY MAZE GENERATION SOUND ONCE WHEN GENERATING
                     lda #FAMISTUDIO_SFX_CH0
@@ -305,6 +312,13 @@ skip_start_screen:
                 LDA has_started
                 CMP #0
                 BNE :+ 
+
+                    ;------------------------
+                    ;PLAY TITLE SCREEN MUSIC
+                    ;------------------------
+                    lda #1
+                    jsr play_music   
+
                     JSR start_game
                     LDA #1
                     STA has_started ;set started to 1 so that we start drawing the sprite
@@ -363,6 +377,13 @@ skip_start_screen:
                 LDA has_started
                 CMP #0
                 BNE :++++ 
+
+                    ;------------------------
+                    ;PAUSE TITLE SCREEN MUSIC
+                    ;------------------------
+                    lda #2
+                    jsr play_music
+
                     ;select the solving mode based on hard mode or not
                     LDA input_game_mode
                     AND #CLEAR_SOLVING_MODE_MASK
@@ -407,6 +428,9 @@ skip_start_screen:
                 @BFS_SOLVE: 
                     CMP #0 ;BFS
                     BNE @LFR_SOLVE
+
+                    jsr play_when_backtracking
+
                     JSR step_BFS
 
                     LDA is_backtracking
@@ -440,6 +464,10 @@ skip_start_screen:
                     JMP @END
                 
                 @SOLVE_END_REACHED: 
+
+                    lda #0
+                    sta sound_played2
+                    
                     ; back to generating
                     LDA #1 ;set the gamemode to generating
                     STA current_game_mode
@@ -451,6 +479,7 @@ skip_start_screen:
                     JMP @END
 
         @END: 
+
             JMP mainloop
 .endproc
 ;*****************************************************************
