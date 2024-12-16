@@ -417,58 +417,7 @@ wait_vblank2:
 
     divide10 score_high
 
-    JSR draw_digit
-    ; CLC
-    ; LDA temp
-    ; SBC #SCORE_DIGIT_OFFSET
-    ; STA temp
-
-    ; JSR draw_digit
-    ; CLC
-    ; LDA temp
-    ; ADC #SCORE_DIGIT_OFFSET     ;add 10 for x offset
-    ; STA temp   
-    
-    
-    ; divide10 score_high
-    ; CLC
-    ; CMP #$0A
-    ; BCC skip_modulo
-
-    ; modulo score_high, #$0A
-
-    ; skip_modulo:
-
-    ; JSR draw_digit
-    ; CLC
-    ; LDA temp
-    ; ADC #SCORE_DIGIT_OFFSET
-    ; STA temp    
-
-    ; divide10 score_low
-
-    ; JSR draw_digit
-    ; CLC
-    ; LDA temp
-    ; ADC #SCORE_DIGIT_OFFSET     ;add 10 for x offset
-    ; STA temp   
-    
-    
-    ; divide10 score_low
-    ; CLC
-    ; CMP #$0A
-    ; BCC skip_modulo2
-
-    ; modulo score_low, #$0A
-
-    ; skip_modulo2:
-
-    ; JSR draw_digit
-    ; CLC
-    ; LDA temp
-    ; ADC #SCORE_DIGIT_OFFSET
-    ; STA temp    
-    
+    JSR draw_digit   
     RTS
 .endproc
 
