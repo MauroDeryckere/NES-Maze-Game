@@ -69,23 +69,23 @@ MAP_ROWS = 30
 
 ; FRONTIER LIST ; maintain 2 pages to be sure but there are no cases that surpas 1 page at the moment
 FRONTIER_LISTQ1 = $0320
-FRONTIER_LISTQ2 = $041E
-; next available address == $51C
+FRONTIER_LISTQ2 = $041E ; Q1 not in use! fix later todo
+; next available address == $041E
 
 ; VISITED CELLS BUFFER
-VISISTED_ADDRESS = $051C ; 120 byte buffer same as maze buffer but this stores if a cell is visited (1) or not (0)
+VISISTED_ADDRESS = $041E ; 120 byte buffer same as maze buffer but this stores if a cell is visited (1) or not (0)
 VISITED_BUFFER_SIZE = 120 
-; next available address == $594
+; next available address == $496
 
 ; DIRECTIONS BUFFER
-DIRECTIONS_ADDRESS = $0595
+DIRECTIONS_ADDRESS = $0496
 DIRECTIONS_BUFFER_SIZE = 240
-; next available address == $685
+; next available address == $586
 
 ; Queue data structure constants
-QUEUE_START = $0686 ; start address for the queue 
+QUEUE_START = $0586 ; start address for the queue 
 QUEUE_CAPACITY = $FF ; the maximum capacity of the queue - actual  available size is capacity - 1
-; next available address == $783
+; next available address == $685
 
 ; player directions
 LEFT = 0

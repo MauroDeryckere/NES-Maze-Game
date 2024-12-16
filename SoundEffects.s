@@ -6,8 +6,8 @@
 .endif
 
 sounds:
-	; .word @pal
-	; .word @pal
+	.word @pal
+	.word @pal
 
 @pal:
 	.word @sfx_pal_mazegeneration
