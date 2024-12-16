@@ -213,75 +213,75 @@ wait_vblank2:
 ;handles the background tiles during vblank using the buffers set in zero page
 .proc draw_background
     ;update the map tiles
-    LDY #0
-    maploop: 
-        LDX #0 ; flag wall or not
-        LDA #0
-        STA high_byte
+    ; LDY #0
+    ; maploop: 
+    ;     LDX #0 ; flag wall or not
+    ;     LDA #0
+    ;     STA high_byte
 
-        ;row
-        LDA changed_tiles_buffer, y
-        ;LDA #0
-        CMP #$FF ;end of buffer
-        BEQ done 
-        STA low_byte
+    ;     ;row
+    ;     LDA changed_tiles_buffer, y
+    ;     ;LDA #0
+    ;     CMP #$FF ;end of buffer
+    ;     BEQ done 
+    ;     STA low_byte
 
-        ; clear the flag bit and row
-        AND #%01100000
-        TAX ;Store the 2-bit TileID in X (0-3) - not shifted yet  
+    ;     ; clear the flag bit and row
+    ;     AND #%01100000
+    ;     TAX ;Store the 2-bit TileID in X (0-3) - not shifted yet  
 
 
-        LDA low_byte
-        AND #%00011111 ; Clear the tileID and flag from the row
-        STA low_byte
+    ;     LDA low_byte
+    ;     AND #%00011111 ; Clear the tileID and flag from the row
+    ;     STA low_byte
         
-        CLC
-        ASL low_byte ;x2
-        ROL high_byte
-        ASL low_byte ;x2
-        ROL high_byte
-        ASL low_byte ;x2
-        ROL high_byte
-        ASL low_byte ;x2
-        ROL high_byte
-        ASL low_byte ;x2 == 32
-        ROL high_byte
+    ;     CLC
+    ;     ASL low_byte ;x2
+    ;     ROL high_byte
+    ;     ASL low_byte ;x2
+    ;     ROL high_byte
+    ;     ASL low_byte ;x2
+    ;     ROL high_byte
+    ;     ASL low_byte ;x2
+    ;     ROL high_byte
+    ;     ASL low_byte ;x2 == 32
+    ;     ROL high_byte
 
-        LDA #$20 ;add high byte
-        CLC
-        ADC high_byte
-        STA $2006
+    ;     LDA #$20 ;add high byte
+    ;     CLC
+    ;     ADC high_byte
+    ;     STA $2006
         
-        ;col
-        INY
-        LDA changed_tiles_buffer, y
-        AND #%00011111 ;clear tileID
-        ADC low_byte 
-        STA $2006
+    ;     ;col
+    ;     INY
+    ;     LDA changed_tiles_buffer, y
+    ;     AND #%00011111 ;clear tileID
+    ;     ADC low_byte 
+    ;     STA $2006
 
-        ;extract the tileID  
-        LDA changed_tiles_buffer, y
-        AND #%11100000
-        ;1110 0000 -> 0000 0111
-        LSR
-        LSR
-        LSR
-        LSR
-        LSR
-        STA low_byte ;temporarily store result
+    ;     ;extract the tileID  
+    ;     LDA changed_tiles_buffer, y
+    ;     AND #%11100000
+    ;     ;1110 0000 -> 0000 0111
+    ;     LSR
+    ;     LSR
+    ;     LSR
+    ;     LSR
+    ;     LSR
+    ;     STA low_byte ;temporarily store result
 
-        ;extract the tileID  
-        ; need to do row * 16 + col
-        ;0110 0000 -> 0000 0011
-        ; but the row is already stored in a significant enough bit so we can minimise amount of shifts
-        TXA 
-        LSR
-        ADC low_byte
-        STA PPU_VRAM_IO
+    ;     ;extract the tileID  
+    ;     ; need to do row * 16 + col
+    ;     ;0110 0000 -> 0000 0011
+    ;     ; but the row is already stored in a significant enough bit so we can minimise amount of shifts
+    ;     TXA 
+    ;     LSR
+    ;     ADC low_byte
+    ;     STA PPU_VRAM_IO
 
-        INY
-        CPY #CHANGED_TILES_BUFFER_SIZE
-        BNE maploop    
+    ;     INY
+    ;     CPY #CHANGED_TILES_BUFFER_SIZE
+    ;     BNE maploop    
     done: 
         LDA #1
         STA should_clear_buffer
@@ -356,75 +356,75 @@ wait_vblank2:
 
 ;display the score
 .proc display_score
-    LDX #4
+    ; LDX #4
 
-    LDA #SCORE_DIGIT_OFFSET
-    ROL     ; x2
-    ROL     ; x2 = x4
-    STA temp
+    ; LDA #SCORE_DIGIT_OFFSET
+    ; ROL     ; x2
+    ; ROL     ; x2 = x4
+    ; STA temp
     
-    LDA score_low
+    ; LDA score_low
 
-    CLC
-    CMP #$0A
-    BCC skip_modulo
+    ; CLC
+    ; CMP #$0A
+    ; BCC skip_modulo
 
-    modulo score_low, #$0A  ;skip modulo if smaller than 10
+    ; modulo score_low, #$0A  ;skip modulo if smaller than 10
 
-    STA a_val               ;store remainder for later
+    ; STA a_val               ;store remainder for later
 
-    skip_modulo:
+    ; skip_modulo:
 
-    JSR draw_digit
-    CLC
-    LDA temp
-    SBC #SCORE_DIGIT_OFFSET
-    STA temp    
+    ; JSR draw_digit
+    ; CLC
+    ; LDA temp
+    ; SBC #SCORE_DIGIT_OFFSET
+    ; STA temp    
 
-    LDA score_low
-    SEC
-    SBC a_val
+    ; LDA score_low
+    ; SEC
+    ; SBC a_val
 
-    divide10 score_low
+    ; divide10 score_low
 
-    JSR draw_digit
-    CLC
-    LDA temp
-    SBC #SCORE_DIGIT_OFFSET
-    STA temp
+    ; JSR draw_digit
+    ; CLC
+    ; LDA temp
+    ; SBC #SCORE_DIGIT_OFFSET
+    ; STA temp
 
     
     
     
-    LDA score_high
+    ; LDA score_high
 
-    CLC
-    CMP #$0A
-    BCC skip_modulo2
+    ; CLC
+    ; CMP #$0A
+    ; BCC skip_modulo2
 
-    modulo score_high, #$0A  ;skip modulo if smaller than 10
+    ; modulo score_high, #$0A  ;skip modulo if smaller than 10
 
-    STA a_val               ;store remainder for later
+    ; STA a_val               ;store remainder for later
 
-    skip_modulo2:
+    ; skip_modulo2:
 
-    JSR draw_digit
-    CLC
-    LDA temp
-    SBC #SCORE_DIGIT_OFFSET
-    STA temp    
+    ; JSR draw_digit
+    ; CLC
+    ; LDA temp
+    ; SBC #SCORE_DIGIT_OFFSET
+    ; STA temp    
 
-    LDA score_high
-    SEC
-    SBC a_val
+    ; LDA score_high
+    ; SEC
+    ; SBC a_val
 
-    divide10 score_high
+    ; divide10 score_high
 
-    JSR draw_digit
-    CLC
-    LDA temp
-    SBC #SCORE_DIGIT_OFFSET
-    STA temp
+    ; JSR draw_digit
+    ; CLC
+    ; LDA temp
+    ; SBC #SCORE_DIGIT_OFFSET
+    ; STA temp
 
     ; JSR draw_digit
     ; CLC
