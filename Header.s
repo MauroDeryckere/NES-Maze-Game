@@ -273,6 +273,8 @@ move_count:             .res 1
 added_high:             .res 1
 added_low:              .res 1 ;these 2 are to make sure add score works correctly
 
+temp_sound:             .res 1
+
 ;*****************************************************************
 
 .segment "OAM"

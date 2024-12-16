@@ -17,6 +17,37 @@
 .include "BFS.s"
 
 ;*****************************************************************
+; Include Sound Engine and Sound Effects Data
+;*****************************************************************
+.segment "CODE"
+
+;FamiStudio Config
+FAMISTUDIO_CFG_EXTERNAL = 1
+FAMISTUDIO_CFG_DPCM_SUPPORT = 1 ;support samples, turning this on wont use memory if there are no samples being used 
+FAMISTUDIO_CFG_SFX_SUPPORT = 1 ;support sound effects
+FAMISTUDIO_CFG_SFX_STREAMS = 2 ; sound effects that can be played at once
+FAMISTUDIO_CFG_EQUALIZER = 1 ; allows relative volme control of sound channel
+FAMISTUDIO_USE_VOLUME_TRACK = 1 ;for when the effects/music control the volume 
+FAMISTUDIO_USE_PITCH_TRACK = 1 ;allows notes to control pitch
+FAMISTUDIO_USE_SLIDE_NOTES = 1 ;support slide notes
+FAMISTUDIO_USE_VIBRATO = 1 ;support vibrato
+FAMISTUDIO_USE_ARPEGGIO = 1 ; supports arpeggio
+FAMISTUDIO_CFG_SMOOTH_VIBRATO = 1 ; allows vibrato to have smoother sound
+FAMISTUDIO_USE_RELEASE_NOTES = 1 ; supports notes that have release notes configured
+FAMISTUDIO_DPCM_OFF = $e000 ; where the dpcm samples are located
+
+; CA65 specific config
+.define FAMISTUDIO_CA65_ZP_SEGMENT   ZEROPAGE
+.define FAMISTUDIO_CA65_RAM_SEGMENT  BSS
+.define FAMISTUDIO_CA65_CODE_SEGMENT CODE
+
+.include "famistudio_ca65.s"
+.include "SoundEffects.s"
+
+.segment "ZEROPAGE"
+sfx_channel:        .res 1
+
+;*****************************************************************
 ; Interupts | Vblank
 ;*****************************************************************
 .segment "CODE"
@@ -93,6 +124,9 @@ skip_start_screen:
 	LDA ppu_ctl1
 	STA PPU_MASK
 
+    ;CALL SOUND PLAY ROUTINE
+    jsr famistudio_update
+
 	; flag PPU update complete
 	LDX #0
 	STX nmi_ready
@@ -161,6 +195,24 @@ skip_start_screen:
 
     LDA #1 
     STA display_BFS_directions
+
+;-----------------------------------------
+;INITIALIZE SOUND
+;-----------------------------------------
+    lda #1 
+    ldx #0 
+    ldy #0
+    jsr famistudio_init
+
+    ldx #.lobyte(sounds)
+    ldy #.hibyte(sounds)
+    jsr famistudio_sfx_init
+
+    lda #FAMISTUDIO_SFX_CH0
+    sta sfx_channel
+    lda #0
+    jsr play_sound_effect
+
 
     RTS
 .endproc
@@ -600,4 +652,27 @@ loop:
     :
     RTS
 .endproc 
+
+;----------------------------------
+;ROUTINE TO PLAY SOUNDEFFECT
+;----------------------------------
+.proc play_sound_effect
+
+    sta temp_sound
+    tya 
+    pha
+    txa 
+    pha 
+
+    lda temp_sound
+    ldx sfx_channel
+    jsr famistudio_sfx_play
+
+    pla 
+    tax 
+    pla 
+    tay 
+    rts
+.endproc
+
 ;*****************************************************************
