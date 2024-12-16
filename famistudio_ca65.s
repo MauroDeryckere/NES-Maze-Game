@@ -154,7 +154,7 @@ FAMISTUDIO_CFG_SFX_STREAMS   = 2
 ; FAMISTUDIO_CFG_SMOOTH_VIBRATO = 1 
 
 ; Enables DPCM playback support.
-FAMISTUDIO_CFG_DPCM_SUPPORT   = 1
+FAMISTUDIO_CFG_DPCM_SUPPORT   = 0
 
 ; Must be enabled if you are calling sound effects from a different thread than the sound engine update.
 ; FAMISTUDIO_CFG_THREAD         = 1     
