@@ -54,6 +54,7 @@ irq:
     JSR draw_background
     JSR draw_player_sprite
     JSR display_score
+    
     JMP skip_start_screen
     
 draw_start_screen:

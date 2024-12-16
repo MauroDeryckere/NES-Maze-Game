@@ -356,71 +356,68 @@ wait_vblank2:
 
 ;display the score
 .proc display_score
-    ; LDX #4
+    LDX #4
 
-    ; LDA #SCORE_DIGIT_OFFSET
-    ; ROL     ; x2
-    ; ROL     ; x2 = x4
-    ; STA temp
+    LDA #SCORE_DIGIT_OFFSET
+    ROL     ; x2
+    ROL     ; x2 = x4
+    STA temp
     
-    ; LDA score_low
+    LDA score_low
 
-    ; CLC
-    ; CMP #$0A
-    ; BCC skip_modulo
+    CLC
+    CMP #$0A
+    BCC skip_modulo
 
-    ; modulo score_low, #$0A  ;skip modulo if smaller than 10
+    modulo score_low, #$0A  ;skip modulo if smaller than 10
 
-    ; STA a_val               ;store remainder for later
+    STA a_val               ;store remainder for later
 
-    ; skip_modulo:
+    skip_modulo:
 
-    ; JSR draw_digit
-    ; CLC
-    ; LDA temp
-    ; SBC #SCORE_DIGIT_OFFSET
-    ; STA temp    
+    JSR draw_digit
+    CLC
+    LDA temp
+    SBC #SCORE_DIGIT_OFFSET
+    STA temp    
 
-    ; LDA score_low
-    ; SEC
-    ; SBC a_val
+    LDA score_low
+    SEC
+    SBC a_val
 
-    ; divide10 score_low
+    divide10 score_low
 
-    ; JSR draw_digit
-    ; CLC
-    ; LDA temp
-    ; SBC #SCORE_DIGIT_OFFSET
-    ; STA temp
-
+    JSR draw_digit
+    CLC
+    LDA temp
+    SBC #SCORE_DIGIT_OFFSET
+    STA temp
     
-    
-    
-    ; LDA score_high
+    LDA score_high
 
-    ; CLC
-    ; CMP #$0A
-    ; BCC skip_modulo2
+    CLC
+    CMP #$0A
+    BCC skip_modulo2
 
-    ; modulo score_high, #$0A  ;skip modulo if smaller than 10
+    modulo score_high, #$0A  ;skip modulo if smaller than 10
 
-    ; STA a_val               ;store remainder for later
+    STA a_val               ;store remainder for later
 
-    ; skip_modulo2:
+    skip_modulo2:
 
-    ; JSR draw_digit
-    ; CLC
-    ; LDA temp
-    ; SBC #SCORE_DIGIT_OFFSET
-    ; STA temp    
+    JSR draw_digit
+    CLC
+    LDA temp
+    SBC #SCORE_DIGIT_OFFSET
+    STA temp    
 
-    ; LDA score_high
-    ; SEC
-    ; SBC a_val
+    LDA score_high
+    SEC
+    SBC a_val
 
-    ; divide10 score_high
+    divide10 score_high
 
-    ; JSR draw_digit
+    JSR draw_digit
     ; CLC
     ; LDA temp
     ; SBC #SCORE_DIGIT_OFFSET
@@ -479,7 +476,7 @@ wait_vblank2:
 .proc draw_digit
     ;convert digit 0-9 to correct tile index
     CLC
-    ADC #$10        ; get correct tile ID  
+    ADC #64        ; get correct tile ID  
     TAY
 
     LDA #SCORE_DIGIT_OFFSET ;Y coordinate
