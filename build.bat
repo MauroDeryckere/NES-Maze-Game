@@ -12,7 +12,7 @@
 @IF ERRORLEVEL 1 GOTO failure
 @echo.
 @echo Linking...
-\cc65\bin\ld65 -o %1.nes -C %1.cfg %1.o -m %1.map.txt -Ln %1.labels.txt --dbgfile %1.nes.dbg
+\cc65\bin\ld65 -o %1.nes -C Setup/%1.cfg %1.o -m %1.map.txt -Ln %1.labels.txt --dbgfile %1.nes.dbg
 @IF ERRORLEVEL 1 GOTO failure
 @echo.
 @echo Success!
