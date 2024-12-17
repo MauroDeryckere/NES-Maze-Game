@@ -1,28 +1,31 @@
 .include "Header.s"
-.include "Macros.s"
 
-; hardware
-.include "Graphics.s"
-.include "Util.s"
-.include "TestCode.s"
+.include "DataStructures/Macros.s"
+.include "DataStructures/Queue.s"
+
+.include "Graphics/Graphics.s"
+
+.include "Util/Util.s"
+
+.include "Testing/TestCode.s"
 
 ; gameplay
-.include "HardMode.s"
-.include "Score.s"
-.include "Player.s"
+.include "Gameplay/HardMode.s"
+.include "Gameplay/Score.s"
+.include "Gameplay/Player.s"
 
 ; algorithms
-.include "Prims.s"
-.include "LeftHandRule.s"
-.include "BFS.s"
+.include "Generation/Prims.s"
+.include "Solving/LeftHandRule.s"
+.include "Solving/BFS.s"
 
 ;*****************************************************************
 ; Include Sound Engine, Sound Effects and Music Data
 ;*****************************************************************
-.include "famistudio_ca65.s"
-.include "SoundEffects.s"
-.include "GameMusic.s"
-.include "PlayMusic.s"
+.include "Audio/famistudio_ca65.s"
+.include "Audio/SoundEffects.s"
+.include "Audio/GameMusic.s"
+.include "Audio/PlayMusic.s"
 
 ;*****************************************************************
 ; Interupts | Vblank

@@ -1,5 +1,3 @@
-.include "Queue.s"
-
 ;*****************************************************************
 ; Breadth first search algorithm code
 ;*****************************************************************
@@ -249,7 +247,7 @@
         BEQ :+
             JMP skip_initial_step
         : 
-
+    
         LDA #1
         STA is_backtracking
 
