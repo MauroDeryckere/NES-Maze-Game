@@ -2,3 +2,4 @@
 *.map.txt
 *.nes.dbg
 *.o
+*.vscode
