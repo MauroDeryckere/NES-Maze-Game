@@ -16,8 +16,7 @@ Players can enjoy the game on original NES hardware or through a compatible NES 
    - [In-Game Controls](#in-game-controls)  
    - [Objective](#objective)  
 4. [Used Software](#used-software)
-5. [References](#references)  
-   - [Initial Project](#initial-project)  
+5. [Project Information](#project-information)  
 
 ## How To Play
 
@@ -57,7 +56,7 @@ Navigate through the maze and reach the end to complete the level.
 - [Mesen](https://www.mesen.ca/) and [MesenX](https://github.com/NovaSquirrel/Mesen-X) (debugging and emulating)
 - [FCEUX](https://fceux.com/web/home.html) (debugging and emulating)
 
-### Project information
+## Project information
 
 The project was made during a class in a [DAE](https://www.digitalartsandentertainment.be/page/31/Game+Development) course (Retro Console & Emulator Programming) given by Tom Tesch.
 
