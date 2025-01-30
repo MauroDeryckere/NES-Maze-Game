@@ -19,8 +19,8 @@ Players can enjoy the game on original NES hardware or through a compatible NES 
 
 ### Examples
 ![Hard mode Preview](https://i.imgur.com/pNOemNL.gif)
-![Left hand rule Preview](https://i.imgur.com/eLUnGxt.gif)
-![BFS preview](https://i.imgur.com/4iyAcWy.gif)
+![Left hand rule Preview](https://i.imgur.com/JGBPhWV.gif)
+![BFS preview](https://i.imgur.com/P9xHJ53.gif)
 
 ## How To Play
 
