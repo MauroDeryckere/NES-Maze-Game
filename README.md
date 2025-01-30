@@ -2,15 +2,14 @@
 
 ## Overview
 
-![Gameplay Preview](https://i.imgur.com/UIlM1vd.gif)
-
 The Maze Game is a game inspired by classic titles from the golden era of gaming. Designed for the Nintendo Entertainment System (NES). The game implements a maze generation algorithm, 2 solving algorithms, and normal gameplay. All coded in Assembly (6502).
 
 Players can enjoy the game on original NES hardware or through a compatible NES emulator.
 
 ## Table of Contents
 1. [Overview](#overview)
-2. [How To Play](#how-to-play)
+   - [Examples](#examples)
+3. [How To Play](#how-to-play)
    - [Gamemodes](#gamemodes) 
    - [Title Screen Controls](#title-screen-controls)
    - [In-Game Controls](#in-game-controls)  
@@ -18,6 +17,10 @@ Players can enjoy the game on original NES hardware or through a compatible NES 
 4. [Used Software](#used-software)
 5. [Project Information](#project-information)  
 
+### Examples
+![Hard mode Preview](https://i.imgur.com/pNOemNL.gif)
+![Left hand rule Preview]()
+![BFS preview]()
 ## How To Play
 
 To play the game if you don't have a NES, you need an emulator, we have tested the game in Mesen and FCEUX but other emulators may also work when they support PAL mode. If you do have a NES you will need a way to upload the NES file to a cartridge (Everdrive, ...)
