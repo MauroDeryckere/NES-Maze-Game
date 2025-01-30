@@ -22,7 +22,7 @@ Players can enjoy the game on original NES hardware or through a compatible NES 
 ![Hard mode Preview](https://i.imgur.com/pNOemNL.gif)
  </br>
 **Left hand rule** </br>
-![Left hand rule Preview](https://i.imgur.com/J34MLqv.gif)
+![Left hand rule Preview](https://i.imgur.com/Fv1F6p5.gif)
  </br>
 **BFS** </br>
 ![BFS preview](https://i.imgur.com/7YKKN9l.gif)
