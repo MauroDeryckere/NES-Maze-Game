@@ -18,11 +18,15 @@ Players can enjoy the game on original NES hardware or through a compatible NES 
 5. [Project Information](#project-information)  
 
 ### Examples
+**Hard mode gameplay** </br>
 ![Hard mode Preview](https://i.imgur.com/pNOemNL.gif)
-
-![Left hand rule Preview](https://i.imgur.com/JGBPhWV.gif)
-
+ </br>
+**Left hand rule** </br>
+![Left hand rule Preview](https://i.imgur.com/J34MLqv.gif)
+ </br>
+**BFS** </br>
 ![BFS preview](https://i.imgur.com/7YKKN9l.gif)
+ </br>
 
 ## How To Play
 
