@@ -18,9 +18,15 @@ Players can enjoy the game on original NES hardware or through a compatible NES 
 5. [Project Information](#project-information)  
 
 ### Examples
+**Hard mode**
 ![Hard mode Preview](https://i.imgur.com/pNOemNL.gif)
-![Left hand rule Preview]()
-![BFS preview]()
+
+**Left hand rule**
+![Left hand rule Preview](https://i.imgur.com/eLUnGxt.gif)
+
+**BFS**
+![BFS preview](https://i.imgur.com/4iyAcWy.gif)
+
 ## How To Play
 
 To play the game if you don't have a NES, you need an emulator, we have tested the game in Mesen and FCEUX but other emulators may also work when they support PAL mode. If you do have a NES you will need a way to upload the NES file to a cartridge (Everdrive, ...)
